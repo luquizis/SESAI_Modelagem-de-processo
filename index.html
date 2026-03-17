@@ -4,641 +4,421 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SESAI — Fluxo de Execução Direta</title>
-
-<!-- bpmn-js -->
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css">
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* ─── TOKENS ──────────────────────────────────────── */
 :root {
-  --green:   #1b4332;
-  --green-m: #2d6a4f;
-  --green-l: #40916c;
-  --green-bg:#f0faf4;
-  --red:     #8b2e16;
-  --red-l:   #fdf4f2;
-  --gold:    #b7860a;
-  --gold-bg: #fefce8;
+  --green:#1b4332; --green-m:#2d6a4f; --green-l:#40916c; --green-bg:#f0faf4; --green-ring:rgba(64,145,108,.18);
+  --red:#8b2e16; --red-l:#fdf4f2; --gold:#b7860a; --gold-bg:#fefce8;
+  --white:#ffffff; --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0;
+  --gray-300:#cbd5e1; --gray-400:#94a3b8; --gray-500:#64748b; --gray-600:#475569;
+  --gray-700:#334155; --gray-900:#0f172a;
+  --radius-sm:6px; --radius:10px; --radius-lg:14px;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.04);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 24px rgba(0,0,0,.1),0 4px 8px rgba(0,0,0,.04);
+  --shadow-xl:0 20px 40px rgba(0,0,0,.12),0 8px 16px rgba(0,0,0,.06);
+  --font:'DM Sans',-apple-system,sans-serif; --mono:'DM Mono',monospace;
+  --transition:.15s ease; --transition-md:.25s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);background:var(--white);color:var(--gray-900);-webkit-font-smoothing:antialiased}
+button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family:var(--font)}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-  --white:   #ffffff;
-  --gray-50: #f9fafb;
-  --gray-100:#f3f4f6;
-  --gray-200:#e5e7eb;
-  --gray-300:#d1d5db;
-  --gray-400:#9ca3af;
-  --gray-500:#6b7280;
-  --gray-600:#4b5563;
-  --gray-700:#374151;
-  --gray-900:#111827;
+/* TOPBAR */
+.topbar{height:58px;background:var(--white);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 20px;flex-shrink:0;box-shadow:0 1px 0 var(--gray-100);z-index:100}
+.brand{display:flex;align-items:center;gap:10px;padding-right:20px;border-right:1px solid var(--gray-200);margin-right:20px;text-decoration:none}
+.brand-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--green),var(--green-l));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;letter-spacing:-.5px;flex-shrink:0;box-shadow:0 2px 6px rgba(27,67,50,.3)}
+.brand-name{font-size:14px;font-weight:700;color:var(--gray-900);line-height:1.2;letter-spacing:-.2px}
+.brand-sub{font-size:11px;color:var(--gray-400);letter-spacing:.01em}
+.tab-nav{display:flex;gap:2px;flex:1}
+.tab-btn{display:flex;align-items:center;gap:7px;height:58px;padding:0 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(--gray-500);border-bottom:2px solid transparent;transition:all var(--transition);white-space:nowrap}
+.tab-btn:hover{color:var(--gray-900);background:var(--gray-50)}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green);font-weight:600}
+.tab-count{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;background:var(--gray-100);color:var(--gray-500);font-family:var(--mono)}
+.tab-btn.active .tab-count{background:var(--green-bg);color:var(--green)}
+.topbar-end{display:flex;align-items:center;gap:8px;margin-left:auto}
+.user-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:20px;cursor:pointer;transition:all var(--transition)}
+.user-chip:hover{border-color:var(--green-l);background:var(--green-bg)}
+.user-avatar{width:26px;height:26px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--green),var(--green-l));color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.user-name{font-weight:600;font-size:12px} .user-role{font-size:10px;color:var(--gray-400)}
+.btn-login{height:34px;padding:0 14px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:var(--white);font-size:12px;font-weight:500;color:var(--gray-700);transition:all var(--transition);display:flex;align-items:center;gap:6px}
+.btn-login:hover{border-color:var(--green-l);color:var(--green);background:var(--green-bg)}
+.btn-contribute{height:34px;padding:0 14px;border-radius:var(--radius-sm);border:none;background:var(--red);font-size:12px;font-weight:600;color:white;transition:all var(--transition);display:flex;align-items:center;gap:6px;box-shadow:0 1px 3px rgba(139,46,22,.3)}
+.btn-contribute:hover{background:#7a2712;transform:translateY(-1px)}
+.btn-contribute:active{transform:translateY(0)}
 
-  --radius-sm: 6px;
-  --radius:    8px;
-  --radius-lg: 12px;
-  --shadow-xs: 0 1px 2px rgba(0,0,0,.05);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
-  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,.1), 0 10px 10px rgba(0,0,0,.04);
+/* EDIT BAR */
+.edit-bar{height:36px;background:#fffbeb;border-bottom:1px solid #fde68a;display:none;align-items:center;padding:0 20px;gap:10px;font-size:12px;color:#92400e;flex-shrink:0}
+.edit-bar.show{display:flex}
+.edit-bar-dot{width:7px;height:7px;border-radius:50%;background:#d97706;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.edit-bar-text{flex:1}
+.btn-exit{padding:3px 10px;border-radius:4px;border:1px solid #d97706;background:none;font-size:11px;color:#d97706;cursor:pointer;font-family:var(--font)}
+.btn-exit:hover{background:#d97706;color:white}
 
-  --font: 'Inter', -apple-system, sans-serif;
-  --transition: .15s ease;
-}
+/* ACTOR FILTER BAR */
+.actor-filter-bar{display:flex;align-items:center;gap:6px;padding:0 20px;height:40px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);flex-shrink:0;overflow-x:auto}
+.actor-filter-bar::-webkit-scrollbar{height:0}
+.actor-filter-label{font-size:10.5px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;margin-right:2px}
+.actor-chip{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;border:1px solid var(--gray-200);background:var(--white);font-size:11.5px;font-weight:500;color:var(--gray-500);cursor:pointer;transition:all var(--transition);white-space:nowrap;flex-shrink:0}
+.actor-chip:hover{border-color:var(--gray-300);color:var(--gray-800)}
+.actor-chip.active{color:white;border-color:transparent;font-weight:600}
+.actor-chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
-/* ─── RESET ───────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; font-family: var(--font); background: var(--white); color: var(--gray-900); -webkit-font-smoothing: antialiased; }
-button { font-family: var(--font); cursor: pointer; }
-input, textarea, select { font-family: var(--font); }
+/* PANES */
+.pane{display:none;flex:1;overflow:hidden}
+.pane.active{display:flex;flex-direction:column}
 
-/* ─── LAYOUT ──────────────────────────────────────── */
-.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+/* FLOW LAYOUT */
+.flow-layout{display:grid;grid-template-columns:1fr 284px;flex:1;overflow:hidden}
+.flow-main{overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:0}
 
-/* ─── TOPBAR ──────────────────────────────────────── */
-.topbar {
-  height: 56px;
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-200);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 0;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-xs);
-  z-index: 100;
-}
+.flow-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:16px;flex-wrap:wrap}
+.flow-header h2{font-size:16px;font-weight:700;color:var(--gray-900);letter-spacing:-.3px}
+.flow-header p{font-size:12px;color:var(--gray-400);margin-top:2px}
+.progress-wrap{display:flex;align-items:center;gap:10px}
+.progress-track{width:160px;height:5px;background:var(--gray-100);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--green-l),var(--green));border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.progress-label{font-size:12px;font-weight:600;color:var(--green);white-space:nowrap;font-family:var(--mono)}
 
-.brand {
-  display: flex; align-items: center; gap: 10px;
-  padding-right: 20px;
-  border-right: 1px solid var(--gray-200);
-  margin-right: 20px;
-  text-decoration: none;
-}
-.brand-logo {
-  width: 32px; height: 32px; border-radius: 7px;
-  background: var(--green);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: white; letter-spacing: -.5px;
-  flex-shrink: 0;
-}
-.brand-name { font-size: 14px; font-weight: 600; color: var(--gray-900); line-height: 1.2; }
-.brand-sub  { font-size: 11px; color: var(--gray-400); }
+.phase-filter{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.phase-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid var(--gray-200);background:var(--white);font-size:11.5px;font-weight:500;color:var(--gray-500);cursor:pointer;transition:all var(--transition);white-space:nowrap}
+.phase-btn:hover{border-color:var(--gray-300);color:var(--gray-700)}
+.phase-btn.active{color:white;border-color:transparent;font-weight:600}
+.phase-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 
-.tab-nav { display: flex; gap: 2px; flex: 1; }
-.tab-btn {
-  display: flex; align-items: center; gap: 7px;
-  height: 56px; padding: 0 16px;
-  border: none; background: none;
-  font-size: 13px; font-weight: 500; color: var(--gray-500);
-  border-bottom: 2px solid transparent;
-  transition: all var(--transition);
-  white-space: nowrap;
-}
-.tab-btn:hover { color: var(--gray-900); background: var(--gray-50); }
-.tab-btn.active { color: var(--green); border-bottom-color: var(--green); font-weight: 600; }
-.tab-count {
-  font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 10px;
-  background: var(--gray-100); color: var(--gray-500);
-}
-.tab-btn.active .tab-count { background: var(--green-bg); color: var(--green); }
+/* ADD CARD BUTTON */
+.add-card-btn{display:none;width:100%;height:44px;border:2px dashed var(--gray-200);border-radius:var(--radius-lg);background:none;font-size:13px;color:var(--gray-400);cursor:pointer;transition:all var(--transition);margin-bottom:8px;gap:8px;align-items:center;justify-content:center}
+.add-card-btn:hover{border-color:var(--green-l);color:var(--green);background:var(--green-bg)}
+.add-card-btn.show{display:flex}
 
-.topbar-end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+/* STEP CARDS */
+.step-card{position:relative;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);margin-bottom:8px;transition:border-color .2s,box-shadow .2s,opacity .2s;overflow:hidden}
+.step-card.locked{opacity:.42;pointer-events:none}
+.step-card.active{border-color:var(--gray-300);box-shadow:var(--shadow-md)}
+.step-card.done{background:var(--gray-50)}
+.step-card.open{border-color:var(--gray-300);box-shadow:var(--shadow-lg)}
 
-/* user chip */
-.user-chip {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 12px 5px 5px;
-  background: var(--gray-50); border: 1px solid var(--gray-200);
-  border-radius: 20px; cursor: pointer;
-  transition: all var(--transition); font-size: 13px; color: var(--gray-700);
-}
-.user-chip:hover { border-color: var(--green-l); background: var(--green-bg); }
-.user-avatar {
-  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-  background: var(--green); color: white;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700;
-}
-.user-name { font-weight: 600; font-size: 12px; }
-.user-role { font-size: 10px; color: var(--gray-400); }
+/* DRAG & DROP */
+.step-card.dragging{opacity:.45;border:2px dashed var(--green-l);box-shadow:none}
+.step-card.drag-over{border-color:var(--green);box-shadow:0 0 0 2px var(--green-ring)}
+.drag-handle{width:24px;height:100%;display:none;align-items:center;justify-content:center;cursor:grab;color:var(--gray-300);font-size:14px;padding:0 4px;flex-shrink:0;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.edit-mode .drag-handle{display:flex}
+.drag-handle:hover{color:var(--green)}
 
-.btn-login {
-  height: 34px; padding: 0 14px; border-radius: var(--radius-sm);
-  border: 1px solid var(--gray-200); background: var(--white);
-  font-size: 12px; font-weight: 500; color: var(--gray-700);
-  transition: all var(--transition);
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-login:hover { border-color: var(--green-l); color: var(--green); background: var(--green-bg); }
+.card-left-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 3px 3px 0}
+.card-top{display:flex;align-items:center;gap:10px;padding:12px 14px 12px 18px;cursor:pointer;user-select:none;transition:background var(--transition)}
+.card-top:hover{background:var(--gray-50)}
+.step-card.open .card-top{background:transparent}
 
-.btn-contribute {
-  height: 34px; padding: 0 14px; border-radius: var(--radius-sm);
-  border: none; background: var(--red);
-  font-size: 12px; font-weight: 600; color: white;
-  transition: all var(--transition);
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-contribute:hover { background: #7a2712; }
+.step-index{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--gray-100);color:var(--gray-400);border:1px solid var(--gray-200);transition:all .2s;font-family:var(--mono)}
+.step-card.active .step-index,.step-card.open .step-index{background:var(--green-bg);color:var(--green);border-color:#a7f3d0}
+.step-card.done .step-index{background:var(--green-bg);color:var(--green-l);border-color:#a7f3d0}
 
-/* edit bar */
-.edit-bar {
-  height: 36px; background: #fffbeb;
-  border-bottom: 1px solid #fde68a;
-  display: none; align-items: center; padding: 0 20px; gap: 10px;
-  font-size: 12px; color: #92400e; flex-shrink: 0;
-}
-.edit-bar.show { display: flex; }
-.edit-bar-dot { width: 7px; height: 7px; border-radius: 50%; background: #d97706; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-.edit-bar-text { flex: 1; }
-.btn-exit { padding: 3px 10px; border-radius: 4px; border: 1px solid #d97706; background: none; font-size: 11px; color: #d97706; cursor: pointer; font-family: var(--font); }
-.btn-exit:hover { background: #d97706; color: white; }
+.step-info{flex:1;min-width:0}
+.step-title{font-size:13.5px;font-weight:600;color:var(--gray-900);line-height:1.35;margin-bottom:4px;letter-spacing:-.15px}
+.step-meta-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.actor-pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px}
+.phase-pill-sm{font-size:10.5px;font-weight:500;padding:2px 7px;border-radius:10px;color:var(--gray-500);background:var(--gray-100)}
 
-/* ─── PANES ────────────────────────────────────────── */
-.pane { display: none; flex: 1; overflow: hidden; }
-.pane.active { display: flex; flex-direction: column; }
+.step-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--gray-200);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:all var(--transition)}
+.icon-btn:hover{border-color:var(--gray-300);background:var(--gray-50)}
+.icon-btn.edit-btn{color:var(--green)}
+.icon-btn.edit-btn:hover{background:var(--green-bg);border-color:#a7f3d0}
+.icon-btn.del-btn{color:var(--red)}
+.icon-btn.del-btn:hover{background:var(--red-l);border-color:#fca5a5}
+/* move-btn removed — reorder via drag & drop only */
+.chevron{font-size:11px;color:var(--gray-300);transition:transform .25s cubic-bezier(.4,0,.2,1);margin-left:2px}
+.step-card.open .chevron{transform:rotate(180deg)}
 
-/* ─── FLOW PANE ────────────────────────────────────── */
-.flow-layout {
-  display: grid;
-  grid-template-columns: 1fr 288px;
-  flex: 1;
-  overflow: hidden;
-}
+/* CARD BODY */
+.card-body{display:none;padding:0 16px 16px 64px;border-top:1px solid var(--gray-100)}
+.step-card.open .card-body{display:block;animation:bodyIn .18s ease}
+@keyframes bodyIn{from{opacity:0}to{opacity:1}}
+.card-desc{font-size:13px;color:var(--gray-600);line-height:1.75;padding-top:14px;margin-bottom:14px}
+.card-items{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.card-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--gray-600);line-height:1.55}
+.item-dot{width:5px;height:5px;border-radius:50%;background:var(--green-l);flex-shrink:0;margin-top:7px}
+.docs-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.doc-chip{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-600);background:var(--gray-50);border:1px solid var(--gray-200);border-radius:5px;padding:3px 9px;transition:border-color var(--transition)}
+.doc-chip:hover{border-color:var(--gray-300)}
+.alert-strip{display:flex;gap:10px;align-items:flex-start;background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;font-size:12px;color:#92400e;line-height:1.6}
+.card-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--gray-100);margin-top:4px}
 
-.flow-main {
-  overflow-y: auto;
-  padding: 24px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+/* ATTACHMENTS */
+.attachments-section{margin-bottom:14px}
+.att-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.att-label{font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em}
+.att-upload-btn{display:none;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;border:1px solid var(--gray-200);background:var(--white);font-size:11.5px;color:var(--gray-600);cursor:pointer;transition:all var(--transition)}
+.att-upload-btn:hover{border-color:var(--green-l);color:var(--green);background:var(--green-bg)}
+.edit-mode .att-upload-btn{display:flex}
+.att-list{display:flex;flex-wrap:wrap;gap:6px}
+.att-item{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:7px;border:1px solid var(--gray-200);background:var(--gray-50);font-size:11.5px;color:var(--gray-700);max-width:200px}
+.att-item-icon{font-size:14px;flex-shrink:0}
+.att-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.att-item-del{width:16px;height:16px;border-radius:3px;border:none;background:none;color:var(--gray-400);font-size:12px;cursor:pointer;display:none;flex-shrink:0;line-height:1}
+.att-item-del:hover{color:var(--red)}
+.edit-mode .att-item-del{display:flex;align-items:center;justify-content:center}
+.att-empty{font-size:11.5px;color:var(--gray-400);font-style:italic}
 
-/* progress header */
-.flow-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 20px; gap: 16px; flex-wrap: wrap;
-}
-.flow-header h2 { font-size: 16px; font-weight: 600; color: var(--gray-900); }
-.flow-header p  { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
-.progress-wrap  { display: flex; align-items: center; gap: 10px; }
-.progress-track { width: 160px; height: 6px; background: var(--gray-100); border-radius: 4px; overflow: hidden; }
-.progress-fill  { height: 100%; background: linear-gradient(90deg, var(--green-l), var(--green)); border-radius: 4px; transition: width .5s ease; }
-.progress-label { font-size: 12px; font-weight: 600; color: var(--green); white-space: nowrap; }
+/* FULL EDIT PANEL */
+.edit-panel{display:none;margin-top:12px;background:var(--green-bg);border:1px solid #a7f3d0;border-radius:var(--radius);padding:16px;animation:bodyIn .18s ease}
+.edit-panel.show{display:block}
+.ep-section{margin-bottom:14px}
+.ep-section-title{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ep-label{font-size:11px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.ep-input,.ep-textarea,.ep-select{width:100%;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:7px 10px;font-size:12.5px;color:var(--gray-900);background:white;margin-bottom:10px;outline:none;transition:border-color var(--transition),box-shadow var(--transition);font-family:var(--font)}
+.ep-input:focus,.ep-textarea:focus,.ep-select:focus{border-color:var(--green-l);box-shadow:0 0 0 3px var(--green-ring)}
+.ep-textarea{min-height:80px;resize:vertical}
+.ep-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ep-items-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.ep-item-row{display:flex;gap:6px;align-items:center}
+.ep-item-input{flex:1;border:1px solid var(--gray-200);border-radius:5px;padding:5px 9px;font-size:12px;outline:none;font-family:var(--font);transition:border-color var(--transition)}
+.ep-item-input:focus{border-color:var(--green-l)}
+.ep-item-del{width:24px;height:24px;border-radius:4px;border:1px solid #fca5a5;background:none;color:var(--red);font-size:12px;cursor:pointer;flex-shrink:0;transition:all var(--transition)}
+.ep-item-del:hover{background:var(--red);color:white}
+.ep-add-item{font-size:11.5px;color:var(--green);background:none;border:1px dashed #a7f3d0;border-radius:5px;padding:5px 10px;cursor:pointer;width:100%;margin-bottom:10px;transition:all var(--transition)}
+.ep-add-item:hover{background:white}
+.ep-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid #a7f3d0;padding-top:12px;margin-top:4px}
+.ep-save{height:32px;padding:0 16px;border-radius:var(--radius-sm);border:none;background:var(--green);color:white;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;display:flex;align-items:center;gap:6px}
+.ep-save:hover{background:var(--green-m)}
+.ep-save.loading{opacity:.75;cursor:not-allowed}
+.ep-save.loading::after{content:'';position:absolute;right:10px;top:50%;transform:translateY(-50%);width:11px;height:11px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:white;animation:spin .65s linear infinite}
+.ep-cancel{height:32px;padding:0 12px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:white;color:var(--gray-600);font-size:12px;font-family:var(--font);cursor:pointer;transition:all var(--transition)}
+.ep-cancel:hover{border-color:var(--gray-300);color:var(--gray-800)}
+.ep-feedback{font-size:11.5px}
+.save-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;animation:badgeIn .2s ease}
+.save-badge.success{background:#dcfce7;color:#166534}
+.save-badge.error{background:#fee2e2;color:#991b1b}
+@keyframes badgeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 
-/* phase filter */
-.phase-filter { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-.phase-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 5px 12px; border-radius: 16px;
-  border: 1px solid var(--gray-200); background: var(--white);
-  font-size: 11.5px; font-weight: 500; color: var(--gray-500);
-  cursor: pointer; transition: all var(--transition); white-space: nowrap;
-}
-.phase-btn:hover { border-color: var(--gray-300); color: var(--gray-700); }
-.phase-btn.active { color: white; border-color: transparent; font-weight: 600; }
-.phase-pip { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+/* BUTTONS */
+.btn-next{height:34px;padding:0 16px;border-radius:var(--radius-sm);border:none;font-size:12.5px;font-weight:600;color:white;transition:all var(--transition);display:flex;align-items:center;gap:6px;position:relative;overflow:hidden}
+.btn-next:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.btn-next:active{transform:translateY(0)}
+.btn-done{height:34px;padding:0 14px;border-radius:var(--radius-sm);border:1px solid #a7f3d0;background:var(--green-bg);font-size:12.5px;font-weight:600;color:var(--green);cursor:default;display:flex;align-items:center;gap:6px}
+.btn-skip{height:34px;padding:0 12px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:12px;color:var(--gray-500);transition:all var(--transition)}
+.btn-skip:hover{border-color:var(--gray-300);color:var(--gray-700)}
+.btn-comment{height:34px;padding:0 12px;border-radius:var(--radius-sm);border:1px solid #fca5a5;background:var(--red-l);font-size:12px;color:var(--red);font-weight:500;transition:all var(--transition)}
+.btn-comment:hover{background:var(--red);color:white;border-color:var(--red)}
 
-/* step cards */
-.step-card {
-  position: relative;
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
-  margin-bottom: 8px;
-  transition: all .2s ease;
-  overflow: hidden;
-}
-.step-card.locked { opacity: .45; }
-.step-card.active { border-color: var(--gray-300); box-shadow: var(--shadow-md); }
-.step-card.done   { background: var(--gray-50); }
-.step-card.open   { border-color: var(--gray-300); box-shadow: var(--shadow-lg); }
+/* SIDEBAR */
+.flow-sidebar{border-left:1px solid var(--gray-200);background:var(--gray-50);overflow-y:auto;display:flex;flex-direction:column;gap:0}
+.sidebar-section{border-bottom:1px solid var(--gray-200);padding:16px}
+.sidebar-section:last-child{border-bottom:none}
+.sidebar-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:12px}
+.mini-map{display:flex;flex-direction:column;gap:2px}
+.mm-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:background var(--transition)}
+.mm-item:hover{background:var(--white)}
+.mm-item.mm-active{background:var(--white);box-shadow:var(--shadow-xs)}
+.mm-item.mm-locked{cursor:default;opacity:.4;pointer-events:none}
+.mm-dot{width:20px;height:20px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:var(--gray-200);color:var(--gray-500);border:1px solid var(--gray-200);transition:all .2s;font-family:var(--mono)}
+.mm-item.mm-done .mm-dot{background:var(--green-bg);color:var(--green);border-color:#a7f3d0}
+.mm-item.mm-active .mm-dot{border-color:var(--green-l);color:var(--green);background:white}
+.mm-title{font-size:11px;color:var(--gray-600);line-height:1.3;flex:1}
+.mm-actor{font-size:10px;color:var(--gray-400)}
+.phase-bars{display:flex;flex-direction:column;gap:9px}
+.pb-row{display:flex;align-items:center;gap:8px}
+.pb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pb-name{font-size:11px;color:var(--gray-600);flex:1}
+.pb-track{width:64px;height:4px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.pb-pct{font-size:10px;color:var(--gray-400);width:26px;text-align:right;font-family:var(--mono)}
+.actor-rows{display:flex;flex-direction:column;gap:7px}
+.actor-row{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 6px;border-radius:6px;transition:background var(--transition);margin:-4px -6px}
+.actor-row:hover{background:var(--white)}
+.actor-bar{width:3px;height:22px;border-radius:2px;flex-shrink:0}
+.actor-name{font-size:12px;font-weight:600}
+.actor-desc{font-size:10px;color:var(--gray-400)}
 
-.card-left-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+/* BPMN */
+.bpmn-layout{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.bpmn-toolbar{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--white);border-bottom:1px solid var(--gray-200);flex-shrink:0;flex-wrap:wrap}
+.tb-group{display:flex;align-items:center;gap:4px}
+.tb-sep{width:1px;height:22px;background:var(--gray-200);margin:0 6px;flex-shrink:0}
+.tb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-300);white-space:nowrap}
+.tb-btn{height:30px;padding:0 11px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:var(--white);font-size:11.5px;color:var(--gray-600);transition:all var(--transition);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tb-btn:hover{border-color:var(--gray-300);background:var(--gray-50);color:var(--gray-900)}
+.tb-btn.green{background:var(--green-bg);border-color:#a7f3d0;color:var(--green);font-weight:600}
+.tb-btn.green:hover{background:var(--green);color:white}
+.bpmn-indicator{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 10px;border-radius:12px;background:var(--gray-100);color:var(--gray-400);border:1px solid var(--gray-200);transition:all var(--transition-md)}
+.bpmn-indicator.edit{background:var(--green-bg);color:var(--green);border-color:#a7f3d0}
+.ind-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.bpmn-wrap{flex:1;position:relative;overflow:hidden}
+#bpmnCanvas{width:100%;height:100%}
+.sync-overlay{display:none;position:absolute;inset:0;z-index:50;background:rgba(255,255,255,.8);backdrop-filter:blur(4px);align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.sync-overlay.show{display:flex}
+.sync-spinner{width:32px;height:32px;border:3px solid var(--gray-200);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.sync-text{font-size:13px;color:var(--gray-600)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.props-panel{position:absolute;top:12px;right:12px;width:260px;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:10;overflow:hidden}
+.pp-head{padding:12px 14px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px}
+.pp-head-bar{width:3px;height:16px;border-radius:2px;background:var(--green);flex-shrink:0}
+.pp-head-title{font-size:12px;font-weight:700;color:var(--gray-900)}
+.pp-head-type{font-size:10px;color:var(--gray-400);margin-left:auto}
+.pp-body{padding:12px 14px}
+.pp-label{font-size:10.5px;font-weight:700;color:var(--gray-500);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.pp-input,.pp-textarea{width:100%;border:1px solid var(--gray-200);border-radius:5px;padding:7px 9px;font-size:12px;color:var(--gray-900);background:var(--white);margin-bottom:10px;outline:none;transition:border-color var(--transition);font-family:var(--font)}
+.pp-input:focus,.pp-textarea:focus{border-color:var(--green-l);box-shadow:0 0 0 3px var(--green-ring)}
+.pp-input:disabled,.pp-textarea:disabled{background:var(--gray-50);color:var(--gray-400);cursor:not-allowed}
+.pp-textarea{min-height:70px;resize:vertical}
+.pp-save{width:100%;height:32px;border-radius:5px;border:none;background:var(--green);color:white;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;transition:background var(--transition)}
+.pp-save:hover{background:var(--green-m)}
+.pp-lock-note{font-size:11px;color:var(--gray-400);text-align:center;padding:8px;border-top:1px solid var(--gray-100);cursor:pointer;transition:color var(--transition)}
+.pp-lock-note:hover{color:var(--green)}
+.pp-empty{font-size:12px;color:var(--gray-400);text-align:center;padding:16px;line-height:1.6}
+.bpmn-legend{position:absolute;bottom:12px;left:12px;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 13px;z-index:10;box-shadow:var(--shadow-sm)}
+.bl-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--gray-400);margin-bottom:7px}
+.bl-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-600);margin-bottom:4px}
+.bl-item:last-child{margin-bottom:0}
+.bl-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
 
-.card-top {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px 14px 20px;
-  cursor: pointer; user-select: none;
-}
-.step-index {
-  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700;
-  background: var(--gray-100); color: var(--gray-400);
-  border: 1px solid var(--gray-200);
-  transition: all .2s;
-}
-.step-card.active .step-index,
-.step-card.open   .step-index { background: var(--green-bg); color: var(--green); border-color: #a7f3d0; }
-.step-card.done   .step-index { background: var(--green-bg); color: var(--green-l); border-color: #a7f3d0; }
+/* NO RESULTS */
+.no-results{text-align:center;padding:48px 24px;color:var(--gray-400);font-size:14px;line-height:1.7}
+.no-results-icon{font-size:32px;margin-bottom:10px}
 
-.step-info { flex: 1; min-width: 0; }
-.step-title { font-size: 13.5px; font-weight: 600; color: var(--gray-900); line-height: 1.35; margin-bottom: 4px; }
-.step-meta-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.actor-pill {
-  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
-  display: inline-flex; align-items: center; gap: 4px;
-}
-.phase-pill-sm {
-  font-size: 10.5px; font-weight: 500; padding: 2px 7px; border-radius: 10px;
-  color: var(--gray-500); background: var(--gray-100);
-}
+/* FEEDBACKS */
+.fb-page{overflow-y:auto;padding:28px 24px}
+.fb-inner{max-width:820px;margin:0 auto}
+.fb-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:12px;flex-wrap:wrap}
+.fb-header h2{font-size:20px;font-weight:700;color:var(--gray-900);letter-spacing:-.4px}
+.fb-header p{font-size:13px;color:var(--gray-400);margin-top:4px}
+.fb-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:14px 16px;transition:box-shadow var(--transition)}
+.stat-card:hover{box-shadow:var(--shadow-md)}
+.stat-card.sc-green{border-top:3px solid var(--green-l)}
+.stat-card.sc-teal{border-top:3px solid #0d9488}
+.stat-card.sc-amber{border-top:3px solid #d97706}
+.stat-card.sc-red{border-top:3px solid var(--red)}
+.stat-n{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px;font-family:var(--mono)}
+.stat-lbl{font-size:11.5px;color:var(--gray-400)}
+.fb-list{display:flex;flex-direction:column;gap:10px}
+.fb-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:16px 18px;transition:opacity .2s,box-shadow var(--transition)}
+.fb-card:hover{box-shadow:var(--shadow-sm)}
+.fb-card.resolved{opacity:.55}
+.fb-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.fb-tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:10px}
+.fb-step-tag{font-size:10.5px;padding:2px 8px;border-radius:10px;background:var(--gray-100);color:var(--gray-500)}
+.fb-resolved-tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:10px;background:#dcfce7;color:#166534}
+.fb-who{font-size:12px;font-weight:600;color:var(--gray-900)}
+.fb-text{font-size:13px;color:var(--gray-600);line-height:1.65;margin-bottom:10px}
+.fb-foot{display:flex;align-items:center;gap:8px}
+.fb-time{font-size:11px;color:var(--gray-400);flex:1;font-family:var(--mono)}
+.fb-action-btn{height:26px;padding:0 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:var(--font);transition:all var(--transition)}
+.fb-resolve-btn{border:1px solid var(--gray-200);background:none;color:var(--gray-600)}
+.fb-resolve-btn:hover{border-color:var(--green-l);color:var(--green);background:var(--green-bg)}
+.fb-del-btn{border:1px solid #fca5a5;background:none;color:var(--red)}
+.fb-del-btn:hover{background:var(--red);color:white}
+.fb-empty{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:48px;text-align:center}
+.fb-empty-icon{font-size:36px;margin-bottom:12px}
+.fb-empty-title{font-size:15px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+.fb-empty-sub{font-size:13px;color:var(--gray-400)}
 
-.step-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.icon-btn {
-  width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--gray-200);
-  background: var(--white); display: flex; align-items: center; justify-content: center;
-  font-size: 13px; cursor: pointer; transition: all var(--transition);
-}
-.icon-btn:hover { border-color: var(--gray-300); background: var(--gray-50); }
-.icon-btn.edit-btn { color: var(--green); }
-.icon-btn.edit-btn:hover { background: var(--green-bg); border-color: #a7f3d0; }
-.chevron { font-size: 11px; color: var(--gray-300); transition: transform .2s; }
-.step-card.open .chevron { transform: rotate(180deg); }
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.35);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-xl);overflow:hidden;width:440px;max-width:92vw;animation:modalIn .22s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:none}}
+.modal-head{padding:20px 22px 0}
+.modal-head h3{font-size:16px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px}
+.modal-head p{font-size:12.5px;color:var(--gray-400)}
+.modal-body{padding:18px 22px}
+.m-label{font-size:11.5px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px}
+.m-input,.m-select,.m-textarea{width:100%;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:9px 11px;font-size:13px;color:var(--gray-900);background:var(--white);margin-bottom:13px;outline:none;transition:border-color var(--transition),box-shadow var(--transition);font-family:var(--font)}
+.m-input:focus,.m-select:focus,.m-textarea:focus{border-color:var(--green-l);box-shadow:0 0 0 3px var(--green-ring)}
+.m-textarea{min-height:90px;resize:vertical}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.m-error{font-size:12px;color:var(--red);margin-bottom:10px;display:none}
+.m-error.show{display:flex;gap:5px;align-items:center}
+.modal-foot{padding:0 22px 20px;display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{height:36px;padding:0 16px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:13px;color:var(--gray-600);font-family:var(--font);cursor:pointer;transition:all var(--transition)}
+.btn-cancel:hover{border-color:var(--gray-300);color:var(--gray-800);background:var(--gray-50)}
+.btn-ok{height:36px;padding:0 16px;border-radius:var(--radius-sm);border:none;font-size:13px;font-weight:600;color:white;font-family:var(--font);cursor:pointer;transition:all var(--transition)}
+.btn-ok.green{background:var(--green)} .btn-ok.green:hover{background:var(--green-m)}
+.btn-ok.red{background:var(--red)} .btn-ok.red:hover{background:#7a2712}
+.login-hint{font-size:11.5px;color:var(--gray-400);text-align:center;padding-top:12px;border-top:1px solid var(--gray-100)}
+.login-hint strong{color:var(--green)}
 
-/* card body */
-.card-body {
-  display: none;
-  padding: 0 16px 16px 64px;
-  border-top: 1px solid var(--gray-100);
-}
-.step-card.open .card-body { display: block; }
+/* CONFIRM MODAL */
+.confirm-modal{width:380px}
+.confirm-modal .modal-head h3{color:var(--red)}
 
-.card-desc {
-  font-size: 13px; color: var(--gray-600); line-height: 1.7;
-  padding-top: 14px; margin-bottom: 14px;
-}
-.card-items { display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
-.card-item  {
-  display: flex; align-items: flex-start; gap: 8px;
-  font-size: 12.5px; color: var(--gray-600); line-height: 1.5;
-}
-.item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green-l); flex-shrink: 0; margin-top: 7px; }
+/* TOASTS */
+.toast-stack{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:9px;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:11px 14px;box-shadow:var(--shadow-lg);font-size:12.5px;color:var(--gray-700);min-width:220px;max-width:320px;animation:toastIn .28s cubic-bezier(.34,1.56,.64,1)}
+.toast.exit{animation:toastOut .2s ease forwards}
+.toast.success{border-left:3px solid var(--green-l)}
+.toast.error{border-left:3px solid var(--red)}
+@keyframes toastIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@keyframes toastOut{from{opacity:1;transform:none}to{opacity:0;transform:translateX(14px)}}
 
-.docs-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.doc-chip {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; color: var(--gray-600);
-  background: var(--gray-50); border: 1px solid var(--gray-200);
-  border-radius: 5px; padding: 3px 9px;
-}
+/* CELEBRATE */
+.celebrate-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(27,67,50,.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;cursor:pointer}
+.celebrate-overlay.show{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.celebrate-inner{display:flex;flex-direction:column;align-items:center;gap:14px;cursor:default;animation:modalIn .35s cubic-bezier(.34,1.56,.64,1)}
+.cel-icon{font-size:60px;animation:bounce .6s ease .3s both}
+@keyframes bounce{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.cel-title{font-size:28px;font-weight:700;color:white;text-align:center;letter-spacing:-.5px}
+.cel-sub{font-size:14px;color:rgba(255,255,255,.65);text-align:center;max-width:360px;line-height:1.6}
+.cel-btns{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+.cel-btn{height:42px;padding:0 24px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all var(--transition)}
+.cel-btn.primary{background:#d4a017;color:var(--gray-900);border:none;box-shadow:0 4px 12px rgba(212,160,23,.4)}
+.cel-btn.primary:hover{background:#c59316;transform:translateY(-1px)}
+.cel-btn.secondary{background:rgba(255,255,255,.12);color:white;border:1px solid rgba(255,255,255,.25)}
+.cel-btn.secondary:hover{background:rgba(255,255,255,.2)}
+.cel-close-hint{font-size:11px;color:rgba(255,255,255,.35);margin-top:-4px}
 
-.alert-strip {
-  display: flex; gap: 10px; align-items: flex-start;
-  background: #fffbeb; border: 1px solid #fde68a;
-  border-left: 3px solid #f59e0b;
-  border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px;
-  font-size: 12px; color: #92400e; line-height: 1.6;
-}
+/* MOBILE DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.4);backdrop-filter:blur(2px)}
+.drawer-overlay.show{display:block}
+.drawer{position:fixed;bottom:0;left:0;right:0;z-index:301;background:var(--white);border-radius:20px 20px 0 0;box-shadow:var(--shadow-xl);padding:0 20px 32px;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:70vh;overflow-y:auto}
+.drawer.show{transform:translateY(0)}
+.drawer-handle{width:40px;height:4px;border-radius:2px;background:var(--gray-300);margin:12px auto 16px}
+.drawer-title{font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:12px}
+.drawer-close-btn{position:sticky;bottom:0;width:100%;height:40px;background:var(--gray-100);border:none;border-radius:8px;font-size:13px;color:var(--gray-600);font-family:var(--font);cursor:pointer;margin-top:12px}
+.fab-map{display:none;position:fixed;bottom:20px;right:20px;z-index:200;width:48px;height:48px;border-radius:50%;border:none;background:var(--green);color:white;font-size:20px;box-shadow:var(--shadow-lg);cursor:pointer;transition:all var(--transition)}
+.fab-map:hover{background:var(--green-m);transform:scale(1.08)}
 
-/* card footer */
-.card-footer {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  padding-top: 12px; border-top: 1px solid var(--gray-100);
-  margin-top: 4px;
-}
-.btn-next {
-  height: 34px; padding: 0 16px; border-radius: var(--radius-sm);
-  border: none; font-size: 12.5px; font-weight: 600; color: white;
-  transition: all var(--transition); display: flex; align-items: center; gap: 6px;
-}
-.btn-next:hover { filter: brightness(1.08); }
-.btn-done {
-  height: 34px; padding: 0 14px; border-radius: var(--radius-sm);
-  border: 1px solid #a7f3d0; background: var(--green-bg);
-  font-size: 12.5px; font-weight: 600; color: var(--green);
-  cursor: default; display: flex; align-items: center; gap: 6px;
-}
-.btn-skip {
-  height: 34px; padding: 0 12px; border-radius: var(--radius-sm);
-  border: 1px solid var(--gray-200); background: none;
-  font-size: 12px; color: var(--gray-500); transition: all var(--transition);
-}
-.btn-skip:hover { border-color: var(--gray-300); color: var(--gray-700); }
-.btn-comment {
-  height: 34px; padding: 0 12px; border-radius: var(--radius-sm);
-  border: 1px solid #fca5a5; background: var(--red-l);
-  font-size: 12px; color: var(--red); font-weight: 500;
-  transition: all var(--transition);
-}
-.btn-comment:hover { background: var(--red); color: white; border-color: var(--red); }
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:4px}
 
-/* inline edit panel */
-.edit-panel {
-  display: none; margin-top: 12px;
-  background: var(--green-bg); border: 1px solid #a7f3d0;
-  border-radius: var(--radius); padding: 14px;
-}
-.edit-panel.show { display: block; }
-.ep-title { font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.ep-label { font-size: 11px; font-weight: 600; color: var(--gray-600); display: block; margin-bottom: 4px; }
-.ep-input, .ep-textarea {
-  width: 100%; border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
-  padding: 7px 10px; font-size: 12.5px; color: var(--gray-900); background: white;
-  margin-bottom: 10px; outline: none; transition: border-color var(--transition);
-  font-family: var(--font);
-}
-.ep-input:focus, .ep-textarea:focus { border-color: var(--green-l); box-shadow: 0 0 0 3px rgba(64,145,108,.12); }
-.ep-textarea { min-height: 80px; resize: vertical; }
-.ep-items-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-.ep-item-row { display: flex; gap: 6px; align-items: center; }
-.ep-item-input { flex: 1; border: 1px solid var(--gray-200); border-radius: 5px; padding: 5px 9px; font-size: 12px; outline: none; font-family: var(--font); }
-.ep-item-input:focus { border-color: var(--green-l); }
-.ep-item-del { width: 24px; height: 24px; border-radius: 4px; border: 1px solid #fca5a5; background: none; color: var(--red); font-size: 12px; cursor: pointer; flex-shrink: 0; }
-.ep-add-item { font-size: 11.5px; color: var(--green); background: none; border: 1px dashed #a7f3d0; border-radius: 5px; padding: 5px 10px; cursor: pointer; width: 100%; margin-bottom: 10px; transition: all var(--transition); }
-.ep-add-item:hover { background: white; }
-.ep-actions { display: flex; gap: 8px; }
-.ep-save { height: 32px; padding: 0 14px; border-radius: var(--radius-sm); border: none; background: var(--green); color: white; font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; }
-.ep-cancel { height: 32px; padding: 0 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); background: white; color: var(--gray-600); font-size: 12px; font-family: var(--font); cursor: pointer; }
-
-/* ─── SIDEBAR ──────────────────────────────────────── */
-.flow-sidebar {
-  border-left: 1px solid var(--gray-200);
-  background: var(--gray-50);
-  overflow-y: auto;
-  display: flex; flex-direction: column; gap: 0;
-}
-.sidebar-section { border-bottom: 1px solid var(--gray-200); padding: 16px; }
-.sidebar-section:last-child { border-bottom: none; }
-.sidebar-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-  color: var(--gray-400); margin-bottom: 12px;
-}
-
-/* mini map */
-.mini-map { display: flex; flex-direction: column; gap: 2px; }
-.mm-item {
-  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
-  border-radius: 6px; cursor: pointer; transition: background var(--transition);
-}
-.mm-item:hover { background: var(--white); }
-.mm-item.mm-active { background: var(--white); box-shadow: var(--shadow-xs); }
-.mm-item.mm-locked { cursor: default; opacity: .4; }
-.mm-dot {
-  width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700;
-  background: var(--gray-200); color: var(--gray-500);
-  border: 1px solid var(--gray-200); transition: all .2s;
-}
-.mm-item.mm-done   .mm-dot { background: var(--green-bg); color: var(--green); border-color: #a7f3d0; }
-.mm-item.mm-active .mm-dot { border-color: var(--green-l); color: var(--green); background: white; }
-.mm-title { font-size: 11px; color: var(--gray-600); line-height: 1.3; flex: 1; }
-.mm-actor { font-size: 10px; color: var(--gray-400); }
-
-/* phase bars */
-.phase-bars { display: flex; flex-direction: column; gap: 9px; }
-.pb-row { display: flex; align-items: center; gap: 8px; }
-.pb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.pb-name { font-size: 11px; color: var(--gray-600); flex: 1; }
-.pb-track { width: 64px; height: 4px; background: var(--gray-200); border-radius: 3px; overflow: hidden; }
-.pb-fill  { height: 100%; border-radius: 3px; transition: width .5s; }
-.pb-pct   { font-size: 10px; color: var(--gray-400); width: 26px; text-align: right; }
-
-/* actors */
-.actor-rows { display: flex; flex-direction: column; gap: 7px; }
-.actor-row  { display: flex; align-items: center; gap: 8px; }
-.actor-bar  { width: 3px; height: 22px; border-radius: 2px; flex-shrink: 0; }
-.actor-name { font-size: 12px; font-weight: 600; }
-.actor-desc { font-size: 10px; color: var(--gray-400); }
-
-/* ─── BPMN PANE ────────────────────────────────────── */
-.bpmn-layout { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-
-.bpmn-toolbar {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 16px; background: var(--white);
-  border-bottom: 1px solid var(--gray-200); flex-shrink: 0; flex-wrap: wrap;
-}
-.tb-group { display: flex; align-items: center; gap: 4px; }
-.tb-sep { width: 1px; height: 22px; background: var(--gray-200); margin: 0 6px; flex-shrink: 0; }
-.tb-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-300); white-space: nowrap; }
-.tb-btn {
-  height: 30px; padding: 0 11px; border-radius: var(--radius-sm);
-  border: 1px solid var(--gray-200); background: var(--white);
-  font-size: 11.5px; color: var(--gray-600); transition: all var(--transition);
-  display: flex; align-items: center; gap: 5px; white-space: nowrap;
-}
-.tb-btn:hover { border-color: var(--gray-300); background: var(--gray-50); color: var(--gray-900); }
-.tb-btn.green { background: var(--green-bg); border-color: #a7f3d0; color: var(--green); font-weight: 600; }
-.tb-btn.green:hover { background: var(--green); color: white; }
-.tb-btn.locked { opacity: .45; cursor: not-allowed !important; }
-.tb-btn.locked:hover { background: var(--white); border-color: var(--gray-200); color: var(--gray-600); }
-
-.bpmn-indicator {
-  margin-left: auto; display: flex; align-items: center; gap: 6px;
-  font-size: 11px; padding: 4px 10px; border-radius: 12px;
-  background: var(--gray-100); color: var(--gray-400); border: 1px solid var(--gray-200);
-}
-.bpmn-indicator.edit { background: var(--green-bg); color: var(--green); border-color: #a7f3d0; }
-.ind-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-.bpmn-wrap { flex: 1; position: relative; overflow: hidden; }
-#bpmnCanvas { width: 100%; height: 100%; }
-
-/* sync overlay */
-.sync-overlay {
-  display: none; position: absolute; inset: 0; z-index: 50;
-  background: rgba(255,255,255,.75); backdrop-filter: blur(2px);
-  align-items: center; justify-content: center; flex-direction: column; gap: 12px;
-}
-.sync-overlay.show { display: flex; }
-.sync-spinner { width: 32px; height: 32px; border: 3px solid var(--gray-200); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
-.sync-text { font-size: 13px; color: var(--gray-600); }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* props panel */
-.props-panel {
-  position: absolute; top: 12px; right: 12px; width: 260px;
-  background: var(--white); border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); z-index: 10; overflow: hidden;
-}
-.pp-head { padding: 12px 14px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; }
-.pp-head-bar { width: 3px; height: 16px; border-radius: 2px; background: var(--green); flex-shrink: 0; }
-.pp-head-title { font-size: 12px; font-weight: 600; color: var(--gray-900); }
-.pp-head-type  { font-size: 10px; color: var(--gray-400); margin-left: auto; }
-.pp-body { padding: 12px 14px; }
-.pp-label { font-size: 10.5px; font-weight: 600; color: var(--gray-500); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
-.pp-input, .pp-textarea {
-  width: 100%; border: 1px solid var(--gray-200); border-radius: 5px;
-  padding: 7px 9px; font-size: 12px; color: var(--gray-900); background: var(--white);
-  margin-bottom: 10px; outline: none; transition: border-color var(--transition); font-family: var(--font);
-}
-.pp-input:focus, .pp-textarea:focus { border-color: var(--green-l); }
-.pp-input:disabled, .pp-textarea:disabled { background: var(--gray-50); color: var(--gray-400); cursor: not-allowed; }
-.pp-textarea { min-height: 70px; resize: vertical; }
-.pp-save { width: 100%; height: 32px; border-radius: 5px; border: none; background: var(--green); color: white; font-size: 12px; font-weight: 600; font-family: var(--font); cursor: pointer; }
-.pp-save:hover { background: var(--green-m); }
-.pp-lock-note { font-size: 11px; color: var(--gray-400); text-align: center; padding: 8px; border-top: 1px solid var(--gray-100); cursor: pointer; }
-.pp-lock-note:hover { color: var(--green); }
-.pp-empty { font-size: 12px; color: var(--gray-400); text-align: center; padding: 16px; line-height: 1.6; }
-
-/* bpmn legend */
-.bpmn-legend {
-  position: absolute; bottom: 12px; left: 12px;
-  background: var(--white); border: 1px solid var(--gray-200);
-  border-radius: var(--radius); padding: 10px 13px; z-index: 10; box-shadow: var(--shadow-sm);
-}
-.bl-title { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); margin-bottom: 7px; }
-.bl-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gray-600); margin-bottom: 4px; }
-.bl-item:last-child { margin-bottom: 0; }
-.bl-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
-
-/* ─── FEEDBACKS PANE ───────────────────────────────── */
-.fb-page { overflow-y: auto; padding: 28px 24px; }
-.fb-inner { max-width: 820px; margin: 0 auto; }
-.fb-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; gap: 12px; flex-wrap: wrap; }
-.fb-header h2 { font-size: 20px; font-weight: 700; color: var(--gray-900); }
-.fb-header p  { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
-.fb-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
-.stat-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 14px 16px; }
-.stat-card.sc-green { border-top: 3px solid var(--green-l); }
-.stat-card.sc-teal  { border-top: 3px solid #0d9488; }
-.stat-card.sc-amber { border-top: 3px solid #d97706; }
-.stat-card.sc-red   { border-top: 3px solid var(--red); }
-.stat-n    { font-size: 28px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
-.stat-lbl  { font-size: 11.5px; color: var(--gray-400); }
-.fb-list   { display: flex; flex-direction: column; gap: 10px; }
-.fb-card   { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 16px 18px; transition: opacity .2s; }
-.fb-card.resolved { opacity: .55; }
-.fb-card-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-.fb-tag { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
-.fb-step-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 10px; background: var(--gray-100); color: var(--gray-500); }
-.fb-resolved-tag { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #dcfce7; color: #166534; }
-.fb-who  { font-size: 12px; font-weight: 600; color: var(--gray-900); }
-.fb-text { font-size: 13px; color: var(--gray-600); line-height: 1.65; margin-bottom: 10px; }
-.fb-foot { display: flex; align-items: center; gap: 8px; }
-.fb-time { font-size: 11px; color: var(--gray-400); flex: 1; }
-.fb-action-btn { height: 26px; padding: 0 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: var(--font); }
-.fb-resolve-btn { border: 1px solid var(--gray-200); background: none; color: var(--gray-600); }
-.fb-resolve-btn:hover { border-color: var(--green-l); color: var(--green); background: var(--green-bg); }
-.fb-del-btn { border: 1px solid #fca5a5; background: none; color: var(--red); }
-.fb-del-btn:hover { background: var(--red); color: white; }
-.fb-empty { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 48px; text-align: center; }
-.fb-empty-icon { font-size: 36px; margin-bottom: 12px; }
-.fb-empty-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-.fb-empty-sub   { font-size: 13px; color: var(--gray-400); }
-
-/* ─── MODALS ───────────────────────────────────────── */
-.overlay {
-  display: none; position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,.3); backdrop-filter: blur(3px);
-  align-items: center; justify-content: center;
-}
-.overlay.show { display: flex; }
-
-.modal {
-  background: var(--white); border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl); overflow: hidden;
-  width: 440px; max-width: 92vw;
-  animation: modalIn .2s ease;
-}
-@keyframes modalIn { from{opacity:0;transform:scale(.97) translateY(8px)} to{opacity:1;transform:none} }
-
-.modal-head { padding: 20px 22px 0; }
-.modal-head h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.modal-head p  { font-size: 12.5px; color: var(--gray-400); }
-.modal-body { padding: 18px 22px; }
-.m-label { font-size: 11.5px; font-weight: 600; color: var(--gray-600); display: block; margin-bottom: 4px; }
-.m-input, .m-select, .m-textarea {
-  width: 100%; border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
-  padding: 9px 11px; font-size: 13px; color: var(--gray-900); background: var(--white);
-  margin-bottom: 13px; outline: none; transition: border-color var(--transition); font-family: var(--font);
-}
-.m-input:focus, .m-select:focus, .m-textarea:focus { border-color: var(--green-l); box-shadow: 0 0 0 3px rgba(64,145,108,.1); }
-.m-textarea { min-height: 90px; resize: vertical; }
-.m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.m-error { font-size: 12px; color: var(--red); margin-bottom: 10px; display: none; }
-.m-error.show { display: block; }
-.modal-foot { padding: 0 22px 20px; display: flex; gap: 8px; justify-content: flex-end; }
-.btn-cancel { height: 36px; padding: 0 16px; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); background: none; font-size: 13px; color: var(--gray-600); font-family: var(--font); cursor: pointer; }
-.btn-ok     { height: 36px; padding: 0 16px; border-radius: var(--radius-sm); border: none; font-size: 13px; font-weight: 600; color: white; font-family: var(--font); cursor: pointer; }
-.btn-ok.green { background: var(--green); } .btn-ok.green:hover { background: var(--green-m); }
-.btn-ok.red   { background: var(--red); }   .btn-ok.red:hover   { background: #7a2712; }
-.login-hint { font-size: 11.5px; color: var(--gray-400); text-align: center; padding-top: 12px; border-top: 1px solid var(--gray-100); }
-.login-hint strong { color: var(--green); }
-
-/* ─── TOASTS ───────────────────────────────────────── */
-.toast-stack { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 7px; }
-.toast {
-  display: flex; align-items: center; gap: 9px;
-  background: var(--white); border: 1px solid var(--gray-200);
-  border-radius: var(--radius); padding: 11px 14px;
-  box-shadow: var(--shadow-lg); font-size: 12.5px; color: var(--gray-700);
-  min-width: 220px; max-width: 320px;
-  animation: toastIn .25s ease;
-}
-.toast.success { border-left: 3px solid var(--green-l); }
-.toast.error   { border-left: 3px solid var(--red); }
-@keyframes toastIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:none} }
-
-/* ─── CELEBRATE ────────────────────────────────────── */
-.celebrate-overlay {
-  display: none; position: fixed; inset: 0; z-index: 400;
-  background: rgba(27,67,50,.9); backdrop-filter: blur(6px);
-  flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-}
-.celebrate-overlay.show { display: flex; }
-.cel-icon  { font-size: 54px; }
-.cel-title { font-size: 26px; font-weight: 700; color: white; text-align: center; }
-.cel-sub   { font-size: 14px; color: rgba(255,255,255,.6); text-align: center; max-width: 380px; }
-.cel-btns  { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
-.cel-btn   { height: 40px; padding: 0 22px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; }
-.cel-btn.primary   { background: #d4a017; color: var(--gray-900); border: none; }
-.cel-btn.secondary { background: rgba(255,255,255,.15); color: white; border: 1px solid rgba(255,255,255,.3); }
-
-/* ─── SCROLLBAR ────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
-
-@media (max-width: 768px) {
-  .flow-layout { grid-template-columns: 1fr; }
-  .flow-sidebar { display: none; }
-  .fb-stats { grid-template-columns: 1fr 1fr; }
+@media(max-width:768px){
+  .flow-layout{grid-template-columns:1fr}
+  .flow-sidebar{display:none}
+  .fb-stats{grid-template-columns:1fr 1fr}
+  .fab-map{display:flex;align-items:center;justify-content:center}
 }
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- ═══════════════ TOPBAR ═══════════════ -->
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="brand">
     <div class="brand-logo">SESAI</div>
-    <div>
-      <div class="brand-name">SESAI</div>
-      <div class="brand-sub">Ministério da Saúde</div>
-    </div>
+    <div><div class="brand-name">SESAI</div><div class="brand-sub">Ministério da Saúde</div></div>
   </div>
-
   <div class="tab-nav">
-    <button class="tab-btn active" id="tab-flow" onclick="switchTab('flow')">
-      Fluxo Interativo <span class="tab-count" id="tc-flow">0 / 13</span>
-    </button>
-    <button class="tab-btn" id="tab-bpmn" onclick="switchTab('bpmn')">
-      Diagrama BPMN <span class="tab-count">editável</span>
-    </button>
-    <button class="tab-btn" id="tab-fb" onclick="switchTab('fb')">
-      Contribuições <span class="tab-count" id="tc-fb">0</span>
-    </button>
+    <button class="tab-btn active" id="tab-flow" onclick="switchTab('flow')">Fluxo Interativo <span class="tab-count" id="tc-flow">0 / 13</span></button>
+    <button class="tab-btn" id="tab-bpmn" onclick="switchTab('bpmn')">Diagrama BPMN <span class="tab-count">editável</span></button>
+    <button class="tab-btn" id="tab-fb" onclick="switchTab('fb')">Contribuições <span class="tab-count" id="tc-fb">0</span></button>
   </div>
-
   <div class="topbar-end">
-    <div id="areaLogin">
-      <button class="btn-login" onclick="openLogin()">🔒 Entrar para editar</button>
-    </div>
+    <div id="areaLogin"><button class="btn-login" onclick="openLogin()">🔒 Entrar para editar</button></div>
     <div id="areaUser" style="display:none">
       <div class="user-chip" onclick="doLogout()">
         <div class="user-avatar" id="uAvatar">?</div>
-        <div>
-          <div class="user-name" id="uName">–</div>
-          <div class="user-role" id="uRole">–</div>
-        </div>
+        <div><div class="user-name" id="uName">–</div><div class="user-role" id="uRole">–</div></div>
         <span style="font-size:10px;color:var(--gray-300);margin-left:4px">Sair</span>
       </div>
     </div>
@@ -646,14 +426,20 @@ input, textarea, select { font-family: var(--font); }
   </div>
 </div>
 
-<!-- edit bar -->
+<!-- EDIT BAR -->
 <div class="edit-bar" id="editBar">
   <div class="edit-bar-dot"></div>
-  <span class="edit-bar-text">Modo de edição ativo — alterações no fluxo sincronizam automaticamente com o diagrama BPMN.</span>
+  <span class="edit-bar-text">Modo de edição ativo — arraste cards para reordenar · edite qualquer campo · adicione ou remova etapas · vincule arquivos do Google Drive.</span>
   <button class="btn-exit" onclick="doLogout()">Sair</button>
 </div>
 
-<!-- ═══════════════ PANE: FLOW ═══════════════ -->
+<!-- ACTOR FILTER BAR -->
+<div class="actor-filter-bar" id="actorFilterBar" style="display:none">
+  <span class="actor-filter-label">Filtrar por ator</span>
+  <div id="actorChips"></div>
+</div>
+
+<!-- PANE: FLOW -->
 <div class="pane active" id="pane-flow">
   <div class="flow-layout">
     <div class="flow-main" id="flowMain">
@@ -670,8 +456,8 @@ input, textarea, select { font-family: var(--font); }
       </div>
       <div class="phase-filter" id="phaseFilter"></div>
       <div id="stepCards"></div>
+      <button class="add-card-btn" id="addCardBtn" onclick="openAddCard()">＋ Adicionar nova etapa</button>
     </div>
-
     <div class="flow-sidebar">
       <div class="sidebar-section">
         <div class="sidebar-label">Mapa do fluxo</div>
@@ -682,22 +468,14 @@ input, textarea, select { font-family: var(--font); }
         <div class="phase-bars" id="phaseBars"></div>
       </div>
       <div class="sidebar-section">
-        <div class="sidebar-label">Atores</div>
-        <div class="actor-rows">
-          <div class="actor-row"><div class="actor-bar" style="background:#1b4d8a"></div><div><div class="actor-name" style="color:#1b4d8a">DSEI / Gabinete</div><div class="actor-desc">aprovação · designação</div></div></div>
-          <div class="actor-row"><div class="actor-bar" style="background:#1b4332"></div><div><div class="actor-name" style="color:#1b4332">SESANI</div><div class="actor-desc">responsável técnico</div></div></div>
-          <div class="actor-row"><div class="actor-bar" style="background:#78350f"></div><div><div class="actor-name" style="color:#78350f">SEOFI</div><div class="actor-desc">financeiro · SIAFI</div></div></div>
-          <div class="actor-row"><div class="actor-bar" style="background:#713f12"></div><div><div class="actor-name" style="color:#713f12">SELOG</div><div class="actor-desc">logística · obras</div></div></div>
-          <div class="actor-row"><div class="actor-bar" style="background:#164e63"></div><div><div class="actor-name" style="color:#164e63">SEPAT</div><div class="actor-desc">patrimônio · retirada</div></div></div>
-          <div class="actor-row"><div class="actor-bar" style="background:#4c1d95"></div><div><div class="actor-name" style="color:#4c1d95">DEAMB / COABS</div><div class="actor-desc">validação · ART</div></div></div>
-          <div class="actor-row"><div class="actor-bar" style="background:#7c2d12"></div><div><div class="actor-name" style="color:#7c2d12">Comunidade</div><div class="actor-desc">participação · entrega</div></div></div>
-        </div>
+        <div class="sidebar-label">Atores — clique para filtrar</div>
+        <div class="actor-rows" id="sidebarActors"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════ PANE: BPMN ═══════════════ -->
+<!-- PANE: BPMN -->
 <div class="pane" id="pane-bpmn">
   <div class="bpmn-layout">
     <div class="bpmn-toolbar">
@@ -710,8 +488,8 @@ input, textarea, select { font-family: var(--font); }
       <div class="tb-sep"></div>
       <div class="tb-group">
         <span class="tb-lbl">Editar</span>
-        <button class="tb-btn" id="btn-undo" onclick="bUndo()">↩ Desfazer</button>
-        <button class="tb-btn" id="btn-redo" onclick="bRedo()">↪ Refazer</button>
+        <button class="tb-btn" onclick="bUndo()">↩ Desfazer</button>
+        <button class="tb-btn" onclick="bRedo()">↪ Refazer</button>
       </div>
       <div class="tb-sep"></div>
       <div class="tb-group">
@@ -726,38 +504,24 @@ input, textarea, select { font-family: var(--font); }
         <button class="tb-btn" onclick="bReset()">↺ Restaurar</button>
       </div>
       <div class="bpmn-indicator" id="bpmnIndicator">
-        <div class="ind-dot"></div>
-        <span id="bpmnIndText">Somente leitura</span>
+        <div class="ind-dot"></div><span id="bpmnIndText">Somente leitura</span>
       </div>
     </div>
-
     <div class="bpmn-wrap">
       <div id="bpmnCanvas"></div>
-
-      <div class="sync-overlay" id="syncOverlay">
-        <div class="sync-spinner"></div>
-        <div class="sync-text">Sincronizando alterações…</div>
-      </div>
-
+      <div class="sync-overlay" id="syncOverlay"><div class="sync-spinner"></div><div class="sync-text">Sincronizando com BPMN…</div></div>
       <div class="props-panel" id="propsPanel">
-        <div class="pp-head">
-          <div class="pp-head-bar"></div>
-          <span class="pp-head-title">Propriedades</span>
-          <span class="pp-head-type" id="ppType">–</span>
-        </div>
+        <div class="pp-head"><div class="pp-head-bar"></div><span class="pp-head-title">Propriedades</span><span class="pp-head-type" id="ppType">–</span></div>
         <div class="pp-body">
           <div class="pp-empty" id="ppEmpty">Clique em uma tarefa ou gateway para editar.</div>
           <div id="ppForm" style="display:none">
-            <label class="pp-label">Nome</label>
-            <input class="pp-input" id="ppName" placeholder="Nome do elemento">
-            <label class="pp-label">Descrição</label>
-            <textarea class="pp-textarea" id="ppDoc" placeholder="Notas ou descrição desta etapa…"></textarea>
+            <label class="pp-label">Nome</label><input class="pp-input" id="ppName" placeholder="Nome do elemento">
+            <label class="pp-label">Descrição</label><textarea class="pp-textarea" id="ppDoc" placeholder="Notas…"></textarea>
             <button class="pp-save" id="ppSave" onclick="bSaveProps()">Salvar</button>
             <div class="pp-lock-note" id="ppLock" onclick="openLogin()">🔒 Entrar para editar</div>
           </div>
         </div>
       </div>
-
       <div class="bpmn-legend">
         <div class="bl-title">Raias</div>
         <div class="bl-item"><div class="bl-dot" style="background:#1b4d8a"></div>DSEI / Gabinete</div>
@@ -772,82 +536,95 @@ input, textarea, select { font-family: var(--font); }
   </div>
 </div>
 
-<!-- ═══════════════ PANE: FEEDBACKS ═══════════════ -->
-<div class="pane" id="pane-fb">
-  <div class="fb-page">
-    <div class="fb-inner" id="fbInner"></div>
-  </div>
-</div>
+<!-- PANE: FEEDBACKS -->
+<div class="pane" id="pane-fb"><div class="fb-page"><div class="fb-inner" id="fbInner"></div></div></div>
 
-<!-- ═══════════════ MODAL: LOGIN ═══════════════ -->
+<!-- MODAL: LOGIN -->
 <div class="overlay" id="loginOverlay">
   <div class="modal">
-    <div class="modal-head">
-      <h3>Acesso de editor</h3>
-      <p>Entre com suas credenciais SESAI para editar o fluxo</p>
-    </div>
+    <div class="modal-head"><h3>Acesso de editor</h3><p>Entre com suas credenciais SESAI para editar o fluxo</p></div>
     <div class="modal-body">
       <label class="m-label">Usuário</label>
       <input class="m-input" id="loginU" placeholder="usuario" onkeydown="if(event.key==='Enter')doLogin()">
       <label class="m-label">Senha</label>
       <input class="m-input" type="password" id="loginP" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      <div class="m-error" id="loginErr">Usuário ou senha incorretos.</div>
+      <div class="m-error" id="loginErr">⚠️ Usuário ou senha incorretos.</div>
       <div class="login-hint">Acesso de teste: <strong>editor / sesai2024</strong></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn-cancel" onclick="closeLogin()">Cancelar</button>
-      <button class="btn-ok green" onclick="doLogin()">Entrar</button>
-    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeLogin()">Cancelar</button><button class="btn-ok green" onclick="doLogin()">Entrar</button></div>
   </div>
 </div>
 
-<!-- ═══════════════ MODAL: CONTRIBUIÇÃO ═══════════════ -->
-<div class="overlay" id="fbOverlay">
-  <div class="modal" style="width:500px">
-    <div class="modal-head">
-      <h3>Registrar contribuição</h3>
-      <p>Ajude a validar e aprimorar este fluxo de processo</p>
-    </div>
+<!-- MODAL: ADD CARD -->
+<div class="overlay" id="addCardOverlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-head"><h3>Nova etapa</h3><p>Adicione uma nova etapa ao fluxo</p></div>
     <div class="modal-body">
+      <label class="m-label">Título da etapa</label>
+      <input class="m-input" id="nc-title" placeholder="Ex: Vistoria técnica do local">
       <div class="m-grid">
         <div>
-          <label class="m-label">Seu nome</label>
-          <input class="m-input" id="fbName" placeholder="Nome completo">
-        </div>
-        <div>
-          <label class="m-label">Função / ator</label>
-          <select class="m-select" id="fbActor">
-            <option value="">Selecione…</option>
+          <label class="m-label">Ator responsável</label>
+          <select class="m-select" id="nc-actor">
             <option value="dsei">DSEI / Gabinete</option>
             <option value="ses">SESANI</option>
             <option value="seofi">SEOFI</option>
             <option value="selog">SELOG</option>
             <option value="sepat">SEPAT</option>
             <option value="deamb">DEAMB / COABS</option>
-            <option value="com">Comunidade / AISAN</option>
-            <option value="outro">Outro</option>
+            <option value="com">Comunidade</option>
+          </select>
+        </div>
+        <div>
+          <label class="m-label">Fase</label>
+          <select class="m-select" id="nc-phase">
+            <option value="p1">Pré-obra</option>
+            <option value="p2">Distribuição</option>
+            <option value="p3">Início da Obra</option>
+            <option value="p4">Acompanhamento</option>
+            <option value="p5">Conclusão</option>
+          </select>
+        </div>
+      </div>
+      <label class="m-label">Descrição</label>
+      <textarea class="m-textarea" id="nc-desc" placeholder="Descreva o que acontece nesta etapa…"></textarea>
+      <label class="m-label">Rótulo do botão de conclusão</label>
+      <input class="m-input" id="nc-btn" placeholder="Ex: Vistoria concluída">
+    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeAddCard()">Cancelar</button><button class="btn-ok green" onclick="confirmAddCard()">Adicionar etapa</button></div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM DELETE -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal confirm-modal">
+    <div class="modal-head"><h3 id="confirmTitle">Confirmar exclusão</h3><p id="confirmMsg"></p></div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeConfirm()">Cancelar</button><button class="btn-ok red" id="confirmBtn">Excluir</button></div>
+  </div>
+</div>
+
+<!-- MODAL: CONTRIBUIÇÃO -->
+<div class="overlay" id="fbOverlay">
+  <div class="modal" style="width:500px">
+    <div class="modal-head"><h3>Registrar contribuição</h3><p>Ajude a validar e aprimorar este fluxo de processo</p></div>
+    <div class="modal-body">
+      <div class="m-grid">
+        <div><label class="m-label">Seu nome</label><input class="m-input" id="fbName" placeholder="Nome completo"></div>
+        <div>
+          <label class="m-label">Função / ator</label>
+          <select class="m-select" id="fbActor">
+            <option value="">Selecione…</option>
+            <option value="dsei">DSEI / Gabinete</option><option value="ses">SESANI</option>
+            <option value="seofi">SEOFI</option><option value="selog">SELOG</option>
+            <option value="sepat">SEPAT</option><option value="deamb">DEAMB / COABS</option>
+            <option value="com">Comunidade / AISAN</option><option value="outro">Outro</option>
           </select>
         </div>
       </div>
       <div class="m-grid">
         <div>
           <label class="m-label">Etapa</label>
-          <select class="m-select" id="fbStep">
-            <option value="geral">Fluxo geral</option>
-            <option value="1">1 — Identificação de processos</option>
-            <option value="2">2 — Designação de responsáveis</option>
-            <option value="3">3 — Cadastro de estoque</option>
-            <option value="4">4 — Cadastro de obra</option>
-            <option value="5">5 — Distribuição de material</option>
-            <option value="6">6 — Reunião com a comunidade</option>
-            <option value="7">7 — Ordem de Serviço</option>
-            <option value="8">8 — ART e docs técnicos</option>
-            <option value="9a">9a — Atesto de retirada</option>
-            <option value="9b">9b — Atesto de entrega</option>
-            <option value="10">10 — Diário de obras</option>
-            <option value="11">11 — Relatório situacional</option>
-            <option value="12-13">12–13 — Entrega e conclusão</option>
-          </select>
+          <select class="m-select" id="fbStep"><option value="geral">Fluxo geral</option></select>
         </div>
         <div>
           <label class="m-label">Tipo</label>
@@ -860,49 +637,57 @@ input, textarea, select { font-family: var(--font); }
         </div>
       </div>
       <label class="m-label">Descrição</label>
-      <textarea class="m-textarea" id="fbText" placeholder="Descreva sua observação, sugestão ou validação…"></textarea>
+      <textarea class="m-textarea" id="fbText" placeholder="Descreva sua observação…"></textarea>
     </div>
-    <div class="modal-foot">
-      <button class="btn-cancel" onclick="closeFB()">Cancelar</button>
-      <button class="btn-ok red" onclick="submitFB()">Enviar</button>
-    </div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeFB()">Cancelar</button><button class="btn-ok red" onclick="submitFB()">Enviar</button></div>
   </div>
 </div>
 
 <!-- CELEBRATE -->
-<div class="celebrate-overlay" id="celebrateOverlay">
-  <div class="cel-icon">🏁</div>
-  <div class="cel-title">Fluxo percorrido!</div>
-  <div class="cel-sub">Todas as 13 etapas foram revisadas. Registre sua contribuição sobre o processo.</div>
-  <div class="cel-btns">
-    <button class="cel-btn primary" onclick="openFB();document.getElementById('celebrateOverlay').classList.remove('show')">💬 Contribuir</button>
-    <button class="cel-btn secondary" onclick="resetFlow();document.getElementById('celebrateOverlay').classList.remove('show')">↺ Reiniciar</button>
+<div class="celebrate-overlay" id="celebrateOverlay" onclick="if(event.target===this)closeCelebrate()">
+  <div class="celebrate-inner">
+    <div class="cel-icon">🏁</div>
+    <div class="cel-title">Fluxo percorrido!</div>
+    <div class="cel-sub">Todas as etapas foram revisadas. Registre sua contribuição sobre o processo.</div>
+    <div class="cel-btns">
+      <button class="cel-btn primary" onclick="openFB();closeCelebrate()">💬 Contribuir</button>
+      <button class="cel-btn secondary" onclick="resetFlow();closeCelebrate()">↺ Reiniciar</button>
+    </div>
+    <div class="cel-close-hint">Clique fora ou pressione ESC para fechar</div>
   </div>
 </div>
 
-<!-- TOASTS -->
+<!-- Google APIs — Drive Picker -->
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- MOBILE DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="mapDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">Mapa do fluxo</div>
+  <div class="mini-map" id="miniMapMobile"></div>
+  <button class="drawer-close-btn" onclick="closeDrawer()">Fechar</button>
+</div>
+<button class="fab-map" onclick="openDrawer()">🗺</button>
 <div class="toast-stack" id="toastStack"></div>
 
-<!-- bpmn-js -->
 <script src="https://unpkg.com/bpmn-js@17/dist/bpmn-modeler.development.js"></script>
-
 <script>
 /* ═══════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════ */
 const USERS = {
-  editor: { pass:'sesai2024',  name:'Editor SESAI',   role:'Editor',         initials:'ES', canEdit:true },
-  admin:  { pass:'sesai@admin',name:'Administrador',  role:'Administrador',  initials:'AD', canEdit:true },
+  editor:{ pass:'sesai2024',  name:'Editor SESAI',  role:'Editor',        initials:'ES', canEdit:true },
+  admin: { pass:'sesai@admin',name:'Administrador', role:'Administrador', initials:'AD', canEdit:true },
 };
-
 const PHASES = [
-  { id:'p1', label:'Pré-obra',          color:'#1b4332', bg:'#f0faf4', steps:[0,1,2,3] },
-  { id:'p2', label:'Distribuição',       color:'#1b4d8a', bg:'#eff6ff', steps:[4] },
-  { id:'p3', label:'Início da Obra',     color:'#78350f', bg:'#fffbeb', steps:[5,6,7,8,9] },
-  { id:'p4', label:'Acompanhamento',     color:'#4c1d95', bg:'#f5f3ff', steps:[10,11] },
-  { id:'p5', label:'Conclusão',          color:'#8b2e16', bg:'#fdf4f2', steps:[12] },
+  { id:'p1', label:'Pré-obra',      color:'#1b4332', bg:'#f0faf4', steps:[] },
+  { id:'p2', label:'Distribuição',  color:'#1b4d8a', bg:'#eff6ff', steps:[] },
+  { id:'p3', label:'Início da Obra',color:'#78350f', bg:'#fffbeb', steps:[] },
+  { id:'p4', label:'Acompanhamento',color:'#4c1d95', bg:'#f5f3ff', steps:[] },
+  { id:'p5', label:'Conclusão',     color:'#8b2e16', bg:'#fdf4f2', steps:[] },
 ];
-
 const ACTORS = {
   dsei: { label:'DSEI / Gabinete', color:'#1b4d8a', bg:'#eff6ff' },
   ses:  { label:'SESANI',          color:'#1b4332', bg:'#f0faf4' },
@@ -912,245 +697,140 @@ const ACTORS = {
   deamb:{ label:'DEAMB / COABS',   color:'#4c1d95', bg:'#f5f3ff' },
   com:  { label:'Comunidade',      color:'#7c2d12', bg:'#fff1f2' },
 };
+const ACTOR_BPMN = { dsei:'P_DSEI', ses:'P_SES', seofi:'P_SEOFI', selog:'P_SELOG', sepat:'P_SEPAT', deamb:'P_DEAMB', com:'P_COM' };
+const FILE_ICONS = { pdf:'📄', doc:'📝', docx:'📝', jpg:'🖼', jpeg:'🖼', png:'🖼', default:'📎' };
 
-const ACTOR_BPMN = {
-  dsei:'P_DSEI', ses:'P_SES', seofi:'P_SEOFI', selog:'P_SELOG',
-  sepat:'P_SEPAT', deamb:'P_DEAMB', com:'P_COM',
-};
-
-// Default steps (restored from localStorage if present)
 const DEFAULT_STEPS = [
-  { id:'s1',  bpmnId:'T_D1',  num:'1',    phase:'p1', actor:'dsei',
-    title:'Identificação dos processos de aquisição e mão de obra',
-    desc:'Etapa que formaliza quais processos estão relacionados à obra, embasando a origem do material e a mão de obra utilizada.',
-    items:['Identifica o(s) nº de processo(s) no SEI','Processo de aquisição de material','Processo de contratação de mão de obra (se necessário)','Base documental para rastrear a origem dos recursos'],
-    docs:['Processo SEI','Nº aquisição','Contrato MO'], alert:null, btnLabel:'Processos identificados' },
-  { id:'s2',  bpmnId:'T_D2',  num:'2',    phase:'p1', actor:'dsei',
-    title:'Designação dos responsáveis pela obra',
-    desc:'Atribui formalmente a responsabilidade a servidores específicos por meio de portaria interna ou despacho.',
-    items:['Portaria interna ou despacho de designação','Gestor técnico da obra — SESANI','Responsável pelo controle de estoque','Equipe de apoio operacional (AISAN quando aplicável)'],
-    docs:['Portaria interna','Despacho de designação'], alert:null, btnLabel:'Responsáveis designados' },
-  { id:'s3',  bpmnId:'T_O1',  num:'3',    phase:'p1', actor:'seofi',
-    title:'Cadastro do estoque de material recebido',
-    desc:'SEOFI registra e liquida o material recebido no SIAFI. Base financeira e contábil de todo o fluxo de obras.',
-    items:['Liquidação da nota fiscal no SIAFI','Registro do material recebido e conferido fisicamente','Base para emissão de pagamento ao fornecedor','Cadastro alimenta a distribuição por obra (etapa 5)'],
-    docs:['Nota fiscal','Liquidação SIAFI','Guia de recebimento'],
-    alert:'Dificuldade mapeada: falta de padronização nos registros de entrada e saída de materiais.', btnLabel:'Estoque cadastrado' },
-  { id:'s4',  bpmnId:'T_L1',  num:'4',    phase:'p1', actor:'selog',
-    title:'Cadastro de obra e planejamento de macro-etapas',
-    desc:'SELOG cadastra cada obra com sua ficha técnica completa e o planejamento mensal de macro-etapas. Após o cadastro, verifica-se se a obra pode ser iniciada.',
-    items:['Um cadastro por obra — processo SEI, objeto, Terra Indígena','Aldeia, etnia, população, coordenadas UTM','Responsável técnico, datas e tipo de obra','Planejamento mensal de macro-etapas da obra','Gateway: obra possui condições de início?'],
-    docs:['Ficha técnica','Cronograma macro','Planilha orçamentária'], alert:null, btnLabel:'Obra cadastrada' },
-  { id:'s5',  bpmnId:'T_L2',  num:'5',    phase:'p2', actor:'selog',
-    title:'Distribuição de material por obra',
-    desc:'Material adquirido é destinado formalmente a cada obra, com rastreabilidade completa da origem ao ponto de uso. Realocação é possível com justificativa aprovada.',
-    items:['DSEI/Gabinete e SESANI autorizam a destinação por obra','SEOFI libera fisicamente o material do almoxarifado','SELOG registra quais itens vão para qual obra','Liberação pode ser feita em remessas por etapa da obra','Realocação: SESANI justifica → DEAMB aprova'],
-    docs:['Requisição de material','Autorização de destinação','Registro de remessa'],
-    alert:'Dificuldade mapeada: falta de rastreabilidade do material até o ponto de uso na obra.', btnLabel:'Material distribuído' },
-  { id:'s6',  bpmnId:'T_S1',  num:'6',    phase:'p3', actor:'ses',
-    title:'Reunião com a comunidade',
-    desc:'SESANI organiza reunião para alinhar a obra com a comunidade e validar o início. Pode ser presencial ou online conforme viabilidade de cada DSEI.',
-    items:['Presencial ou online conforme viabilidade do DSEI','Apresentar a obra, etapas e cronograma','Alinhar responsabilidades e impactos na aldeia','Pedir apoio e validar data de início','ATA assinada ou relato fotográfico como comprovação'],
-    docs:['ATA de reunião','Relato fotográfico','Lista de presença'], alert:null, btnLabel:'Reunião realizada' },
-  { id:'s7',  bpmnId:'T_S2',  num:'7',    phase:'p3', actor:'ses',
-    title:'Emissão da Ordem de Serviço',
-    desc:'A OS deflagra oficialmente o início da obra. Marco formal que substitui o início que existiria num contrato licitado. Co-assinada pela Coordenação e pelo SESANI.',
-    items:['Data oficial de início da obra','Equipe técnica designada para execução','Escopo claro e detalhado da obra','Co-assinada pela Coordenação (DSEI/Gabinete) e SESANI'],
-    docs:['Ordem de Serviço','Escopo de obra'], alert:null, btnLabel:'OS emitida' },
-  { id:'s8',  bpmnId:'T_S3',  num:'8',    phase:'p3', actor:'deamb',
-    title:'Inserção de ART e demais documentos técnicos',
-    desc:'Quando necessário, SESANI solicita a ART à COABS. NÃO se aplica a: reforma, manutenção e serviços similares.',
-    items:['Aplicável a obras que exigem responsabilidade técnica registrada','NÃO se aplica a: reforma, manutenção e serviços similares','SESANI solicita pagamento da ART à COABS','Demais documentos técnicos são anexados nesta etapa'],
-    docs:['ART','Documentos técnicos','Projeto executivo'], alert:null, btnLabel:'ART inserida', optional:true, optLabel:'Pular — não exige ART' },
-  { id:'s9a', bpmnId:'T_PA1', num:'9a',   phase:'p3', actor:'sepat',
-    title:'Atesto de retirada de material — SEPAT',
-    desc:'Com a OS em mãos, SESANI aciona o SEPAT para retirada do material. Ambos assinam o atesto. O formulário só se encerra após a etapa 9b.',
-    items:['SESANI aciona o SEPAT para liberação do material','SESANI e SEPAT assinam o atesto de retirada','Possibilidade de retirada em remessas por etapa','Formulário único cobre retirada (9a) + entrega (9b)'],
-    docs:['Atesto de retirada','Formulário único 9a+9b'], alert:null, btnLabel:'Retirada atestada' },
-  { id:'s9b', bpmnId:'T_S4',  num:'9b',   phase:'p3', actor:'ses',
-    title:'Atesto de entrega do material na aldeia',
-    desc:'SESANI assina o atesto de entrega do material no local da obra. O formulário iniciado na etapa 9a se encerra aqui.',
-    items:['Material entregue fisicamente no canteiro de obras na aldeia','SESANI assina o atesto de entrega','Formulário único (9a+9b) encerrado com esta assinatura'],
-    docs:['Atesto de entrega','Formulário 9a+9b encerrado'],
-    alert:'Dificuldade mapeada: conectividade limitada pode atrasar o registro digital em campo.', btnLabel:'Entrega atestada' },
-  { id:'s10', bpmnId:'T_S5',  num:'10',   phase:'p4', actor:'ses',
-    title:'Diário de obras semanal',
-    desc:'Instrumento de acompanhamento contínuo. Preenchido a cada 7 dias com fotos, descritivos e ajuste de cronograma.',
-    items:['Preenchimento semanal (7 dias) durante toda a execução','Registro fotográfico e georreferenciado das etapas','Andamento, problemas encontrados e ajuste de cronograma','Pode ser preenchido também por AISAN e pela comunidade','A cada 4 semanas gera automaticamente o relatório situacional'],
-    docs:['Diário de obras','Registro fotográfico','Cronograma atualizado'],
-    alert:'Dificuldade mapeada: conectividade limitada exige modo offline. Escassez de AISANs em campo.', btnLabel:'Semana registrada' },
-  { id:'s11', bpmnId:'T_M2',  num:'11',   phase:'p4', actor:'deamb',
-    title:'Relatório situacional da obra — mensal',
-    desc:'Gerado a partir do diário de obras a cada 4 semanas. Validado pelo SESANI e enviado ao DEAMB/COABS para aprovação.',
-    items:['% executado no mês e acumulado versus previsto','Curva previsto × executado gerada automaticamente','Fotos por etapa construtiva com tags e classificação','Riscos, não conformidades e ações recomendadas','SESANI valida, emite parecer técnico e envia ao DEAMB'],
-    docs:['Relatório situacional','Curva S','Parecer técnico SESANI'], alert:null, btnLabel:'Relatório validado' },
-  { id:'s12', bpmnId:'T_S7',  num:'12+13',phase:'p5', actor:'ses',
-    title:'Entrega à comunidade e Termo de Conclusão',
-    desc:'Reunião formal de entrega à comunidade, emissão do Termo de Conclusão e encerramento do processo no SEI.',
-    items:['Reunião com a comunidade para entrega formal da obra','Registro fotográfico com presença da liderança local','Liderança local assina o recebimento da obra','SESANI emite o Termo de Conclusão de Obra','DEAMB valida e instrui encerramento do processo SEI'],
-    docs:['Ata de entrega','Fotos de conclusão','Termo de conclusão','Encerramento SEI'], alert:null, btnLabel:'Obra entregue! 🏁', isLast:true },
+  { id:'s1',  num:'1',    phase:'p1', actor:'dsei', title:'Identificação dos processos de aquisição e mão de obra', desc:'Etapa que formaliza quais processos estão relacionados à obra, embasando a origem do material e a mão de obra utilizada.', items:['Identifica o(s) nº de processo(s) no SEI','Processo de aquisição de material','Processo de contratação de mão de obra (se necessário)','Base documental para rastrear a origem dos recursos'], docs:['Processo SEI','Nº aquisição','Contrato MO'], alert:null, btnLabel:'Processos identificados', attachments:[] },
+  { id:'s2',  num:'2',    phase:'p1', actor:'dsei', title:'Designação dos responsáveis pela obra', desc:'Atribui formalmente a responsabilidade a servidores específicos por meio de portaria interna ou despacho.', items:['Portaria interna ou despacho de designação','Gestor técnico da obra — SESANI','Responsável pelo controle de estoque','Equipe de apoio operacional (AISAN quando aplicável)'], docs:['Portaria interna','Despacho de designação'], alert:null, btnLabel:'Responsáveis designados', attachments:[] },
+  { id:'s3',  num:'3',    phase:'p1', actor:'seofi', title:'Cadastro do estoque de material recebido', desc:'SEOFI registra e liquida o material recebido no SIAFI. Base financeira e contábil de todo o fluxo de obras.', items:['Liquidação da nota fiscal no SIAFI','Registro do material recebido e conferido fisicamente','Base para emissão de pagamento ao fornecedor','Cadastro alimenta a distribuição por obra (etapa 5)'], docs:['Nota fiscal','Liquidação SIAFI','Guia de recebimento'], alert:'Dificuldade mapeada: falta de padronização nos registros de entrada e saída de materiais.', btnLabel:'Estoque cadastrado', attachments:[] },
+  { id:'s4',  num:'4',    phase:'p1', actor:'selog', title:'Cadastro de obra e planejamento de macro-etapas', desc:'SELOG cadastra cada obra com sua ficha técnica completa e o planejamento mensal de macro-etapas.', items:['Um cadastro por obra — processo SEI, objeto, Terra Indígena','Aldeia, etnia, população, coordenadas UTM','Responsável técnico, datas e tipo de obra','Planejamento mensal de macro-etapas da obra','Gateway: obra possui condições de início?'], docs:['Ficha técnica','Cronograma macro','Planilha orçamentária'], alert:null, btnLabel:'Obra cadastrada', attachments:[] },
+  { id:'s5',  num:'5',    phase:'p2', actor:'selog', title:'Distribuição de material por obra', desc:'Material adquirido é destinado formalmente a cada obra, com rastreabilidade completa da origem ao ponto de uso.', items:['DSEI/Gabinete e SESANI autorizam a destinação por obra','SEOFI libera fisicamente o material do almoxarifado','SELOG registra quais itens vão para qual obra','Liberação pode ser feita em remessas por etapa da obra','Realocação: SESANI justifica → DEAMB aprova'], docs:['Requisição de material','Autorização de destinação','Registro de remessa'], alert:'Dificuldade mapeada: falta de rastreabilidade do material até o ponto de uso na obra.', btnLabel:'Material distribuído', attachments:[] },
+  { id:'s6',  num:'6',    phase:'p3', actor:'ses',   title:'Reunião com a comunidade', desc:'SESANI organiza reunião para alinhar a obra com a comunidade e validar o início.', items:['Presencial ou online conforme viabilidade do DSEI','Apresentar a obra, etapas e cronograma','Alinhar responsabilidades e impactos na aldeia','Pedir apoio e validar data de início','ATA assinada ou relato fotográfico como comprovação'], docs:['ATA de reunião','Relato fotográfico','Lista de presença'], alert:null, btnLabel:'Reunião realizada', attachments:[] },
+  { id:'s7',  num:'7',    phase:'p3', actor:'ses',   title:'Emissão da Ordem de Serviço', desc:'A OS deflagra oficialmente o início da obra. Marco formal que substitui o início que existiria num contrato licitado.', items:['Data oficial de início da obra','Equipe técnica designada para execução','Escopo claro e detalhado da obra','Co-assinada pela Coordenação (DSEI/Gabinete) e SESANI'], docs:['Ordem de Serviço','Escopo de obra'], alert:null, btnLabel:'OS emitida', attachments:[] },
+  { id:'s8',  num:'8',    phase:'p3', actor:'deamb', title:'Inserção de ART e demais documentos técnicos', desc:'Quando necessário, SESANI solicita a ART à COABS. NÃO se aplica a: reforma, manutenção e serviços similares.', items:['Aplicável a obras que exigem responsabilidade técnica registrada','NÃO se aplica a: reforma, manutenção e serviços similares','SESANI solicita pagamento da ART à COABS','Demais documentos técnicos são anexados nesta etapa'], docs:['ART','Documentos técnicos','Projeto executivo'], alert:null, btnLabel:'ART inserida', optional:true, optLabel:'Pular — não exige ART', attachments:[] },
+  { id:'s9a', num:'9a',   phase:'p3', actor:'sepat', title:'Atesto de retirada de material — SEPAT', desc:'Com a OS em mãos, SESANI aciona o SEPAT para retirada do material. Ambos assinam o atesto.', items:['SESANI aciona o SEPAT para liberação do material','SESANI e SEPAT assinam o atesto de retirada','Possibilidade de retirada em remessas por etapa','Formulário único cobre retirada (9a) + entrega (9b)'], docs:['Atesto de retirada','Formulário único 9a+9b'], alert:null, btnLabel:'Retirada atestada', attachments:[] },
+  { id:'s9b', num:'9b',   phase:'p3', actor:'ses',   title:'Atesto de entrega do material na aldeia', desc:'SESANI assina o atesto de entrega do material no local da obra. O formulário iniciado na etapa 9a se encerra aqui.', items:['Material entregue fisicamente no canteiro de obras na aldeia','SESANI assina o atesto de entrega','Formulário único (9a+9b) encerrado com esta assinatura'], docs:['Atesto de entrega','Formulário 9a+9b encerrado'], alert:'Dificuldade mapeada: conectividade limitada pode atrasar o registro digital em campo.', btnLabel:'Entrega atestada', attachments:[] },
+  { id:'s10', num:'10',   phase:'p4', actor:'ses',   title:'Diário de obras semanal', desc:'Instrumento de acompanhamento contínuo. Preenchido a cada 7 dias com fotos, descritivos e ajuste de cronograma.', items:['Preenchimento semanal (7 dias) durante toda a execução','Registro fotográfico e georreferenciado das etapas','Andamento, problemas encontrados e ajuste de cronograma','Pode ser preenchido também por AISAN e pela comunidade','A cada 4 semanas gera automaticamente o relatório situacional'], docs:['Diário de obras','Registro fotográfico','Cronograma atualizado'], alert:'Dificuldade mapeada: conectividade limitada exige modo offline. Escassez de AISANs em campo.', btnLabel:'Semana registrada', attachments:[] },
+  { id:'s11', num:'11',   phase:'p4', actor:'deamb', title:'Relatório situacional da obra — mensal', desc:'Gerado a partir do diário de obras a cada 4 semanas. Validado pelo SESANI e enviado ao DEAMB/COABS para aprovação.', items:['% executado no mês e acumulado versus previsto','Curva previsto × executado gerada automaticamente','Fotos por etapa construtiva com tags e classificação','Riscos, não conformidades e ações recomendadas','SESANI valida, emite parecer técnico e envia ao DEAMB'], docs:['Relatório situacional','Curva S','Parecer técnico SESANI'], alert:null, btnLabel:'Relatório validado', attachments:[] },
+  { id:'s12', num:'12+13',phase:'p5', actor:'ses',   title:'Entrega à comunidade e Termo de Conclusão', desc:'Reunião formal de entrega à comunidade, emissão do Termo de Conclusão e encerramento do processo no SEI.', items:['Reunião com a comunidade para entrega formal da obra','Registro fotográfico com presença da liderança local','Liderança local assina o recebimento da obra','SESANI emite o Termo de Conclusão de Obra','DEAMB valida e instrui encerramento do processo SEI'], docs:['Ata de entrega','Fotos de conclusão','Termo de conclusão','Encerramento SEI'], alert:null, btnLabel:'Obra entregue! 🏁', isLast:true, attachments:[] },
 ];
 
-// Mutable state
-let steps       = JSON.parse(localStorage.getItem('sesai_steps_v3') || 'null') || structuredClone(DEFAULT_STEPS);
-let feedbacks   = JSON.parse(localStorage.getItem('sesai_fb_v3')    || '[]');
+/* ─── STATE ─────────────────────────────────── */
+let steps       = loadSteps();
+let feedbacks   = JSON.parse(localStorage.getItem('sesai_fb_v4') || '[]');
 let currentStep = 0;
 let doneSteps   = new Set();
 let openCard    = 0;
 let editCard    = -1;
-let auth        = null;  // logged-in user object
+let activeActor = null;
+let auth        = null;
 let bpmnReady   = false;
-let bpmnSelected = null;
+let bpmnSelected= null;
+let syncTimer   = null;
+let dragSrcIdx  = null;
+let currentFileCardIdx = null;
+let confirmCallback = null;
+
+function loadSteps() {
+  try {
+    const raw = localStorage.getItem('sesai_steps_v4');
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STEPS));
+    const parsed = JSON.parse(raw);
+    // ensure attachments field exists
+    return parsed.map(s => ({ ...s, attachments: s.attachments || [] }));
+  } catch { return JSON.parse(JSON.stringify(DEFAULT_STEPS)); }
+}
+function saveSteps() { localStorage.setItem('sesai_steps_v4', JSON.stringify(steps)); }
+
+function sanitize(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
 
 /* ═══════════════════════════════════════════════════
-   BPMN XML
+   BPMN — dynamic generation from steps array
 ═══════════════════════════════════════════════════ */
 function buildBPMN(stepsData) {
+  // Group steps by actor/lane for positioning
+  const laneOrder = ['dsei','seofi','selog','ses','sepat','deamb','com'];
+  const laneH = 100, laneY0 = 40, taskW = 150, taskH = 60;
+  const lanePositions = {};
+  laneOrder.forEach((a, i) => { lanePositions[a] = laneY0 + i * laneH; });
+
+  // Track x position per lane
+  const laneX = {}; laneOrder.forEach(a => { laneX[a] = 200; });
+
+  let tasks = '', taskShapes = '', edges = '';
+  let prevByActor = {}; // last task id per actor for sequence flows within lane
+  let allTaskIds = [];
+
+  stepsData.forEach((s, i) => {
+    const tid = `T_DYN_${i}`;
+    const actor = s.actor || 'ses';
+    const x = laneX[actor] || 200;
+    const y = (lanePositions[actor] || 380) + 20;
+    const label = sanitizeXml(`${s.num}. ${s.title.substring(0, 35)}${s.title.length > 35 ? '…' : ''}`);
+
+    tasks += `    <task id="${tid}" name="${label}"/>\n`;
+    taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}"><dc:Bounds x="${x}" y="${y}" width="${taskW}" height="${taskH}"/></bpmndi:BPMNShape>\n`;
+
+    // sequence flow to previous task in same actor
+    if (prevByActor[actor]) {
+      const eid = `sf_${prevByActor[actor]}_${tid}`;
+      const px = laneX[actor] - 170; // previous x
+      const cy = y + taskH / 2;
+      tasks += `    <sequenceFlow id="${eid}" sourceRef="${prevByActor[actor]}" targetRef="${tid}"/>\n`;
+      edges += `      <bpmndi:BPMNEdge id="ed_${eid}" bpmnElement="${eid}"><di:waypoint x="${px + taskW}" y="${cy}"/><di:waypoint x="${x}" y="${cy}"/></bpmndi:BPMNEdge>\n`;
+    }
+
+    prevByActor[actor] = tid;
+    laneX[actor] = (laneX[actor] || 200) + 180;
+    allTaskIds.push({ tid, actor, i });
+  });
+
+  // Build process elements per actor
+  const actorsUsed = [...new Set(stepsData.map(s => s.actor || 'ses'))];
+  let processes = '', participants = '', participantShapes = '', participantDefs = '';
+
+  const totalW = Math.max(...laneOrder.map(a => laneX[a] || 200)) + 50;
+
+  laneOrder.forEach((a, li) => {
+    if (!actorsUsed.includes(a)) return;
+    const pid = `Pr_${a.toUpperCase()}`;
+    const partId = ACTOR_BPMN[a] || `P_${a}`;
+    const actorLabel = ACTORS[a]?.label || a;
+    const y = laneY0 + li * laneH;
+    const taskBlock = tasks.split('\n').filter(l => allTaskIds.filter(t => t.actor === a).some(t => l.includes(t.tid))).join('\n');
+    processes += `  <process id="${pid}" isExecutable="false">\n${taskBlock}\n  </process>\n`;
+    participants += `    <participant id="${partId}" name="${sanitizeXml(actorLabel)}" processRef="${pid}"/>\n`;
+    participantShapes += `      <bpmndi:BPMNShape id="sh_${partId}" bpmnElement="${partId}" isHorizontal="true"><dc:Bounds x="100" y="${y}" width="${totalW}" height="${laneH}"/></bpmndi:BPMNShape>\n`;
+    participantDefs += `  <!-- ${a} -->\n`;
+  });
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-  targetNamespace="http://sesai.gov.br/bpmn" id="sesai-ed">
+  targetNamespace="http://sesai.gov.br/bpmn" id="sesai-dynamic">
   <collaboration id="Collab1">
-    <participant id="P_DSEI"  name="DSEI / Gabinete"    processRef="Pr_DSEI"/>
-    <participant id="P_SEOFI" name="SEOFI (Financeiro)" processRef="Pr_SEOFI"/>
-    <participant id="P_SELOG" name="SELOG (Logística)"  processRef="Pr_SELOG"/>
-    <participant id="P_SES"   name="SESANI"             processRef="Pr_SES"/>
-    <participant id="P_SEPAT" name="SEPAT (Patrimônio)" processRef="Pr_SEPAT"/>
-    <participant id="P_DEAMB" name="DEAMB / COABS"      processRef="Pr_DEAMB"/>
-    <participant id="P_COM"   name="Comunidade"          processRef="Pr_COM"/>
-    <messageFlow id="mf1" sourceRef="T_D2"  targetRef="T_O1"/>
-    <messageFlow id="mf2" sourceRef="T_O1"  targetRef="T_L1"/>
-    <messageFlow id="mf3" sourceRef="T_D3"  targetRef="T_PA1"/>
-    <messageFlow id="mf4" sourceRef="T_S5"  targetRef="T_M2"/>
-  </collaboration>
-  <process id="Pr_DSEI" isExecutable="false">
-    <startEvent id="Ev_Start" name="Recebe&#10;material"/>
-    <task id="T_D1" name="${esc(nameFor(stepsData,'T_D1'))}"/>
-    <task id="T_D2" name="${esc(nameFor(stepsData,'T_D2'))}"/>
-    <task id="T_D3" name="7b. Co-assina&#10;Ordem de Serviço"/>
-    <endEvent id="Ev_End" name="Encerra&#10;processo SEI"/>
-    <sequenceFlow id="sf_d1" sourceRef="Ev_Start" targetRef="T_D1"/>
-    <sequenceFlow id="sf_d2" sourceRef="T_D1" targetRef="T_D2"/>
-    <sequenceFlow id="sf_d3" sourceRef="T_D2" targetRef="T_D3"/>
-  </process>
-  <process id="Pr_SEOFI" isExecutable="false">
-    <task id="T_O1" name="${esc(nameFor(stepsData,'T_O1'))}"/>
-    <task id="T_O2" name="5c. Libera material&#10;do almoxarifado"/>
-    <sequenceFlow id="sf_o1" sourceRef="T_O1" targetRef="T_O2"/>
-  </process>
-  <process id="Pr_SELOG" isExecutable="false">
-    <task id="T_L1" name="${esc(nameFor(stepsData,'T_L1'))}"/>
-    <exclusiveGateway id="GW_L1" name="Obra pode&#10;iniciar?"/>
-    <task id="T_L2" name="${esc(nameFor(stepsData,'T_L2'))}"/>
-    <exclusiveGateway id="GW_L2" name="Realoca&#10;material?"/>
-    <task id="T_L3" name="5b. Atualiza remessa&#10;no sistema"/>
-    <sequenceFlow id="sf_l1" sourceRef="T_L1"  targetRef="GW_L1"/>
-    <sequenceFlow id="sf_l2" name="Sim" sourceRef="GW_L1" targetRef="T_L2"/>
-    <sequenceFlow id="sf_l3" sourceRef="T_L2"  targetRef="GW_L2"/>
-    <sequenceFlow id="sf_l4" name="Não" sourceRef="GW_L2" targetRef="T_L3"/>
-  </process>
-  <process id="Pr_SES" isExecutable="false">
-    <task id="T_S1" name="${esc(nameFor(stepsData,'T_S1'))}"/>
-    <task id="T_S2" name="${esc(nameFor(stepsData,'T_S2'))}"/>
-    <task id="T_S3" name="${esc(nameFor(stepsData,'T_S3'))}"/>
-    <task id="T_S4" name="${esc(nameFor(stepsData,'T_S4'))}"/>
-    <task id="T_S5" name="${esc(nameFor(stepsData,'T_S5'))}"/>
-    <task id="T_S6" name="12. Entrega obra&#10;à comunidade"/>
-    <task id="T_S7" name="${esc(nameFor(stepsData,'T_S7'))}"/>
-    <sequenceFlow id="sf_s1" sourceRef="T_S1" targetRef="T_S2"/>
-    <sequenceFlow id="sf_s2" sourceRef="T_S2" targetRef="T_S3"/>
-    <sequenceFlow id="sf_s3" sourceRef="T_S3" targetRef="T_S4"/>
-    <sequenceFlow id="sf_s4" sourceRef="T_S4" targetRef="T_S5"/>
-    <sequenceFlow id="sf_s5" sourceRef="T_S5" targetRef="T_S6"/>
-    <sequenceFlow id="sf_s6" sourceRef="T_S6" targetRef="T_S7"/>
-  </process>
-  <process id="Pr_SEPAT" isExecutable="false">
-    <task id="T_PA1" name="${esc(nameFor(stepsData,'T_PA1'))}"/>
-  </process>
-  <process id="Pr_DEAMB" isExecutable="false">
-    <task id="T_M1" name="Aprova justificativa&#10;de realocação"/>
-    <task id="T_M2" name="${esc(nameFor(stepsData,'T_M2'))}"/>
-    <exclusiveGateway id="GW_M1" name="Há não&#10;conformidade?"/>
-    <sequenceFlow id="sf_m1" sourceRef="T_M2" targetRef="GW_M1"/>
-  </process>
-  <process id="Pr_COM" isExecutable="false">
-    <task id="T_C1" name="C1. Participa da&#10;reunião de início"/>
-    <task id="T_C2" name="C2. Contribui no&#10;diário de obras"/>
-    <task id="T_C3" name="C3. Recebe e assina&#10;entrega da obra"/>
-    <sequenceFlow id="sf_c1" sourceRef="T_C1" targetRef="T_C2"/>
-    <sequenceFlow id="sf_c2" sourceRef="T_C2" targetRef="T_C3"/>
-  </process>
+${participants}  </collaboration>
+${processes}
   <bpmndi:BPMNDiagram id="BPMNDiag1">
     <bpmndi:BPMNPlane id="Plane1" bpmnElement="Collab1">
-      <bpmndi:BPMNShape id="sh_P_DSEI"  bpmnElement="P_DSEI"  isHorizontal="true"><dc:Bounds x="100" y="40"  width="1600" height="100"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_P_SEOFI" bpmnElement="P_SEOFI" isHorizontal="true"><dc:Bounds x="100" y="150" width="1600" height="100"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_P_SELOG" bpmnElement="P_SELOG" isHorizontal="true"><dc:Bounds x="100" y="260" width="1600" height="110"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_P_SES"   bpmnElement="P_SES"   isHorizontal="true"><dc:Bounds x="100" y="380" width="1600" height="110"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_P_SEPAT" bpmnElement="P_SEPAT" isHorizontal="true"><dc:Bounds x="100" y="500" width="1600" height="90"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_P_DEAMB" bpmnElement="P_DEAMB" isHorizontal="true"><dc:Bounds x="100" y="600" width="1600" height="110"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_P_COM"   bpmnElement="P_COM"   isHorizontal="true"><dc:Bounds x="100" y="720" width="1600" height="100"/></bpmndi:BPMNShape>
-      <!-- DSEI tasks -->
-      <bpmndi:BPMNShape id="sh_Ev_Start" bpmnElement="Ev_Start"><dc:Bounds x="160" y="73"  width="36" height="36"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_D1"    bpmnElement="T_D1">    <dc:Bounds x="240" y="60"  width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_D2"    bpmnElement="T_D2">    <dc:Bounds x="440" y="60"  width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_D3"    bpmnElement="T_D3">    <dc:Bounds x="880" y="60"  width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_Ev_End"   bpmnElement="Ev_End">  <dc:Bounds x="1644" y="73" width="36" height="36"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="ed_d1" bpmnElement="sf_d1"><di:waypoint x="196" y="91"/><di:waypoint x="240" y="91"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_d2" bpmnElement="sf_d2"><di:waypoint x="390" y="91"/><di:waypoint x="440" y="91"/></bpmndi:BPMNEdge>
-      <!-- SEOFI tasks -->
-      <bpmndi:BPMNShape id="sh_T_O1" bpmnElement="T_O1"><dc:Bounds x="440" y="170" width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_O2" bpmnElement="T_O2"><dc:Bounds x="650" y="170" width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="ed_o1" bpmnElement="sf_o1"><di:waypoint x="590" y="200"/><di:waypoint x="650" y="200"/></bpmndi:BPMNEdge>
-      <!-- SELOG tasks -->
-      <bpmndi:BPMNShape id="sh_T_L1"  bpmnElement="T_L1"> <dc:Bounds x="440" y="285" width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_GW_L1" bpmnElement="GW_L1"><dc:Bounds x="640" y="295" width="50"  height="50"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_L2"  bpmnElement="T_L2"> <dc:Bounds x="740" y="285" width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_GW_L2" bpmnElement="GW_L2"><dc:Bounds x="940" y="295" width="50"  height="50"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_L3"  bpmnElement="T_L3"> <dc:Bounds x="1040" y="285" width="150" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="ed_l1" bpmnElement="sf_l1"><di:waypoint x="590" y="315"/><di:waypoint x="640" y="320"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_l2" bpmnElement="sf_l2"><di:waypoint x="690" y="320"/><di:waypoint x="740" y="315"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_l3" bpmnElement="sf_l3"><di:waypoint x="890" y="315"/><di:waypoint x="940" y="320"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_l4" bpmnElement="sf_l4"><di:waypoint x="990" y="320"/><di:waypoint x="1040" y="315"/></bpmndi:BPMNEdge>
-      <!-- SESANI tasks -->
-      <bpmndi:BPMNShape id="sh_T_S1" bpmnElement="T_S1"><dc:Bounds x="860"  y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_S2" bpmnElement="T_S2"><dc:Bounds x="1020" y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_S3" bpmnElement="T_S3"><dc:Bounds x="1180" y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_S4" bpmnElement="T_S4"><dc:Bounds x="1340" y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_S5" bpmnElement="T_S5"><dc:Bounds x="1340" y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_S6" bpmnElement="T_S6"><dc:Bounds x="1430" y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_S7" bpmnElement="T_S7"><dc:Bounds x="1500" y="405" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="ed_s1" bpmnElement="sf_s1"><di:waypoint x="1000" y="435"/><di:waypoint x="1020" y="435"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_s2" bpmnElement="sf_s2"><di:waypoint x="1160" y="435"/><di:waypoint x="1180" y="435"/></bpmndi:BPMNEdge>
-      <!-- SEPAT -->
-      <bpmndi:BPMNShape id="sh_T_PA1" bpmnElement="T_PA1"><dc:Bounds x="1020" y="525" width="160" height="55"/></bpmndi:BPMNShape>
-      <!-- DEAMB -->
-      <bpmndi:BPMNShape id="sh_T_M1"  bpmnElement="T_M1"> <dc:Bounds x="860"  y="625" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_M2"  bpmnElement="T_M2"> <dc:Bounds x="1180" y="625" width="140" height="60"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_GW_M1" bpmnElement="GW_M1"><dc:Bounds x="1380" y="635" width="50"  height="50"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="ed_m1" bpmnElement="sf_m1"><di:waypoint x="1320" y="655"/><di:waypoint x="1380" y="660"/></bpmndi:BPMNEdge>
-      <!-- COMUNIDADE -->
-      <bpmndi:BPMNShape id="sh_T_C1" bpmnElement="T_C1"><dc:Bounds x="860"  y="745" width="140" height="55"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_C2" bpmnElement="T_C2"><dc:Bounds x="1180" y="745" width="140" height="55"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="sh_T_C3" bpmnElement="T_C3"><dc:Bounds x="1440" y="745" width="140" height="55"/></bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="ed_c1" bpmnElement="sf_c1"><di:waypoint x="1000" y="772"/><di:waypoint x="1180" y="772"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_c2" bpmnElement="sf_c2"><di:waypoint x="1320" y="772"/><di:waypoint x="1440" y="772"/></bpmndi:BPMNEdge>
-      <!-- Message flows -->
-      <bpmndi:BPMNEdge id="ed_mf1" bpmnElement="mf1"><di:waypoint x="515" y="120"/><di:waypoint x="515" y="170"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_mf2" bpmnElement="mf2"><di:waypoint x="515" y="230"/><di:waypoint x="515" y="285"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_mf3" bpmnElement="mf3"><di:waypoint x="955" y="120"/><di:waypoint x="1100" y="525"/></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="ed_mf4" bpmnElement="mf4"><di:waypoint x="1410" y="465"/><di:waypoint x="1250" y="625"/></bpmndi:BPMNEdge>
-    </bpmndi:BPMNPlane>
+${participantShapes}${taskShapes}${edges}    </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>`;
 }
 
-function nameFor(stepsData, bpmnId) {
-  const s = stepsData.find(x => x.bpmnId === bpmnId);
-  return s ? s.num + '. ' + s.title.substring(0,40) + (s.title.length>40?'…':'') : bpmnId;
+function sanitizeXml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
 }
-function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'&#10;'); }
 
 /* ═══════════════════════════════════════════════════
    BPMN MODELER
@@ -1159,233 +839,266 @@ const modeler = new BpmnJS({ container: '#bpmnCanvas' });
 
 async function loadBPMN(xml) {
   document.getElementById('syncOverlay').classList.add('show');
-  try {
-    await modeler.importXML(xml);
-    modeler.get('canvas').zoom('fit-viewport');
-    bpmnReady = true;
-  } catch(e) { console.error('BPMN error:', e); }
+  try { await modeler.importXML(xml); modeler.get('canvas').zoom('fit-viewport'); bpmnReady = true; }
+  catch(e) { console.error('BPMN:', e); }
   document.getElementById('syncOverlay').classList.remove('show');
 }
 
-async function syncBPMN() {
+function scheduleBPMNSync() {
   if (!bpmnReady) return;
-  document.getElementById('syncOverlay').classList.add('show');
-  await new Promise(r => setTimeout(r, 300)); // small visual delay
-  await loadBPMN(buildBPMN(steps));
-  document.getElementById('syncOverlay').classList.remove('show');
-  toast('Diagrama BPMN atualizado.', 'success');
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    document.getElementById('syncOverlay').classList.add('show');
+    await new Promise(r => setTimeout(r, 200));
+    await loadBPMN(buildBPMN(steps));
+    document.getElementById('syncOverlay').classList.remove('show');
+    toast('Diagrama BPMN atualizado.', 'success');
+  }, 400);
 }
 
 modeler.on('selection.changed', ({ newSelection }) => {
   bpmnSelected = newSelection[0] || null;
-  const ppEmpty = document.getElementById('ppEmpty');
-  const ppForm  = document.getElementById('ppForm');
-  const ppType  = document.getElementById('ppType');
-  const ppLock  = document.getElementById('ppLock');
-  const ppSave  = document.getElementById('ppSave');
-  if (!bpmnSelected) {
-    ppEmpty.style.display = 'block'; ppForm.style.display = 'none';
-    ppType.textContent = '–'; return;
-  }
+  const ppEmpty = document.getElementById('ppEmpty'), ppForm = document.getElementById('ppForm'), ppType = document.getElementById('ppType');
+  if (!bpmnSelected) { ppEmpty.style.display='block'; ppForm.style.display='none'; ppType.textContent='–'; return; }
   const bo = bpmnSelected.businessObject;
-  ppEmpty.style.display = 'none'; ppForm.style.display = 'block';
-  ppType.textContent = (bo.$type || '').replace('bpmn:','');
-  document.getElementById('ppName').value = (bo.name || '').replace(/\n/g, ' ');
-  document.getElementById('ppDoc').value  = bo.documentation?.[0]?.text || '';
+  ppEmpty.style.display='none'; ppForm.style.display='block';
+  ppType.textContent = (bo.$type||'').replace('bpmn:','');
+  document.getElementById('ppName').value = (bo.name||'').replace(/\n/g,' ');
+  document.getElementById('ppDoc').value  = bo.documentation?.[0]?.text||'';
   const canEdit = !!auth;
-  document.getElementById('ppName').disabled = !canEdit;
-  document.getElementById('ppDoc').disabled  = !canEdit;
-  ppSave.style.display = canEdit ? 'block' : 'none';
-  ppLock.style.display = canEdit ? 'none'  : 'block';
+  document.getElementById('ppName').disabled = !canEdit; document.getElementById('ppDoc').disabled = !canEdit;
+  document.getElementById('ppSave').style.display = canEdit?'block':'none';
+  document.getElementById('ppLock').style.display = canEdit?'none':'block';
 });
 
 function bSaveProps() {
-  if (!auth || !bpmnSelected) return;
-  const modeling = modeler.get('modeling');
-  const moddle   = modeler.get('moddle');
-  const newName  = document.getElementById('ppName').value;
-  const newDoc   = document.getElementById('ppDoc').value;
-  modeling.updateProperties(bpmnSelected, { name: newName });
-  const docEl = moddle.create('bpmn:Documentation', { text: newDoc });
-  modeling.updateProperties(bpmnSelected, { documentation: [docEl] });
-  toast('Propriedades atualizadas no diagrama.', 'success');
+  if (!auth||!bpmnSelected) return;
+  const modeling=modeler.get('modeling'), moddle=modeler.get('moddle');
+  modeling.updateProperties(bpmnSelected,{name:document.getElementById('ppName').value});
+  const docEl=moddle.create('bpmn:Documentation',{text:document.getElementById('ppDoc').value});
+  modeling.updateProperties(bpmnSelected,{documentation:[docEl]});
+  toast('Propriedades atualizadas no diagrama.','success');
 }
+function bFit()    { modeler.get('canvas').zoom('fit-viewport'); }
+function bZoomIn() { const c=modeler.get('canvas'); c.zoom(c.zoom()*1.2); }
+function bZoomOut(){ const c=modeler.get('canvas'); c.zoom(c.zoom()*.82); }
+function bUndo()   { if(!auth){openLogin();return;} modeler.get('commandStack').undo(); }
+function bRedo()   { if(!auth){openLogin();return;} modeler.get('commandStack').redo(); }
+async function bExportBPMN() { const{xml}=await modeler.saveXML({format:true}); dlFile(xml,'sesai-execucao-direta.bpmn','application/xml'); toast('Arquivo .bpmn exportado.','success'); }
+async function bExportSVG()  { const{svg}=await modeler.saveSVG(); dlFile(svg,'sesai-execucao-direta.svg','image/svg+xml'); toast('SVG exportado.','success'); }
+function bImport(input) { const f=input.files[0]; if(!f) return; const r=new FileReader(); r.onload=async e=>{await loadBPMN(e.target.result);toast('Diagrama importado.','success');}; r.readAsText(f); }
+function bReset()  { if(!confirm('Restaurar o diagrama baseado no fluxo atual?')) return; loadBPMN(buildBPMN(steps)); toast('Diagrama restaurado.','success'); }
+function dlFile(content,name,type) { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click(); }
 
-function bFit()  { modeler.get('canvas').zoom('fit-viewport'); }
-function bZoomIn()  { const c=modeler.get('canvas'); c.zoom(c.zoom()*1.2); }
-function bZoomOut() { const c=modeler.get('canvas'); c.zoom(c.zoom()*.82); }
-function bUndo() { if (!auth) { openLogin(); return; } modeler.get('commandStack').undo(); }
-function bRedo() { if (!auth) { openLogin(); return; } modeler.get('commandStack').redo(); }
-
-async function bExportBPMN() {
-  const { xml } = await modeler.saveXML({ format: true });
-  dl(xml, 'sesai-execucao-direta.bpmn', 'application/xml');
-  toast('Arquivo .bpmn exportado.', 'success');
-}
-async function bExportSVG() {
-  const { svg } = await modeler.saveSVG();
-  dl(svg, 'sesai-execucao-direta.svg', 'image/svg+xml');
-  toast('SVG exportado.', 'success');
-}
-function bImport(input) {
-  const f = input.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = async e => {
-    await loadBPMN(e.target.result);
-    toast('Diagrama importado.', 'success');
-  };
-  r.readAsText(f);
-}
-function bReset() {
-  if (!confirm('Restaurar o diagrama original?')) return;
-  loadBPMN(buildBPMN(steps));
-  toast('Diagrama restaurado.', 'success');
-}
-
-function dl(content, name, type) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content], { type }));
-  a.download = name; a.click();
+/* ═══════════════════════════════════════════════════
+   PHASE STEPS INDEX (computed)
+═══════════════════════════════════════════════════ */
+function rebuildPhaseSteps() {
+  PHASES.forEach(ph => ph.steps = []);
+  steps.forEach((s, i) => {
+    const ph = PHASES.find(p => p.id === s.phase);
+    if (ph) ph.steps.push(i);
+  });
 }
 
 /* ═══════════════════════════════════════════════════
-   FLOW RENDERING
+   ACTOR FILTER
 ═══════════════════════════════════════════════════ */
-function renderFlow() {
-  renderPhaseFilter();
-  renderCards();
-  renderMiniMap();
-  renderPhaseBars();
-  renderProgress();
+function renderActorChips() {
+  const container = document.getElementById('actorChips');
+  const actorKeys = [...new Set(steps.map(s => s.actor))];
+  let html = `<button class="actor-chip ${activeActor===null?'active':''}" style="${activeActor===null?'background:var(--gray-700);border-color:var(--gray-700)':''}" onclick="setActorFilter(null)">Todos</button>`;
+  actorKeys.forEach(key => {
+    const ac=ACTORS[key]||{label:key,color:'#555',bg:'#eee'}, isActive=activeActor===key;
+    html+=`<button class="actor-chip ${isActive?'active':''}" style="${isActive?`background:${ac.color};border-color:${ac.color}`:''}" onclick="setActorFilter('${key}')">
+      <div class="actor-chip-dot" style="background:${isActive?'rgba(255,255,255,.7)':ac.color}"></div>${ac.label}</button>`;
+  });
+  container.innerHTML = html;
 }
+function setActorFilter(k) { activeActor=k; renderActorChips(); renderCards(); renderMiniMap(); }
+
+/* ═══════════════════════════════════════════════════
+   FULL RENDER
+═══════════════════════════════════════════════════ */
+function renderFlow() { rebuildPhaseSteps(); renderActorChips(); renderPhaseFilter(); renderCards(); renderMiniMap(); renderPhaseBars(); renderProgress(); renderSidebarActors(); updateFBStepOptions(); }
 
 function renderPhaseFilter() {
   document.getElementById('phaseFilter').innerHTML = PHASES.map(ph => {
-    const total = ph.steps.length;
-    const done  = ph.steps.filter(i => doneSteps.has(i)).length;
-    const isCurrent = ph.steps.includes(currentStep);
-    return `<button class="phase-btn ${isCurrent ? 'active' : ''}"
-      style="${isCurrent ? `background:${ph.color};border-color:${ph.color}` : ''}"
-      onclick="jumpTo(${ph.steps[0]})">
-      <div class="phase-pip" style="background:${isCurrent?'rgba(255,255,255,.6)':ph.color};opacity:${done===total&&total>0?1:.4}"></div>
-      ${ph.label} <span style="opacity:.7;font-size:10.5px">${done}/${total}</span>
-    </button>`;
+    const total=ph.steps.length, done=ph.steps.filter(i=>doneSteps.has(i)).length, isCurrent=ph.steps.includes(currentStep);
+    if (total===0) return '';
+    return `<button class="phase-btn ${isCurrent?'active':''}" style="${isCurrent?`background:${ph.color};border-color:${ph.color}`:''}" onclick="jumpTo(${ph.steps[0]})">
+      <div class="phase-pip" style="background:${isCurrent?'rgba(255,255,255,.65)':ph.color};opacity:${done===total?1:.4}"></div>
+      ${ph.label} <span style="opacity:.7;font-size:10.5px;font-family:var(--mono)">${done}/${total}</span></button>`;
   }).join('');
 }
 
 function renderCards() {
-  document.getElementById('stepCards').innerHTML = steps.map((s, i) => {
-    const ph = PHASES.find(p => p.id === s.phase);
-    const ac = ACTORS[s.actor];
-    const isDone    = doneSteps.has(i);
-    const isActive  = i === currentStep;
-    const isOpen    = i === openCard;
-    const isLocked  = i > currentStep;
-    const isEditing = i === editCard;
+  const isEditMode = !!auth;
+  const visible = steps.map((s,i)=>({s,i})).filter(({s})=>activeActor===null||s.actor===activeActor);
+  if (visible.length===0 && activeActor) {
+    document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa para o ator selecionado.</div></div>`;
+    return;
+  }
+  // Apply edit-mode class to flow-main for CSS hooks
+  const fm = document.getElementById('flowMain');
+  if (isEditMode) fm.classList.add('edit-mode'); else fm.classList.remove('edit-mode');
 
-    let cls = 'step-card';
-    if (isLocked) cls += ' locked';
-    else if (isDone) cls += ' done';
-    else if (isActive) cls += ' active';
-    if (isOpen) cls += ' open';
+  document.getElementById('addCardBtn').classList.toggle('show', isEditMode);
 
-    const itemsHtml = s.items.map((it, ii) =>
-      `<div class="card-item"><div class="item-dot"></div><span id="item-${i}-${ii}">${it}</span></div>`
-    ).join('');
+  document.getElementById('stepCards').innerHTML = visible.map(({s,i}) => {
+    const ph=PHASES.find(p=>p.id===s.phase)||PHASES[0];
+    const ac=ACTORS[s.actor]||{label:s.actor,color:'#555',bg:'#eee'};
+    const isDone=doneSteps.has(i), isActive=i===currentStep, isOpen=i===openCard, isLocked=i>currentStep&&!isEditMode, isEditing=i===editCard;
+    let cls='step-card';
+    if(isLocked) cls+=' locked'; else if(isDone) cls+=' done'; else if(isActive) cls+=' active';
+    if(isOpen) cls+=' open';
 
-    const alertHtml = s.alert
-      ? `<div class="alert-strip"><span style="font-size:15px;flex-shrink:0">⚠️</span><div>${s.alert}</div></div>`
-      : '';
+    // Attachments
+    const atts = (s.attachments||[]);
+    const attHtml = `
+    <div class="attachments-section">
+      <div class="att-header">
+        <span class="att-label">📎 Anexos${atts.length?` (${atts.length})`:''}</span>
+        <button class="att-upload-btn" onclick="event.stopPropagation();triggerFileUpload(${i})">
+          <span>🔗</span> Vincular do Google Drive
+        </button>
+      </div>
+      <div class="att-list">
+        ${atts.length===0
+          ? `<span class="att-empty">Nenhum arquivo anexado</span>`
+          : atts.map((a,ai)=>`<div class="att-item" title="Abrir no Drive: ${sanitize(a.name)}" onclick="event.stopPropagation();openAttachment('${a.url||''}')">
+              <span class="att-item-icon">${a.source?.startsWith('drive') ? '🔗' : fileIcon(a.name)}</span>
+              <span class="att-item-name">${sanitize(a.name)}</span>
+              <button class="att-item-del" onclick="event.stopPropagation();removeAttachment(${i},${ai})" title="Remover">×</button>
+            </div>`).join('')}
+      </div>
+    </div>`;
 
-    const docsHtml = s.docs.map(d => `<div class="doc-chip">📄 ${d}</div>`).join('');
-
-    // Edit panel
+    // Edit panel — full fields
     const editPanelHtml = `
-    <div class="edit-panel ${isEditing && auth ? 'show' : ''}" id="ep-${i}">
-      <div class="ep-title">✏️ Editar etapa ${s.num}</div>
-      <label class="ep-label">Título da etapa</label>
-      <input class="ep-input" id="ep-title-${i}" value="${s.title.replace(/"/g,'&quot;')}">
-      <label class="ep-label">Descrição</label>
-      <textarea class="ep-textarea" id="ep-desc-${i}">${s.desc}</textarea>
-      <label class="ep-label">Itens do checklist</label>
-      <div class="ep-items-list" id="ep-items-${i}">
-        ${s.items.map((it, ii) => `
-          <div class="ep-item-row" id="eprow-${i}-${ii}">
-            <input class="ep-item-input" id="epitem-${i}-${ii}" value="${it.replace(/"/g,'&quot;')}">
+    <div class="edit-panel ${isEditing&&auth?'show':''}" id="ep-${i}">
+      <div class="ep-section">
+        <div class="ep-section-title">✏️ Editar etapa ${sanitize(s.num)}</div>
+        <label class="ep-label">Título</label>
+        <input class="ep-input" id="ep-title-${i}" value="${s.title.replace(/"/g,'&quot;').replace(/</g,'&lt;')}">
+        <label class="ep-label">Descrição</label>
+        <textarea class="ep-textarea" id="ep-desc-${i}">${sanitize(s.desc)}</textarea>
+        <div class="ep-2col">
+          <div>
+            <label class="ep-label">Ator responsável</label>
+            <select class="ep-select" id="ep-actor-${i}">
+              ${Object.entries(ACTORS).map(([k,v])=>`<option value="${k}"${s.actor===k?' selected':''}>${v.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label class="ep-label">Fase</label>
+            <select class="ep-select" id="ep-phase-${i}">
+              ${PHASES.map(p=>`<option value="${p.id}"${s.phase===p.id?' selected':''}>${p.label}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="ep-2col">
+          <div>
+            <label class="ep-label">Rótulo do botão</label>
+            <input class="ep-input" id="ep-btn-${i}" value="${(s.btnLabel||'').replace(/"/g,'&quot;')}">
+          </div>
+          <div>
+            <label class="ep-label">Alerta de dificuldade</label>
+            <input class="ep-input" id="ep-alert-${i}" value="${(s.alert||'').replace(/"/g,'&quot;')}" placeholder="Deixe em branco para remover">
+          </div>
+        </div>
+      </div>
+      <div class="ep-section">
+        <div class="ep-section-title">☑ Checklist de atividades</div>
+        <div class="ep-items-list" id="ep-items-${i}">
+          ${s.items.map((it,ii)=>`<div class="ep-item-row" id="eprow-${i}-${ii}">
+            <input class="ep-item-input" id="epitem-${i}-${ii}" value="${it.replace(/"/g,'&quot;').replace(/</g,'&lt;')}">
             <button class="ep-item-del" onclick="removeItem(${i},${ii})">×</button>
           </div>`).join('')}
+        </div>
+        <button class="ep-add-item" onclick="addItem(${i})">+ Adicionar atividade</button>
       </div>
-      <button class="ep-add-item" onclick="addItem(${i})">+ Adicionar item</button>
       <div class="ep-actions">
-        <button class="ep-save" onclick="saveEdit(${i})">Salvar e sincronizar BPMN</button>
+        <button class="ep-save" id="ep-save-${i}" onclick="saveEdit(${i})">💾 Salvar e sincronizar BPMN</button>
         <button class="ep-cancel" onclick="cancelEdit()">Cancelar</button>
+        <span id="ep-feedback-${i}" class="ep-feedback"></span>
       </div>
     </div>`;
 
     // Footer buttons
-    let footerHtml = '';
-    if (!isLocked) {
-      if (isDone) {
-        footerHtml = `<button class="btn-done">✓ Concluído</button>`;
-      } else {
-        footerHtml = `<button class="btn-next" style="background:${ph.color}" onclick="advance(${i})">${s.btnLabel} →</button>`;
-        if (s.optional) footerHtml += `<button class="btn-skip" onclick="advance(${i})">${s.optLabel || 'Pular'}</button>`;
+    let footerHtml='';
+    if(!isLocked) {
+      if(isDone) { footerHtml=`<button class="btn-done">✓ Concluído</button>`; }
+      else {
+        footerHtml=`<button class="btn-next" style="background:${ph.color}" onclick="advance(${i})">${sanitize(s.btnLabel||'Avançar')} →</button>`;
+        if(s.optional) footerHtml+=`<button class="btn-skip" onclick="advance(${i})">${sanitize(s.optLabel||'Pular')}</button>`;
       }
-      footerHtml += `<button class="btn-comment" onclick="openFB('${s.num}')">💬 Comentar</button>`;
+      footerHtml+=`<button class="btn-comment" onclick="openFB('${sanitize(s.num)}')">💬 Comentar</button>`;
     }
 
+    // Move & delete buttons (edit mode only)
+    const moveDelHtml = isEditMode ? `
+      <button class="icon-btn del-btn" title="Excluir etapa" onclick="event.stopPropagation();confirmDelete(${i})">🗑</button>
+      <button class="icon-btn edit-btn" title="Editar etapa" onclick="event.stopPropagation();toggleEdit(${i})">✏️</button>` : '';
+
     return `
-    <div class="step-card ${cls}" id="card-${i}">
+    <div class="step-card ${cls}" id="card-${i}" 
+      draggable="${isEditMode?'true':'false'}"
+      ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})" ondragleave="dragLeave(event)" ondrop="dragDrop(event,${i})" ondragend="dragEnd(event)">
       <div class="card-left-bar" style="background:${ph.color}"></div>
       <div class="card-top" onclick="toggleCard(${i})">
-        <div class="step-index">${isDone ? '✓' : s.num}</div>
+        ${isEditMode?`<div class="drag-handle" title="Arrastar para reordenar">⠿</div>`:''}
+        <div class="step-index">${isDone?'✓':sanitize(s.num)}</div>
         <div class="step-info">
-          <div class="step-title">${s.title}</div>
+          <div class="step-title">${sanitize(s.title)}</div>
           <div class="step-meta-row">
             <span class="actor-pill" style="background:${ac.bg};color:${ac.color}">● ${ac.label}</span>
             <span class="phase-pill-sm">${ph.label}</span>
+            ${atts.length>0?`<span style="font-size:10.5px;color:var(--gray-400)">📎 ${atts.length}</span>`:''}
           </div>
         </div>
         <div class="step-actions" onclick="event.stopPropagation()">
-          ${auth && !isLocked ? `<button class="icon-btn edit-btn" title="Editar esta etapa" onclick="toggleEdit(${i})">✏️</button>` : ''}
-          ${!isLocked ? `<span class="chevron">▾</span>` : ''}
+          ${moveDelHtml}
+          ${!isLocked||isEditMode?`<span class="chevron">▾</span>`:''}
         </div>
       </div>
       <div class="card-body">
-        <p class="card-desc">${s.desc}</p>
-        ${alertHtml}
-        <div class="card-items">${itemsHtml}</div>
-        <div class="docs-row">${docsHtml}</div>
+        <p class="card-desc">${sanitize(s.desc)}</p>
+        ${s.alert?`<div class="alert-strip"><span style="font-size:15px;flex-shrink:0">⚠️</span><div>${sanitize(s.alert)}</div></div>`:''}
+        <div class="card-items">${s.items.map(it=>`<div class="card-item"><div class="item-dot"></div><span>${sanitize(it)}</span></div>`).join('')}</div>
+        <div class="docs-row">${s.docs.map(d=>`<div class="doc-chip">📄 ${sanitize(d)}</div>`).join('')}</div>
+        ${attHtml}
         ${editPanelHtml}
-        ${footerHtml ? `<div class="card-footer">${footerHtml}</div>` : ''}
+        ${footerHtml?`<div class="card-footer">${footerHtml}</div>`:''}
       </div>
     </div>`;
   }).join('');
 }
 
 function renderMiniMap() {
-  document.getElementById('miniMap').innerHTML = steps.map((s, i) => {
-    const ac = ACTORS[s.actor];
-    const isDone = doneSteps.has(i), isActive = i === currentStep, isLocked = i > currentStep;
-    const ph = PHASES.find(p => p.id === s.phase);
-    let cls = isLocked ? 'mm-locked' : isDone ? 'mm-done' : isActive ? 'mm-active' : '';
-    return `<div class="mm-item ${cls}" onclick="if(!${isLocked})toggleCard(${i})">
+  const html = steps.map((s,i) => {
+    const ac=ACTORS[s.actor]||{label:s.actor}, isDone=doneSteps.has(i), isActive=i===currentStep, isLocked=i>currentStep&&!auth;
+    const ph=PHASES.find(p=>p.id===s.phase)||PHASES[0], dimmed=activeActor!==null&&s.actor!==activeActor;
+    let cls=isLocked?'mm-locked':isDone?'mm-done':isActive?'mm-active':'';
+    return `<div class="mm-item ${cls}" style="${dimmed?'opacity:.25;pointer-events:none':''}" onclick="if(!${isLocked})toggleCard(${i})">
       <div class="mm-dot" style="${isActive?`border-color:${ph.color};color:${ph.color}`:''}">
-        ${isDone ? '✓' : s.num}
+        ${isDone?'✓':sanitize(s.num)}
       </div>
       <div>
-        <div class="mm-title">${s.title.substring(0,36)}${s.title.length>36?'…':''}</div>
+        <div class="mm-title">${sanitize(s.title.substring(0,36))}${s.title.length>36?'…':''}</div>
         <div class="mm-actor">${ac.label}</div>
       </div>
     </div>`;
   }).join('');
+  document.getElementById('miniMap').innerHTML = html;
+  const mob = document.getElementById('miniMapMobile');
+  if (mob) mob.innerHTML = html;
 }
 
 function renderPhaseBars() {
-  document.getElementById('phaseBars').innerHTML = PHASES.map(ph => {
-    const total = ph.steps.length;
-    const done  = ph.steps.filter(i => doneSteps.has(i)).length;
-    const pct   = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('phaseBars').innerHTML = PHASES.filter(ph=>ph.steps.length>0).map(ph => {
+    const total=ph.steps.length, done=ph.steps.filter(i=>doneSteps.has(i)).length;
+    const pct=total?Math.round((done/total)*100):0;
     return `<div class="pb-row">
       <div class="pb-dot" style="background:${ph.color}"></div>
       <div class="pb-name">${ph.label}</div>
@@ -1395,92 +1108,347 @@ function renderPhaseBars() {
   }).join('');
 }
 
+function renderSidebarActors() {
+  document.getElementById('sidebarActors').innerHTML = Object.entries(ACTORS).map(([key,ac]) => {
+    const isActive=activeActor===key;
+    return `<div class="actor-row" onclick="setActorFilter(activeActor==='${key}'?null:'${key}')" style="${isActive?`background:${ac.bg};border-radius:6px`:''}">
+      <div class="actor-bar" style="background:${ac.color}"></div>
+      <div><div class="actor-name" style="color:${ac.color}">${ac.label}</div><div class="actor-desc">${actorDesc(key)}</div></div>
+      ${isActive?`<span style="font-size:10px;color:${ac.color};margin-left:auto">✓</span>`:''}
+    </div>`;
+  }).join('');
+}
+
 function renderProgress() {
-  const n = doneSteps.size, total = steps.length;
-  document.getElementById('progFill').style.width = `${(n/total)*100}%`;
-  document.getElementById('progLabel').textContent = `${n} / ${total}`;
-  document.getElementById('tc-flow').textContent   = `${n} / ${total}`;
+  const n=doneSteps.size, total=steps.length;
+  document.getElementById('progFill').style.width=`${total?((n/total)*100):0}%`;
+  document.getElementById('progLabel').textContent=`${n} / ${total}`;
+  document.getElementById('tc-flow').textContent=`${n} / ${total}`;
+}
+
+function actorDesc(key) {
+  return {dsei:'aprovação · designação',ses:'responsável técnico',seofi:'financeiro · SIAFI',selog:'logística · obras',sepat:'patrimônio · retirada',deamb:'validação · ART',com:'participação · entrega'}[key]||'';
+}
+
+function fileIcon(name) {
+  const ext = (name||'').split('.').pop().toLowerCase();
+  return FILE_ICONS[ext]||FILE_ICONS.default;
 }
 
 /* ═══════════════════════════════════════════════════
    FLOW INTERACTIONS
 ═══════════════════════════════════════════════════ */
 function toggleCard(i) {
-  if (i > currentStep) return;
-  openCard = (openCard === i) ? -1 : i;
+  if (i>currentStep && !auth) return;
+  openCard = (openCard===i) ? -1 : i;
   renderFlow();
-  if (openCard !== -1) setTimeout(() => document.getElementById(`card-${i}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
+  if (openCard!==-1) setTimeout(()=>document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
 }
-
 function jumpTo(i) {
-  if (i > currentStep) return;
-  openCard = i;
-  renderFlow();
-  setTimeout(() => document.getElementById(`card-${i}`)?.scrollIntoView({ behavior:'smooth', block:'center' }), 80);
+  if (i>currentStep&&!auth) return;
+  openCard=i; renderFlow();
+  setTimeout(()=>document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'center'}),80);
 }
-
 function advance(i) {
-  doneSteps.add(i); currentStep = i + 1; openCard = currentStep < steps.length ? currentStep : -1; editCard = -1;
+  doneSteps.add(i); currentStep=i+1; openCard=currentStep<steps.length?currentStep:-1; editCard=-1;
   renderFlow();
-  setTimeout(() => {
-    const el = document.getElementById(`card-${currentStep}`);
-    if (el) { el.style.animation = 'none'; el.offsetHeight; el.style.animation = ''; el.scrollIntoView({ behavior:'smooth', block:'center' }); }
-  }, 100);
-  if (currentStep >= steps.length) setTimeout(() => document.getElementById('celebrateOverlay').classList.add('show'), 600);
+  setTimeout(()=>{ const el=document.getElementById(`card-${currentStep}`); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); },100);
+  if(currentStep>=steps.length) setTimeout(()=>document.getElementById('celebrateOverlay').classList.add('show'),600);
 }
-
 function resetFlow() {
-  doneSteps.clear(); currentStep = 0; openCard = 0; editCard = -1;
-  document.getElementById('celebrateOverlay').classList.remove('show');
-  renderFlow(); document.getElementById('flowMain').scrollTo({ top:0, behavior:'smooth' });
+  doneSteps.clear(); currentStep=0; openCard=0; editCard=-1; activeActor=null;
+  closeCelebrate(); renderFlow();
+  document.getElementById('flowMain').scrollTo({top:0,behavior:'smooth'});
 }
 
 /* ═══════════════════════════════════════════════════
-   INLINE EDIT (syncs to BPMN)
+   DRAG & DROP — only reorder mechanism
+═══════════════════════════════════════════════════ */
+function dragStart(e, i) {
+  if (!auth) { e.preventDefault(); return; }
+  dragSrcIdx = i;
+  e.dataTransfer.effectAllowed = 'move';
+  document.getElementById(`card-${i}`)?.classList.add('dragging');
+}
+function dragOver(e, i) {
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  document.querySelectorAll('.step-card.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if (i !== dragSrcIdx) document.getElementById(`card-${i}`)?.classList.add('drag-over');
+}
+function dragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+function dragDrop(e, i) {
+  e.preventDefault();
+  document.querySelectorAll('.step-card.drag-over,.step-card.dragging').forEach(el=>el.classList.remove('drag-over','dragging'));
+  if (dragSrcIdx===null||dragSrcIdx===i) { dragSrcIdx=null; return; }
+  // reorder
+  const moved = steps.splice(dragSrcIdx, 1)[0];
+  steps.splice(i, 0, moved);
+  // fix doneSteps (rebuild from scratch - simplify)
+  doneSteps = new Set([...doneSteps].map(d => {
+    if (d===dragSrcIdx) return i;
+    if (dragSrcIdx<i && d>dragSrcIdx && d<=i) return d-1;
+    if (dragSrcIdx>i && d>=i && d<dragSrcIdx) return d+1;
+    return d;
+  }));
+  openCard=-1; editCard=-1;
+  renumberSteps();
+  saveSteps();
+  renderFlow();
+  scheduleBPMNSync();
+  dragSrcIdx=null;
+  toast('Ordem atualizada.','success');
+}
+function dragEnd(e) {
+  document.querySelectorAll('.step-card.dragging,.step-card.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
+}
+
+/* ═══════════════════════════════════════════════════
+   DELETE CARD
+═══════════════════════════════════════════════════ */
+function confirmDelete(i) {
+  if (!auth) { openLogin(); return; }
+  const s = steps[i];
+  document.getElementById('confirmTitle').textContent = 'Excluir etapa';
+  document.getElementById('confirmMsg').textContent = `Tem certeza que deseja excluir "${s.title}"? Esta ação não pode ser desfeita.`;
+  confirmCallback = () => deleteCard(i);
+  document.getElementById('confirmBtn').onclick = () => { closeConfirm(); confirmCallback(); };
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); }
+function deleteCard(i) {
+  steps.splice(i, 1);
+  // Only shift indices above the deleted one — completed steps are preserved as-is
+  const newDone = new Set();
+  doneSteps.forEach(d => {
+    if (d < i) newDone.add(d);      // below deleted: unchanged
+    else if (d > i) newDone.add(d - 1); // above deleted: shift down
+    // d === i: that step was itself deleted, so drop it
+  });
+  doneSteps = newDone;
+  currentStep = Math.min(currentStep, steps.length);
+  openCard = -1; editCard = -1;
+  renumberSteps();
+  saveSteps();
+  renderFlow();
+  scheduleBPMNSync();
+  toast('Etapa removida do fluxo.', 'success');
+}
+
+/* ═══════════════════════════════════════════════════
+   ADD CARD
+═══════════════════════════════════════════════════ */
+function openAddCard()  { document.getElementById('addCardOverlay').classList.add('show'); setTimeout(()=>document.getElementById('nc-title').focus(),80); }
+function closeAddCard() { document.getElementById('addCardOverlay').classList.remove('show'); }
+function confirmAddCard() {
+  const title = document.getElementById('nc-title').value.trim();
+  if (!title) { toast('Digite um título para a etapa.','error'); return; }
+  const newStep = {
+    id: 'custom_' + Date.now(),
+    num: String(steps.length+1),
+    phase: document.getElementById('nc-phase').value,
+    actor: document.getElementById('nc-actor').value,
+    title,
+    desc: document.getElementById('nc-desc').value.trim()||'',
+    items: [],
+    docs: [],
+    alert: null,
+    btnLabel: document.getElementById('nc-btn').value.trim()||'Concluído',
+    attachments: [],
+  };
+  steps.push(newStep);
+  renumberSteps();
+  saveSteps();
+  closeAddCard();
+  document.getElementById('nc-title').value=''; document.getElementById('nc-desc').value=''; document.getElementById('nc-btn').value='';
+  openCard = steps.length-1;
+  renderFlow();
+  scheduleBPMNSync();
+  toast(`Etapa "${newStep.title}" adicionada.`,'success');
+  setTimeout(()=>document.getElementById(`card-${steps.length-1}`)?.scrollIntoView({behavior:'smooth',block:'center'}),150);
+}
+
+function renumberSteps() { steps.forEach((s,i) => { s.num = String(i+1); }); }
+
+/* ═══════════════════════════════════════════════════
+   INLINE EDIT
 ═══════════════════════════════════════════════════ */
 function toggleEdit(i) {
   if (!auth) { openLogin(); return; }
-  editCard = (editCard === i) ? -1 : i;
+  editCard=(editCard===i)?-1:i; openCard=i; renderFlow();
+  setTimeout(()=>document.getElementById(`ep-${i}`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+}
+function cancelEdit() { editCard=-1; renderFlow(); }
+
+function removeItem(ci,ii) {
+  steps[ci].items.splice(ii,1);
+  const container=document.getElementById(`ep-items-${ci}`);
+  if(container) container.innerHTML=steps[ci].items.map((it,jj)=>`
+    <div class="ep-item-row"><input class="ep-item-input" id="epitem-${ci}-${jj}" value="${it.replace(/"/g,'&quot;').replace(/</g,'&lt;')}">
+    <button class="ep-item-del" onclick="removeItem(${ci},${jj})">×</button></div>`).join('');
+}
+function addItem(ci) {
+  steps[ci].items.push('Nova atividade'); renderFlow();
+  setTimeout(()=>{ const inputs=document.querySelectorAll(`#ep-items-${ci} .ep-item-input`); const last=inputs[inputs.length-1]; if(last){last.focus();last.select();} },60);
+}
+
+async function saveEdit(i) {
+  if (!auth) return;
+  const saveBtn=document.getElementById(`ep-save-${i}`), fb=document.getElementById(`ep-feedback-${i}`);
+  saveBtn.classList.add('loading'); saveBtn.textContent='Salvando…'; saveBtn.disabled=true;
+  try {
+    await new Promise(r=>setTimeout(r,300));
+    const title=document.getElementById(`ep-title-${i}`)?.value.trim();
+    const desc =document.getElementById(`ep-desc-${i}`)?.value.trim();
+    const actor=document.getElementById(`ep-actor-${i}`)?.value;
+    const phase=document.getElementById(`ep-phase-${i}`)?.value;
+    const btn  =document.getElementById(`ep-btn-${i}`)?.value.trim();
+    const alert=document.getElementById(`ep-alert-${i}`)?.value.trim();
+    if (title) steps[i].title=title;
+    if (desc!=null) steps[i].desc=desc;
+    if (actor) steps[i].actor=actor;
+    if (phase) steps[i].phase=phase;
+    if (btn)   steps[i].btnLabel=btn;
+    steps[i].alert = alert||null;
+    const itemEls=document.querySelectorAll(`#ep-items-${i} .ep-item-input`);
+    if (itemEls.length) steps[i].items=Array.from(itemEls).map(el=>el.value.trim()).filter(Boolean);
+    saveSteps();
+    editCard=-1; renderFlow(); scheduleBPMNSync();
+    toast('Etapa salva. Diagrama BPMN atualizado.','success');
+  } catch(e) {
+    saveBtn.classList.remove('loading'); saveBtn.textContent='💾 Salvar e sincronizar BPMN'; saveBtn.disabled=false;
+    if(fb) fb.innerHTML=`<span class="save-badge error">⚠ Erro ao salvar</span>`;
+    setTimeout(()=>{ if(fb) fb.innerHTML=''; },3000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   FILE ATTACHMENTS — Google Drive Picker
+   Requires user to be signed in with a Google account.
+   Uses the Google Picker API (no backend needed).
+   Files are stored as { name, driveId, mimeType, url }
+   and opened via drive.google.com viewer links.
+═══════════════════════════════════════════════════ */
+
+// ── Google API config ──────────────────────────────
+// Uses the public Google Drive Picker API.
+// The API key below is a publishable browser key restricted
+// to the Picker API — safe to embed in client code.
+const DRIVE_API_KEY    = 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFmBWY'; // public demo key
+const DRIVE_CLIENT_ID  = '';   // set your OAuth client ID here if you want OAuth sign-in
+const DRIVE_SCOPE      = 'https://www.googleapis.com/auth/drive.readonly';
+
+let pickerApiLoaded = false;
+let driveOAuthToken = null;
+
+// Load the Picker API
+function loadPickerApi() {
+  if (typeof gapi === 'undefined') return; // gapi not loaded yet
+  gapi.load('picker', { callback: () => { pickerApiLoaded = true; } });
+}
+// Try loading once DOM is ready; retry after 1s if gapi hasn't arrived
+window.addEventListener('load', () => {
+  if (typeof gapi !== 'undefined') loadPickerApi();
+  else setTimeout(loadPickerApi, 1000);
+});
+
+function triggerFileUpload(cardIdx) {
+  if (!auth) { openLogin(); return; }
+  currentFileCardIdx = cardIdx;
+
+  // If Picker API not available, show helpful fallback
+  if (!pickerApiLoaded) {
+    openDriveFallback(cardIdx);
+    return;
+  }
+
+  // If we already have a token, open picker directly
+  if (driveOAuthToken) { openPicker(); return; }
+
+  // Request OAuth token via Google Identity Services
+  if (typeof google === 'undefined' || !google.accounts) {
+    openDriveFallback(cardIdx);
+    return;
+  }
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: DRIVE_CLIENT_ID || 'demo',
+    scope: DRIVE_SCOPE,
+    callback: (resp) => {
+      if (resp.error) { toast('Não foi possível conectar ao Google Drive.', 'error'); return; }
+      driveOAuthToken = resp.access_token;
+      openPicker();
+    },
+  });
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+function openPicker() {
+  const picker = new google.picker.PickerBuilder()
+    .addView(new google.picker.DocsView()
+      .setIncludeFolders(true)
+      .setMimeTypes('application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png'))
+    .addView(google.picker.ViewId.RECENTLY_PICKED)
+    .setOAuthToken(driveOAuthToken)
+    .setDeveloperKey(DRIVE_API_KEY)
+    .setTitle('Selecione arquivos para anexar')
+    .setCallback(pickerCallback)
+    .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+    .build();
+  picker.setVisible(true);
+}
+
+function pickerCallback(data) {
+  if (data.action !== google.picker.Action.PICKED) return;
+  const i = currentFileCardIdx;
+  if (!steps[i].attachments) steps[i].attachments = [];
+  data.docs.forEach(doc => {
+    steps[i].attachments.push({
+      name:     doc.name,
+      driveId:  doc.id,
+      mimeType: doc.mimeType,
+      url:      `https://drive.google.com/file/d/${doc.id}/view`,
+      source:   'drive',
+    });
+    toast(`"${doc.name}" vinculado do Drive.`, 'success');
+  });
+  saveSteps();
   openCard = i;
   renderFlow();
-  setTimeout(() => document.getElementById(`ep-${i}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
-}
-function cancelEdit() { editCard = -1; renderFlow(); }
-
-function removeItem(cardIdx, itemIdx) {
-  steps[cardIdx].items.splice(itemIdx, 1);
-  // Re-render just the items list
-  const container = document.getElementById(`ep-items-${cardIdx}`);
-  if (container) container.innerHTML = steps[cardIdx].items.map((it, ii) => `
-    <div class="ep-item-row" id="eprow-${cardIdx}-${ii}">
-      <input class="ep-item-input" id="epitem-${cardIdx}-${ii}" value="${it.replace(/"/g,'&quot;')}">
-      <button class="ep-item-del" onclick="removeItem(${cardIdx},${ii})">×</button>
-    </div>`).join('');
+  setTimeout(() => document.getElementById(`card-${i}`)?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 80);
 }
 
-function addItem(cardIdx) {
-  steps[cardIdx].items.push('Nova atividade');
+// ── Fallback: manual link paste when OAuth not configured ──
+function openDriveFallback(cardIdx) {
+  const url = prompt('Cole o link do arquivo do Google Drive (compartilhado):');
+  if (!url || !url.trim()) return;
+  const name = prompt('Nome do arquivo:') || 'Arquivo do Drive';
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const driveId = match ? match[1] : null;
+  if (!steps[cardIdx].attachments) steps[cardIdx].attachments = [];
+  steps[cardIdx].attachments.push({
+    name,
+    driveId,
+    mimeType: 'application/octet-stream',
+    url: driveId ? `https://drive.google.com/file/d/${driveId}/view` : url,
+    source: 'drive-manual',
+  });
+  saveSteps();
+  openCard = cardIdx;
   renderFlow();
-  setTimeout(() => {
-    const inputs = document.querySelectorAll(`#ep-items-${cardIdx} .ep-item-input`);
-    const last = inputs[inputs.length - 1];
-    if (last) { last.focus(); last.select(); }
-  }, 60);
+  toast(`"${name}" vinculado.`, 'success');
 }
 
-function saveEdit(i) {
-  const title = document.getElementById(`ep-title-${i}`)?.value.trim();
-  const desc  = document.getElementById(`ep-desc-${i}`)?.value.trim();
-  if (title) steps[i].title = title;
-  if (desc)  steps[i].desc  = desc;
-  // collect items from DOM
-  const itemEls = document.querySelectorAll(`#ep-items-${i} .ep-item-input`);
-  if (itemEls.length) steps[i].items = Array.from(itemEls).map(el => el.value.trim()).filter(Boolean);
-  // persist
-  localStorage.setItem('sesai_steps_v3', JSON.stringify(steps));
-  editCard = -1;
+function removeAttachment(cardIdx, attIdx) {
+  if (!auth) { openLogin(); return; }
+  steps[cardIdx].attachments.splice(attIdx, 1);
+  saveSteps();
   renderFlow();
-  syncBPMN(); // ← THIS is where flow → BPMN sync happens
+  toast('Anexo removido.','success');
+}
+
+function openAttachment(url) {
+  if (url) window.open(url, '_blank', 'noopener');
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1488,51 +1456,25 @@ function saveEdit(i) {
 ═══════════════════════════════════════════════════ */
 function openLogin()  { document.getElementById('loginOverlay').classList.add('show'); setTimeout(()=>document.getElementById('loginU').focus(),80); }
 function closeLogin() { document.getElementById('loginOverlay').classList.remove('show'); document.getElementById('loginErr').classList.remove('show'); }
-
 function doLogin() {
-  const u = document.getElementById('loginU').value.trim().toLowerCase();
-  const p = document.getElementById('loginP').value;
-  const user = USERS[u];
-  if (user && user.pass === p) {
-    auth = { ...user, username: u };
-    closeLogin();
-    applyAuth();
-    toast(`Bem-vindo, ${user.name}!`, 'success');
-    document.getElementById('loginU').value = '';
-    document.getElementById('loginP').value = '';
-  } else {
-    document.getElementById('loginErr').classList.add('show');
-  }
+  const u=document.getElementById('loginU').value.trim().toLowerCase(), p=document.getElementById('loginP').value;
+  const user=USERS[u];
+  if(user&&user.pass===p) {
+    auth={...user,username:u}; closeLogin(); applyAuth();
+    toast(`Bem-vindo, ${sanitize(user.name)}!`,'success');
+    document.getElementById('loginU').value=''; document.getElementById('loginP').value='';
+  } else { document.getElementById('loginErr').classList.add('show'); }
 }
-
-function doLogout() {
-  auth = null; editCard = -1;
-  applyAuth();
-  renderFlow();
-  toast('Sessão encerrada.', 'success');
-}
-
+function doLogout() { auth=null; editCard=-1; applyAuth(); renderFlow(); toast('Sessão encerrada.','success'); }
 function applyAuth() {
-  const on = !!auth;
-  document.getElementById('areaLogin').style.display = on ? 'none' : 'block';
-  document.getElementById('areaUser').style.display  = on ? 'block' : 'none';
-  document.getElementById('editBar').classList.toggle('show', on);
-  if (on) {
-    document.getElementById('uAvatar').textContent = auth.initials;
-    document.getElementById('uName').textContent   = auth.name;
-    document.getElementById('uRole').textContent   = auth.role;
-  }
-  // BPMN indicator
-  const ind = document.getElementById('bpmnIndicator');
-  ind.classList.toggle('edit', on);
-  document.getElementById('bpmnIndText').textContent = on ? 'Modo de edição' : 'Somente leitura';
-  // update ppLock visibility if element selected
-  if (bpmnSelected) {
-    document.getElementById('ppSave').style.display = on ? 'block' : 'none';
-    document.getElementById('ppLock').style.display = on ? 'none'  : 'block';
-    document.getElementById('ppName').disabled = !on;
-    document.getElementById('ppDoc').disabled  = !on;
-  }
+  const on=!!auth;
+  document.getElementById('areaLogin').style.display=on?'none':'block';
+  document.getElementById('areaUser').style.display=on?'block':'none';
+  document.getElementById('editBar').classList.toggle('show',on);
+  if(on){document.getElementById('uAvatar').textContent=auth.initials;document.getElementById('uName').textContent=auth.name;document.getElementById('uRole').textContent=auth.role;}
+  document.getElementById('bpmnIndicator').classList.toggle('edit',on);
+  document.getElementById('bpmnIndText').textContent=on?'Modo de edição':'Somente leitura';
+  if(bpmnSelected){document.getElementById('ppSave').style.display=on?'block':'none';document.getElementById('ppLock').style.display=on?'none':'block';document.getElementById('ppName').disabled=!on;document.getElementById('ppDoc').disabled=!on;}
   renderFlow();
 }
 
@@ -1540,130 +1482,96 @@ function applyAuth() {
    TABS
 ═══════════════════════════════════════════════════ */
 function switchTab(tab) {
-  ['flow','bpmn','fb'].forEach(t => {
-    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
-    document.getElementById('pane-'+(t==='fb'?'fb':t)).classList.toggle('active', t===tab);
+  ['flow','bpmn','fb'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('pane-'+(t==='fb'?'fb':t)).classList.toggle('active',t===tab);
   });
-  if (tab === 'fb') renderFBPage();
+  document.getElementById('actorFilterBar').style.display=tab==='flow'?'flex':'none';
+  if(tab==='fb') renderFBPage();
 }
 
 /* ═══════════════════════════════════════════════════
    FEEDBACKS
 ═══════════════════════════════════════════════════ */
-const FB_TYPES = {
-  validacao: { label:'Validação',   icon:'✅', color:'#166534', bg:'#dcfce7' },
-  sugestao:  { label:'Sugestão',    icon:'💡', color:'#92400e', bg:'#fef3c7' },
-  problema:  { label:'Problema',    icon:'⚠️', color:'#991b1b', bg:'#fee2e2' },
-  duvida:    { label:'Dúvida',      icon:'❓', color:'#1e40af', bg:'#dbeafe' },
-};
+const FB_TYPES={validacao:{label:'Validação',icon:'✅',color:'#166534',bg:'#dcfce7'},sugestao:{label:'Sugestão',icon:'💡',color:'#92400e',bg:'#fef3c7'},problema:{label:'Problema',icon:'⚠️',color:'#991b1b',bg:'#fee2e2'},duvida:{label:'Dúvida',icon:'❓',color:'#1e40af',bg:'#dbeafe'}};
 
-function openFB(step='') {
-  if (step) document.getElementById('fbStep').value = step;
-  document.getElementById('fbOverlay').classList.add('show');
-  setTimeout(() => document.getElementById('fbName').focus(), 80);
+function updateFBStepOptions() {
+  const sel = document.getElementById('fbStep');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = `<option value="geral">Fluxo geral</option>` + steps.map(s=>`<option value="${sanitize(s.num)}">${sanitize(s.num)} — ${sanitize(s.title.substring(0,40))}</option>`).join('');
+  if ([...sel.options].some(o=>o.value===prev)) sel.value=prev;
 }
+function openFB(step='') { updateFBStepOptions(); if(step) document.getElementById('fbStep').value=step; document.getElementById('fbOverlay').classList.add('show'); setTimeout(()=>document.getElementById('fbName').focus(),80); }
 function closeFB() { document.getElementById('fbOverlay').classList.remove('show'); }
-
 function submitFB() {
-  const name  = document.getElementById('fbName').value.trim();
-  const actor = document.getElementById('fbActor').value;
-  const step  = document.getElementById('fbStep').value;
-  const type  = document.getElementById('fbType').value;
-  const text  = document.getElementById('fbText').value.trim();
-  if (!name || !actor || !text) { toast('Preencha nome, função e descrição.', 'error'); return; }
-  feedbacks.unshift({ id: Date.now(), name, actor, step, type, text, time: new Date().toLocaleString('pt-BR'), resolved: false });
-  localStorage.setItem('sesai_fb_v3', JSON.stringify(feedbacks));
+  const name=document.getElementById('fbName').value.trim(), actor=document.getElementById('fbActor').value, step=document.getElementById('fbStep').value, type=document.getElementById('fbType').value, text=document.getElementById('fbText').value.trim();
+  if(!name||!actor||!text){toast('Preencha nome, função e descrição.','error');return;}
+  feedbacks.unshift({id:Date.now(),name,actor,step,type,text,time:new Date().toLocaleString('pt-BR'),resolved:false});
+  localStorage.setItem('sesai_fb_v4',JSON.stringify(feedbacks));
   updateFBBadge(); closeFB();
-  document.getElementById('fbName').value = '';
-  document.getElementById('fbText').value = '';
-  toast('Contribuição registrada! Obrigado.', 'success');
-  if (document.getElementById('pane-fb')?.classList.contains('active')) renderFBPage();
+  document.getElementById('fbName').value=''; document.getElementById('fbText').value='';
+  toast('Contribuição registrada! Obrigado.','success');
+  if(document.getElementById('pane-fb')?.classList.contains('active')) renderFBPage();
 }
-
-function updateFBBadge() { document.getElementById('tc-fb').textContent = feedbacks.length; }
-
-function resolveToggle(id) {
-  if (!auth) { openLogin(); return; }
-  const fb = feedbacks.find(f => f.id === id);
-  if (fb) { fb.resolved = !fb.resolved; localStorage.setItem('sesai_fb_v3', JSON.stringify(feedbacks)); renderFBPage(); }
-}
-function deleteFB(id) {
-  if (!auth) { openLogin(); return; }
-  if (!confirm('Excluir esta contribuição?')) return;
-  feedbacks = feedbacks.filter(f => f.id !== id);
-  localStorage.setItem('sesai_fb_v3', JSON.stringify(feedbacks));
-  updateFBBadge(); renderFBPage();
-}
-
-function renderFBPage() {
-  const stats = {
-    total:     feedbacks.length,
-    validacao: feedbacks.filter(f=>f.type==='validacao').length,
-    sugestao:  feedbacks.filter(f=>f.type==='sugestao').length,
-    problema:  feedbacks.filter(f=>f.type==='problema').length,
-  };
-  const actorMeta = {
-    dsei:'DSEI/Gabinete', ses:'SESANI', seofi:'SEOFI', selog:'SELOG',
-    sepat:'SEPAT', deamb:'DEAMB/COABS', com:'Comunidade', outro:'Outro'
-  };
-
-  document.getElementById('fbInner').innerHTML = `
-  <div class="fb-header">
-    <div>
-      <h2>Contribuições da equipe</h2>
-      <p>Validações, sugestões e problemas registrados sobre o fluxo</p>
-    </div>
-    <button class="btn-contribute" onclick="openFB()">+ Nova contribuição</button>
-  </div>
+function updateFBBadge(){document.getElementById('tc-fb').textContent=feedbacks.length;}
+function resolveToggle(id){if(!auth){openLogin();return;}const fb=feedbacks.find(f=>f.id===id);if(fb){fb.resolved=!fb.resolved;localStorage.setItem('sesai_fb_v4',JSON.stringify(feedbacks));renderFBPage();}}
+function deleteFB(id){if(!auth){openLogin();return;}if(!confirm('Excluir esta contribuição?'))return;feedbacks=feedbacks.filter(f=>f.id!==id);localStorage.setItem('sesai_fb_v4',JSON.stringify(feedbacks));updateFBBadge();renderFBPage();}
+function renderFBPage(){
+  const stats={total:feedbacks.length,validacao:feedbacks.filter(f=>f.type==='validacao').length,sugestao:feedbacks.filter(f=>f.type==='sugestao').length,problema:feedbacks.filter(f=>f.type==='problema').length};
+  const actorMeta={dsei:'DSEI/Gabinete',ses:'SESANI',seofi:'SEOFI',selog:'SELOG',sepat:'SEPAT',deamb:'DEAMB/COABS',com:'Comunidade',outro:'Outro'};
+  document.getElementById('fbInner').innerHTML=`
+  <div class="fb-header"><div><h2>Contribuições da equipe</h2><p>Validações, sugestões e problemas registrados sobre o fluxo</p></div><button class="btn-contribute" onclick="openFB()">+ Nova contribuição</button></div>
   <div class="fb-stats">
     <div class="stat-card sc-green"><div class="stat-n" style="color:var(--green)">${stats.total}</div><div class="stat-lbl">Total</div></div>
     <div class="stat-card sc-teal"><div class="stat-n" style="color:#0d9488">${stats.validacao}</div><div class="stat-lbl">Validações ✅</div></div>
     <div class="stat-card sc-amber"><div class="stat-n" style="color:#d97706">${stats.sugestao}</div><div class="stat-lbl">Sugestões 💡</div></div>
     <div class="stat-card sc-red"><div class="stat-n" style="color:var(--red)">${stats.problema}</div><div class="stat-lbl">Problemas ⚠️</div></div>
   </div>
-  <div class="fb-list">
-    ${feedbacks.length === 0
-      ? `<div class="fb-empty"><div class="fb-empty-icon">💬</div><div class="fb-empty-title">Nenhuma contribuição ainda</div><div class="fb-empty-sub">Use "Nova contribuição" para registrar sua opinião sobre o fluxo.</div></div>`
-      : feedbacks.map(fb => {
-          const ty = FB_TYPES[fb.type] || { label:fb.type, icon:'', color:'#555', bg:'#eee' };
-          return `
-          <div class="fb-card ${fb.resolved?'resolved':''}">
-            <div class="fb-card-top">
-              <span class="fb-tag" style="background:${ty.bg};color:${ty.color}">${ty.icon} ${ty.label}</span>
-              <span class="fb-step-tag">Etapa ${fb.step==='geral'?'Geral':fb.step}</span>
-              <span class="fb-tag" style="background:#f3f4f6;color:#6b7280">${actorMeta[fb.actor]||fb.actor}</span>
-              ${fb.resolved ? '<span class="fb-resolved-tag">✓ Resolvido</span>' : ''}
-            </div>
-            <div class="fb-who">${fb.name}</div>
-            <div class="fb-text">${fb.text}</div>
-            <div class="fb-foot">
-              <div class="fb-time">🕐 ${fb.time}</div>
-              ${auth ? `
-                <button class="fb-action-btn fb-resolve-btn" onclick="resolveToggle(${fb.id})">${fb.resolved?'↩ Reabrir':'✓ Resolver'}</button>
-                <button class="fb-action-btn fb-del-btn" onclick="deleteFB(${fb.id})">🗑</button>
-              ` : ''}
-            </div>
-          </div>`;
-        }).join('')
-    }
+  <div class="fb-list">${feedbacks.length===0
+    ?`<div class="fb-empty"><div class="fb-empty-icon">💬</div><div class="fb-empty-title">Nenhuma contribuição ainda</div><div class="fb-empty-sub">Use "Nova contribuição" para registrar sua opinião sobre o fluxo.</div></div>`
+    :feedbacks.map(fb=>{const ty=FB_TYPES[fb.type]||{label:fb.type,icon:'',color:'#555',bg:'#eee'};return`<div class="fb-card ${fb.resolved?'resolved':''}">
+      <div class="fb-card-top">
+        <span class="fb-tag" style="background:${ty.bg};color:${ty.color}">${ty.icon} ${ty.label}</span>
+        <span class="fb-step-tag">Etapa ${fb.step==='geral'?'Geral':sanitize(fb.step)}</span>
+        <span class="fb-tag" style="background:#f1f5f9;color:#475569">${sanitize(actorMeta[fb.actor]||fb.actor)}</span>
+        ${fb.resolved?'<span class="fb-resolved-tag">✓ Resolvido</span>':''}
+      </div>
+      <div class="fb-who">${sanitize(fb.name)}</div>
+      <div class="fb-text">${sanitize(fb.text)}</div>
+      <div class="fb-foot">
+        <div class="fb-time">🕐 ${sanitize(fb.time)}</div>
+        ${auth?`<button class="fb-action-btn fb-resolve-btn" onclick="resolveToggle(${fb.id})">${fb.resolved?'↩ Reabrir':'✓ Resolver'}</button><button class="fb-action-btn fb-del-btn" onclick="deleteFB(${fb.id})">🗑</button>`:''}
+      </div></div>`;}).join('')}
   </div>`;
 }
 
-/* ═══════════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════════ */
-function toast(msg, type='') {
-  const s = document.getElementById('toastStack');
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.innerHTML = msg;
+/* CELEBRATE */
+function closeCelebrate(){document.getElementById('celebrateOverlay').classList.remove('show');}
+
+/* MOBILE DRAWER */
+function openDrawer(){document.getElementById('mapDrawer').classList.add('show');document.getElementById('drawerOverlay').classList.add('show');document.body.style.overflow='hidden';}
+function closeDrawer(){document.getElementById('mapDrawer').classList.remove('show');document.getElementById('drawerOverlay').classList.remove('show');document.body.style.overflow='';}
+
+/* KEYBOARD */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeCelebrate();closeLogin();closeFB();closeDrawer();closeConfirm();if(editCard!==-1){editCard=-1;renderFlow();}}
+});
+
+/* TOAST */
+function toast(msg,type=''){
+  const s=document.getElementById('toastStack'),t=document.createElement('div');
+  t.className=`toast ${type}`;
+  const icon=type==='success'?'✓':type==='error'?'⚠':'ℹ';
+  t.innerHTML=`<span style="font-size:14px">${icon}</span> ${sanitize(msg)}`;
   s.appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  setTimeout(()=>{t.classList.add('exit');setTimeout(()=>t.remove(),220);},3200);
 }
 
 /* ═══════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════ */
+document.getElementById('actorFilterBar').style.display='flex';
 renderFlow();
 updateFBBadge();
 loadBPMN(buildBPMN(steps));
