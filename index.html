@@ -274,11 +274,11 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 .pp-lock-note{font-size:11px;color:var(--gray-400);text-align:center;padding:8px;border-top:1px solid var(--gray-100);cursor:pointer;transition:color var(--transition)}
 .pp-lock-note:hover{color:var(--green)}
 .pp-empty{font-size:12px;color:var(--gray-400);text-align:center;padding:16px;line-height:1.6}
-.bpmn-legend{position:absolute;bottom:12px;left:12px;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 13px;z-index:10;box-shadow:var(--shadow-sm)}
+.bpmn-legend{position:absolute;bottom:12px;left:12px;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 13px;z-index:10;box-shadow:var(--shadow-sm);min-width:170px}
 .bl-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--gray-400);margin-bottom:7px}
-.bl-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-600);margin-bottom:4px}
+.bl-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gray-600);margin-bottom:5px}
 .bl-item:last-child{margin-bottom:0}
-.bl-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.bl-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;border:1.5px solid rgba(0,0,0,.2)}
 
 /* NO RESULTS */
 .no-results{text-align:center;padding:48px 24px;color:var(--gray-400);font-size:14px;line-height:1.7}
@@ -496,6 +496,7 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
         <span class="tb-lbl">Exportar</span>
         <button class="tb-btn green" onclick="bExportBPMN()">⬇ .bpmn</button>
         <button class="tb-btn green" onclick="bExportSVG()">🖼 SVG</button>
+        <button class="tb-btn green" onclick="bPrint()">🖨 Imprimir</button>
       </div>
       <div class="tb-sep"></div>
       <div class="tb-group">
@@ -523,14 +524,35 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
         </div>
       </div>
       <div class="bpmn-legend">
-        <div class="bl-title">Raias</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#1b4d8a"></div>DSEI / Gabinete</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#1b4332"></div>SESANI</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#78350f"></div>SEOFI</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#713f12"></div>SELOG</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#164e63"></div>SEPAT</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#4c1d95"></div>DEAMB/COABS</div>
-        <div class="bl-item"><div class="bl-dot" style="background:#7c2d12"></div>Comunidade</div>
+        <div class="bl-title">Raias — atores</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#c5d9f0;border:1.5px solid #1b4d8a"></div>DSEI / Gabinete</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#c3e8d2;border:1.5px solid #1b6e3e"></div>SESANI</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#f9dbb0;border:1.5px solid #c06000"></div>SEOFI</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#faedb0;border:1.5px solid #a06010"></div>SELOG</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#b8e8f0;border:1.5px solid #0e6880"></div>SEPAT</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#d8d0f0;border:1.5px solid #5b3db0"></div>DEAMB/COABS</div>
+        <div class="bl-item"><div class="bl-dot" style="background:#f0d0c8;border:1.5px solid #9c3020"></div>Comunidade</div>
+        <div class="bl-title" style="margin-top:10px">Símbolos BPMN</div>
+        <div class="bl-item">
+          <svg width="14" height="14" style="flex-shrink:0"><circle cx="7" cy="7" r="6" fill="white" stroke="#1b4332" stroke-width="1.5"/></svg>
+          Início do fluxo
+        </div>
+        <div class="bl-item">
+          <svg width="14" height="14" style="flex-shrink:0"><circle cx="7" cy="7" r="6" fill="white" stroke="#1b4332" stroke-width="3"/></svg>
+          Fim do fluxo
+        </div>
+        <div class="bl-item">
+          <svg width="14" height="14" style="flex-shrink:0"><rect x="1" y="2" width="12" height="10" rx="1.5" fill="#e4f4ec" stroke="#1b6e3e" stroke-width="1.5"/></svg>
+          Tarefa / atividade
+        </div>
+        <div class="bl-item">
+          <svg width="14" height="14" style="flex-shrink:0"><polygon points="7,1 13,7 7,13 1,7" fill="white" stroke="#b7860a" stroke-width="1.5"/></svg>
+          Gateway XOR (opcional)
+        </div>
+        <div class="bl-item">
+          <svg width="22" height="10" style="flex-shrink:0"><line x1="0" y1="5" x2="18" y2="5" stroke="#555" stroke-width="1.5"/><polygon points="16,2 22,5 16,8" fill="#555"/></svg>
+          Fluxo de sequência
+        </div>
       </div>
     </div>
   </div>
@@ -751,83 +773,274 @@ function sanitize(str) {
 }
 
 /* ═══════════════════════════════════════════════════
-   BPMN — dynamic generation from steps array
+   BPMN — Full rebuild
+   Architecture: single Pool → single Process → laneSet
+   - Correct cross-lane sequence flows
+   - Start event, end event
+   - Intermediate gateways for optional steps
+   - Bizagi-compatible colors via fill/stroke
+   - Horizontal layout left→right, time order
+   - Print-ready SVG export
 ═══════════════════════════════════════════════════ */
+
+// Bizagi color palette (fill / stroke) per actor
+const BIZAGI_COLORS = {
+  dsei:  { fill:'#dce9f9', stroke:'#1b4d8a', text:'#1b4d8a' },
+  seofi: { fill:'#fdf0e0', stroke:'#c06000', text:'#78350f' },
+  selog: { fill:'#fdf5e0', stroke:'#a06010', text:'#713f12' },
+  ses:   { fill:'#e4f4ec', stroke:'#1b6e3e', text:'#1b4332' },
+  sepat: { fill:'#e0f4f8', stroke:'#0e6880', text:'#164e63' },
+  deamb: { fill:'#ece8f8', stroke:'#5b3db0', text:'#4c1d95' },
+  com:   { fill:'#f8e8e4', stroke:'#9c3020', text:'#7c2d12' },
+};
+const LANE_ORDER = ['dsei','seofi','selog','ses','sepat','deamb','com'];
+// Lane colors (header background) — Bizagi style
+const LANE_FILL = {
+  dsei:'#c5d9f0', seofi:'#f9dbb0', selog:'#faedb0',
+  ses:'#c3e8d2',  sepat:'#b8e8f0', deamb:'#d8d0f0', com:'#f0d0c8',
+};
+
 function buildBPMN(stepsData) {
-  // Group steps by actor/lane for positioning
-  const laneOrder = ['dsei','seofi','selog','ses','sepat','deamb','com'];
-  const laneH = 100, laneY0 = 40, taskW = 150, taskH = 60;
-  const lanePositions = {};
-  laneOrder.forEach((a, i) => { lanePositions[a] = laneY0 + i * laneH; });
+  if (!stepsData || stepsData.length === 0) return buildEmptyBPMN();
 
-  // Track x position per lane
-  const laneX = {}; laneOrder.forEach(a => { laneX[a] = 200; });
+  const LANE_H    = 110;   // height of each swim lane
+  const TASK_W    = 160;   // task width
+  const TASK_H    = 70;    // task height
+  const STEP_X    = 210;   // x spacing between tasks
+  const X_START   = 260;   // first task x (after pool label + lane label)
+  const Y_POOL    = 20;    // pool y origin
+  const POOL_LABEL_W = 30; // pool header width
+  const LANE_LABEL_W = 120;// lane label width
+  const ELEM_X0   = POOL_LABEL_W + LANE_LABEL_W; // first element starts here
+  const GW_SIZE   = 44;    // gateway diamond size
 
-  let tasks = '', taskShapes = '', edges = '';
-  let prevByActor = {}; // last task id per actor for sequence flows within lane
-  let allTaskIds = [];
+  // ── 1. Compute which lanes are actually used ────
+  const usedActors = [...new Set(stepsData.map(s => s.actor || 'ses'))];
+  const activeLanes = LANE_ORDER.filter(a => usedActors.includes(a));
+
+  // ── 2. Assign Y center per lane ─────────────────
+  const laneYMap = {};
+  activeLanes.forEach((a, i) => {
+    laneYMap[a] = Y_POOL + i * LANE_H + LANE_H / 2;
+  });
+
+  // ── 3. Assign X position to each step (sequential, global) ─
+  // Each step gets an x slot regardless of lane
+  const stepX = []; // stepX[i] = center X of step i
+  let curX = ELEM_X0 + X_START;
+  stepsData.forEach((s, i) => {
+    stepX[i] = curX;
+    const next = stepsData[i + 1];
+    // If next step is optional gateway, reserve extra X space
+    const hasGw = s.optional || (next && next.optional);
+    curX += hasGw ? STEP_X + 60 : STEP_X;
+  });
+
+  // Start event and end event X
+  const X_START_EVT = ELEM_X0 + 80;
+  const X_END_EVT   = curX + 60;
+  const TOTAL_W     = X_END_EVT + 80;
+  const TOTAL_H     = activeLanes.length * LANE_H;
+  const POOL_H      = TOTAL_H;
+
+  // ── 4. Build XML elements ────────────────────────
+  let seqFlowDefs  = '';
+  let seqFlowEdges = '';
+  let taskDefs     = '';
+  let taskShapes   = '';
+  let gwDefs       = '';
+  let gwShapes     = '';
+
+  // Start event — in the first lane of first step
+  const firstActor = stepsData[0]?.actor || activeLanes[0];
+  const startY = laneYMap[firstActor] - 18;
+  const startX = X_START_EVT;
+
+  // End event — in the last lane of last step
+  const lastActor = stepsData[stepsData.length - 1]?.actor || activeLanes[activeLanes.length - 1];
+  const endY = laneYMap[lastActor] - 18;
+  const endX = X_END_EVT;
+
+  let prevId = 'Ev_Start';
+  let prevX  = startX + 36; // right edge of start event
+  let prevY  = laneYMap[firstActor];
 
   stepsData.forEach((s, i) => {
-    const tid = `T_DYN_${i}`;
+    const tid   = `T_${i}`;
     const actor = s.actor || 'ses';
-    const x = laneX[actor] || 200;
-    const y = (lanePositions[actor] || 380) + 20;
-    const label = sanitizeXml(`${s.num}. ${s.title.substring(0, 35)}${s.title.length > 35 ? '…' : ''}`);
+    const col   = BIZAGI_COLORS[actor] || BIZAGI_COLORS.ses;
+    const cx    = stepX[i];
+    const cy    = laneYMap[actor];
+    const tx    = cx - TASK_W / 2;
+    const ty    = cy - TASK_H / 2;
+    const label = sanitizeXml(`${s.num}. ${s.title.substring(0, 42)}${s.title.length > 42 ? '…' : ''}`);
 
-    tasks += `    <task id="${tid}" name="${label}"/>\n`;
-    taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}"><dc:Bounds x="${x}" y="${y}" width="${taskW}" height="${taskH}"/></bpmndi:BPMNShape>\n`;
+    taskDefs += `    <task id="${tid}" name="${label}"/>\n`;
+    taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}">
+        <dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>\n`;
 
-    // sequence flow to previous task in same actor
-    if (prevByActor[actor]) {
-      const eid = `sf_${prevByActor[actor]}_${tid}`;
-      const px = laneX[actor] - 170; // previous x
-      const cy = y + taskH / 2;
-      tasks += `    <sequenceFlow id="${eid}" sourceRef="${prevByActor[actor]}" targetRef="${tid}"/>\n`;
-      edges += `      <bpmndi:BPMNEdge id="ed_${eid}" bpmnElement="${eid}"><di:waypoint x="${px + taskW}" y="${cy}"/><di:waypoint x="${x}" y="${cy}"/></bpmndi:BPMNEdge>\n`;
+    // Sequence flow from previous element to this task
+    const sfId = `sf_${prevId}_${tid}`;
+    seqFlowDefs += `    <sequenceFlow id="${sfId}" sourceRef="${prevId}" targetRef="${tid}"/>\n`;
+    seqFlowEdges += buildEdge(sfId, prevX, prevY, tx, cy);
+
+    prevId = tid;
+    prevX  = tx + TASK_W;
+    prevY  = cy;
+
+    // Optional gateway (XOR) after this task if step is optional
+    if (s.optional) {
+      const gwId  = `GW_${i}`;
+      const gwX   = prevX + 30;
+      const gwY   = cy - GW_SIZE / 2;
+      gwDefs   += `    <exclusiveGateway id="${gwId}" name="Necessário?"/>\n`;
+      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId}" bpmnElement="${gwId}" isMarkerVisible="true">
+        <dc:Bounds x="${gwX}" y="${gwY}" width="${GW_SIZE}" height="${GW_SIZE}"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="${gwX - 10}" y="${gwY - 20}" width="64" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>\n`;
+      // flow: task → gateway
+      const sf1 = `sf_${tid}_${gwId}`;
+      seqFlowDefs  += `    <sequenceFlow id="${sf1}" sourceRef="${tid}" targetRef="${gwId}"/>\n`;
+      seqFlowEdges += buildEdge(sf1, prevX, cy, gwX, cy);
+      prevId = gwId;
+      prevX  = gwX + GW_SIZE;
+      prevY  = cy;
+      // "Não" path label will be on the main flow (handled by next iteration)
     }
-
-    prevByActor[actor] = tid;
-    laneX[actor] = (laneX[actor] || 200) + 180;
-    allTaskIds.push({ tid, actor, i });
   });
 
-  // Build process elements per actor
-  const actorsUsed = [...new Set(stepsData.map(s => s.actor || 'ses'))];
-  let processes = '', participants = '', participantShapes = '', participantDefs = '';
+  // Final flow → End event
+  const sfEnd = `sf_${prevId}_Ev_End`;
+  seqFlowDefs  += `    <sequenceFlow id="${sfEnd}" sourceRef="${prevId}" targetRef="Ev_End"/>\n`;
+  seqFlowEdges += buildEdge(sfEnd, prevX, prevY, endX, endY);
 
-  const totalW = Math.max(...laneOrder.map(a => laneX[a] || 200)) + 50;
+  // ── 5. Lane XML ──────────────────────────────────
+  let laneChildRefs = '';
+  const allTids = stepsData.map((_, i) => `T_${i}`);
+  // assign elements to lanes
+  const laneElements = {};
+  activeLanes.forEach(a => { laneElements[a] = []; });
+  stepsData.forEach((s, i) => {
+    const a = s.actor || 'ses';
+    if (laneElements[a]) laneElements[a].push(`T_${i}`);
+    // gateway also belongs to same lane
+    if (s.optional) { if (laneElements[a]) laneElements[a].push(`GW_${i}`); }
+  });
+  // start/end belong to their respective actor lanes
+  if (laneElements[firstActor]) laneElements[firstActor].unshift('Ev_Start');
+  if (laneElements[lastActor])  laneElements[lastActor].push('Ev_End');
 
-  laneOrder.forEach((a, li) => {
-    if (!actorsUsed.includes(a)) return;
-    const pid = `Pr_${a.toUpperCase()}`;
-    const partId = ACTOR_BPMN[a] || `P_${a}`;
+  let laneSetXml = `    <laneSet id="LaneSet1" name="Processo">\n`;
+  let laneShapes = '';
+  activeLanes.forEach((a, li) => {
+    const laneId  = `Lane_${a}`;
+    const laneY   = Y_POOL + li * LANE_H;
     const actorLabel = ACTORS[a]?.label || a;
-    const y = laneY0 + li * laneH;
-    const taskBlock = tasks.split('\n').filter(l => allTaskIds.filter(t => t.actor === a).some(t => l.includes(t.tid))).join('\n');
-    processes += `  <process id="${pid}" isExecutable="false">\n${taskBlock}\n  </process>\n`;
-    participants += `    <participant id="${partId}" name="${sanitizeXml(actorLabel)}" processRef="${pid}"/>\n`;
-    participantShapes += `      <bpmndi:BPMNShape id="sh_${partId}" bpmnElement="${partId}" isHorizontal="true"><dc:Bounds x="100" y="${y}" width="${totalW}" height="${laneH}"/></bpmndi:BPMNShape>\n`;
-    participantDefs += `  <!-- ${a} -->\n`;
+    const childRefs  = laneElements[a].map(id => `      <flowNodeRef>${id}</flowNodeRef>`).join('\n');
+    laneSetXml += `      <lane id="${laneId}" name="${sanitizeXml(actorLabel)}">\n${childRefs}\n      </lane>\n`;
+    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true">
+        <dc:Bounds x="${POOL_LABEL_W}" y="${Y_POOL + li * LANE_H}" width="${TOTAL_W - POOL_LABEL_W}" height="${LANE_H}"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="${POOL_LABEL_W + 2}" y="${Y_POOL + li * LANE_H + LANE_H/2 - 6}" width="${LANE_LABEL_W - 8}" height="12"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>\n`;
   });
+  laneSetXml += `    </laneSet>\n`;
 
+  // ── 6. Assemble XML ──────────────────────────────
   return `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-  targetNamespace="http://sesai.gov.br/bpmn" id="sesai-dynamic">
+  xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0"
+  targetNamespace="http://sesai.gov.br/bpmn" id="sesai-flow">
+
   <collaboration id="Collab1">
-${participants}  </collaboration>
-${processes}
+    <participant id="Pool_SESAI" name="SESAI — Fluxo de Execução Direta" processRef="Proc_Main"/>
+  </collaboration>
+
+  <process id="Proc_Main" isExecutable="false">
+${laneSetXml}
+    <!-- Events -->
+    <startEvent id="Ev_Start" name="Início&#10;do fluxo">
+      <outgoing>sf_Ev_Start_T_0</outgoing>
+    </startEvent>
+    <endEvent id="Ev_End" name="Processo&#10;concluído">
+    </endEvent>
+
+    <!-- Tasks -->
+${taskDefs}
+    <!-- Gateways -->
+${gwDefs}
+    <!-- Sequence Flows -->
+${seqFlowDefs}
+  </process>
+
   <bpmndi:BPMNDiagram id="BPMNDiag1">
     <bpmndi:BPMNPlane id="Plane1" bpmnElement="Collab1">
-${participantShapes}${taskShapes}${edges}    </bpmndi:BPMNPlane>
+
+      <!-- Pool -->
+      <bpmndi:BPMNShape id="sh_Pool_SESAI" bpmnElement="Pool_SESAI" isHorizontal="true">
+        <dc:Bounds x="0" y="${Y_POOL}" width="${TOTAL_W}" height="${POOL_H}"/>
+        <bpmndi:BPMNLabel/>
+      </bpmndi:BPMNShape>
+
+      <!-- Lanes -->
+${laneShapes}
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="sh_Ev_Start" bpmnElement="Ev_Start">
+        <dc:Bounds x="${startX}" y="${startY}" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="${startX - 10}" y="${startY + 40}" width="56" height="28"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- End Event -->
+      <bpmndi:BPMNShape id="sh_Ev_End" bpmnElement="Ev_End">
+        <dc:Bounds x="${endX}" y="${endY}" width="36" height="36"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="${endX - 10}" y="${endY + 40}" width="56" height="28"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Tasks -->
+${taskShapes}
+      <!-- Gateways -->
+${gwShapes}
+      <!-- Edges -->
+${seqFlowEdges}
+    </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>`;
 }
 
+// Build a sequence flow edge with correct cross-lane routing
+function buildEdge(id, x1, y1, x2, y2) {
+  let wps = '';
+  if (Math.abs(y1 - y2) < 4) {
+    // Same lane — straight horizontal
+    wps = `<di:waypoint x="${x1}" y="${y1}"/><di:waypoint x="${x2}" y="${y2}"/>`;
+  } else {
+    // Cross-lane — horizontal then vertical then horizontal (orthogonal routing)
+    const midX = Math.round((x1 + x2) / 2);
+    wps = `<di:waypoint x="${x1}" y="${y1}"/>` +
+          `<di:waypoint x="${midX}" y="${y1}"/>` +
+          `<di:waypoint x="${midX}" y="${y2}"/>` +
+          `<di:waypoint x="${x2}" y="${y2}"/>`;
+  }
+  return `      <bpmndi:BPMNEdge id="ed_${id}" bpmnElement="${id}">${wps}</bpmndi:BPMNEdge>\n`;
+}
+
+function buildEmptyBPMN() {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  targetNamespace="http://sesai.gov.br/bpmn" id="sesai-empty">
+  <process id="Proc_Empty" isExecutable="false"/>
+  <bpmndi:BPMNDiagram id="D1"><bpmndi:BPMNPlane id="P1" bpmnElement="Proc_Empty"/></bpmndi:BPMNDiagram>
+</definitions>`;
+}
+
 function sanitizeXml(str) {
-  return String(str)
+  return String(str || '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
 }
@@ -889,6 +1102,113 @@ async function bExportSVG()  { const{svg}=await modeler.saveSVG(); dlFile(svg,'s
 function bImport(input) { const f=input.files[0]; if(!f) return; const r=new FileReader(); r.onload=async e=>{await loadBPMN(e.target.result);toast('Diagrama importado.','success');}; r.readAsText(f); }
 function bReset()  { if(!confirm('Restaurar o diagrama baseado no fluxo atual?')) return; loadBPMN(buildBPMN(steps)); toast('Diagrama restaurado.','success'); }
 function dlFile(content,name,type) { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click(); }
+
+async function bPrint() {
+  // Export current diagram as SVG then open a clean print window
+  let svg;
+  try { const res = await modeler.saveSVG(); svg = res.svg; }
+  catch(e) { toast('Erro ao gerar SVG para impressão.','error'); return; }
+
+  const totalSteps = steps.length;
+  const actors = [...new Set(steps.map(s => ACTORS[s.actor]?.label || s.actor))].join(', ');
+  const date = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<title>SESAI — Fluxo de Execução Direta</title>
+<style>
+  @page { size: A3 landscape; margin: 15mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Arial', sans-serif; background: white; color: #111; }
+  .print-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #1b4332; }
+  .print-title { font-size: 18px; font-weight: 700; color: #1b4332; }
+  .print-sub { font-size: 11px; color: #555; margin-top: 3px; }
+  .print-meta { text-align: right; font-size: 10px; color: #666; line-height: 1.7; }
+  .print-meta strong { color: #1b4332; }
+  .diagram-wrap { width: 100%; overflow: hidden; }
+  .diagram-wrap svg { width: 100%; height: auto; max-height: 180mm; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ddd; }
+  .legend-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #888; width: 100%; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 9.5px; color: #333; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,.15); flex-shrink: 0; }
+  .legend-sym { display: flex; align-items: center; gap: 10px; margin-left: 16px; }
+  .sym-item { display: flex; align-items: center; gap: 5px; font-size: 9.5px; color: #333; }
+  .step-table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 9px; }
+  .step-table th { background: #1b4332; color: white; padding: 4px 6px; text-align: left; font-weight: 600; }
+  .step-table td { padding: 3px 6px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+  .step-table tr:nth-child(even) td { background: #f8fafc; }
+  .actor-pill { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 8.5px; font-weight: 600; }
+  .print-footer { margin-top: 8px; font-size: 8.5px; color: #aaa; display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 6px; }
+  @media print {
+    .no-print { display: none; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head><body>
+<div class="print-header">
+  <div>
+    <div class="print-title">SESAI — Fluxo de Execução Direta</div>
+    <div class="print-sub">Ministério da Saúde · Secretaria Especial de Saúde Indígena</div>
+  </div>
+  <div class="print-meta">
+    <div><strong>Gerado em:</strong> ${date}</div>
+    <div><strong>Etapas:</strong> ${totalSteps}</div>
+    <div><strong>Atores:</strong> ${actors}</div>
+  </div>
+</div>
+
+<div class="diagram-wrap">${svg}</div>
+
+<div class="legend">
+  <div class="legend-title">Legenda de raias (atores)</div>
+  ${Object.entries(BIZAGI_COLORS).filter(([k])=>[...new Set(steps.map(s=>s.actor))].includes(k)).map(([k,c])=>`
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:${c.fill};border-color:${c.stroke}"></div>
+      ${ACTORS[k]?.label||k}
+    </div>`).join('')}
+  <div class="legend-sym">
+    <div class="sym-item"><svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="white" stroke="#1b4332" stroke-width="1.5"/></svg> Evento de início</div>
+    <div class="sym-item"><svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="white" stroke="#1b4332" stroke-width="3"/></svg> Evento de fim</div>
+    <div class="sym-item"><svg width="18" height="18"><rect x="1" y="1" width="16" height="16" rx="2" fill="#e4f4ec" stroke="#1b6e3e" stroke-width="1.5"/></svg> Tarefa (atividade)</div>
+    <div class="sym-item"><svg width="18" height="18"><polygon points="9,1 17,9 9,17 1,9" fill="white" stroke="#b7860a" stroke-width="1.5"/></svg> Gateway XOR (decisão)</div>
+  </div>
+</div>
+
+<table class="step-table">
+  <thead>
+    <tr>
+      <th style="width:4%">#</th>
+      <th style="width:28%">Atividade</th>
+      <th style="width:12%">Ator</th>
+      <th style="width:10%">Fase</th>
+      <th style="width:46%">Descrição / Checklist</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${steps.map((s,i) => {
+      const ac = ACTORS[s.actor]||{label:s.actor,color:'#555',bg:'#eee'};
+      const ph = PHASES.find(p=>p.id===s.phase)||{label:'',color:'#555'};
+      return `<tr>
+        <td style="font-weight:700;color:#1b4332">${sanitize(s.num)}</td>
+        <td style="font-weight:600">${sanitize(s.title)}</td>
+        <td><span class="actor-pill" style="background:${ac.bg};color:${ac.color}">${ac.label}</span></td>
+        <td style="color:#555">${ph.label}</td>
+        <td style="color:#444">${s.items.map(it=>`• ${sanitize(it)}`).join('<br>')}</td>
+      </tr>`;
+    }).join('')}
+  </tbody>
+</table>
+
+<div class="print-footer">
+  <span>SESAI / Ministério da Saúde — documento gerado automaticamente pelo sistema de fluxos</span>
+  <span>Página 1</span>
+</div>
+
+<script>window.onload = () => { window.print(); }<\/script>
+</body></html>`);
+  win.document.close();
+}
 
 /* ═══════════════════════════════════════════════════
    PHASE STEPS INDEX (computed)
