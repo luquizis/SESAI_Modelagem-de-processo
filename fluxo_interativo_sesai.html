@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Execução Direta — Fluxo Interativo · SESAI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:       #080c12;
+  --surf:     #0e1420;
+  --surf2:    #141c2a;
+  --surf3:    #1a2336;
+  --border:   #1e2d42;
+  --border2:  #283d58;
+  --txt:      #c8d8ec;
+  --dim:      #5a7090;
+  --faint:    #2a3a50;
+
+  --green:  #1fbb78;
+  --blue:   #2a8fdd;
+  --amber:  #e09a28;
+  --purple: #9a54e0;
+  --red:    #e04444;
+  --teal:   #1aadcc;
+  --coral:  #e06040;
+
+  /* actor accent colors */
+  --a-dsei:  #2a7abf;
+  --a-ses:   #1fbb78;
+  --a-seofi: #e09a28;
+  --a-selog: #c8b420;
+  --a-sepat: #1aadcc;
+  --a-deamb: #9a54e0;
+  --a-com:   #e06040;
+
+  --fn: 'DM Sans', sans-serif;
+  --fm: 'DM Mono', monospace;
+
+  --radius: 10px;
+  --card-shadow: 0 24px 60px rgba(0,0,0,.6), 0 4px 16px rgba(0,0,0,.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; }
+
+body {
+  font-family: var(--fn);
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BG GRID TEXTURE ── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(30,45,66,.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30,45,66,.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+}
+
+/* ── LAYOUT ── */
+.app {
+  position:relative; z-index:1;
+  display:grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 28px 0 20px;
+  border-bottom: 1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; flex-wrap:wrap;
+}
+.logo-area { display:flex; align-items:center; gap:14px; }
+.logo-mark {
+  width:40px; height:40px; border-radius:10px;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:700; color:#fff; flex-shrink:0;
+  box-shadow: 0 4px 16px rgba(31,187,120,.3);
+}
+.logo-text h1 { font-size:15px; font-weight:600; letter-spacing:-.01em; }
+.logo-text p  { font-size:11px; color:var(--dim); font-family:var(--fm); margin-top:2px; }
+.progress-area { display:flex; align-items:center; gap:12px; }
+.prog-label { font-size:11px; color:var(--dim); font-family:var(--fm); }
+.prog-bar {
+  width:160px; height:4px; background:var(--surf3); border-radius:4px; overflow:hidden;
+}
+.prog-fill {
+  height:100%; background:linear-gradient(90deg, var(--green), var(--blue));
+  border-radius:4px; transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+.prog-count { font-size:11px; color:var(--dim); font-family:var(--fm); white-space:nowrap; }
+
+/* ── PHASE TABS ── */
+.phase-tabs {
+  display:flex; gap:6px; padding: 18px 0 14px;
+  overflow-x:auto; scrollbar-width:none;
+}
+.phase-tabs::-webkit-scrollbar { display:none; }
+.ptab {
+  display:flex; align-items:center; gap:7px;
+  padding:6px 14px; border-radius:20px;
+  border:1px solid var(--border);
+  background:transparent; cursor:pointer;
+  font-size:11px; font-family:var(--fm); font-weight:500;
+  color:var(--dim); white-space:nowrap;
+  transition:all .2s ease;
+}
+.ptab:hover { border-color:var(--border2); color:var(--txt); }
+.ptab.active { color:#fff; border-color:transparent; }
+.ptab.done   { opacity:.6; }
+.ptab-dot { width:7px; height:7px; border-radius:50%; }
+
+/* ── MAIN CONTENT ── */
+main {
+  display:grid;
+  grid-template-columns: 1fr 380px;
+  gap:20px;
+  padding: 8px 0 32px;
+  align-items:start;
+}
+
+/* ── FLOW COLUMN ── */
+.flow-col { display:flex; flex-direction:column; gap:12px; }
+
+/* ── STEP CARD ── */
+.step-card {
+  background:var(--surf);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  opacity:.38;
+  transform: translateY(4px);
+}
+.step-card.unlocked {
+  opacity:1; transform:translateY(0);
+  border-color:var(--border2);
+}
+.step-card.active {
+  opacity:1; transform:translateY(0);
+  box-shadow: var(--card-shadow);
+}
+.step-card.done {
+  opacity:.55; transform:translateY(0);
+}
+
+.card-header {
+  display:flex; align-items:center; gap:0;
+  cursor:pointer; user-select:none;
+}
+.card-phase-stripe {
+  width:4px; align-self:stretch; flex-shrink:0;
+  transition:background .3s;
+}
+.card-inner-hdr {
+  flex:1; display:flex; align-items:center; gap:12px;
+  padding:14px 16px;
+}
+.step-num {
+  width:32px; height:32px; border-radius:8px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:600; font-family:var(--fm);
+  background:var(--surf2); border:1px solid var(--border);
+  color:var(--dim); transition:all .3s;
+}
+.step-card.active .step-num,
+.step-card.unlocked .step-num {
+  color:var(--txt); border-color:var(--border2);
+}
+.step-card.done .step-num {
+  background:rgba(31,187,120,.12); border-color:rgba(31,187,120,.3);
+  color:var(--green);
+}
+.step-meta { flex:1; min-width:0; }
+.step-title {
+  font-size:13px; font-weight:600; color:var(--txt);
+  line-height:1.3; margin-bottom:2px;
+}
+.step-actor {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:10px; font-family:var(--fm); color:var(--dim);
+}
+.actor-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.step-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.step-phase-badge {
+  font-size:9px; font-family:var(--fm); padding:2px 8px;
+  border-radius:10px; white-space:nowrap;
+}
+.chevron {
+  font-size:12px; color:var(--dim); transition:transform .3s;
+}
+.step-card.open .chevron { transform:rotate(180deg); }
+
+/* ── CARD BODY ── */
+.card-body {
+  display:none; padding:0 16px 16px 60px;
+  border-top:1px solid var(--border);
+}
+.step-card.open .card-body { display:block; }
+
+.body-desc {
+  font-size:13px; color:var(--dim); line-height:1.7;
+  margin: 14px 0 16px;
+}
+.body-items {
+  display:flex; flex-direction:column; gap:6px; margin-bottom:16px;
+}
+.body-item {
+  display:flex; align-items:flex-start; gap:8px;
+  font-size:12px; color:var(--dim); line-height:1.5;
+}
+.body-item::before {
+  content:''; width:5px; height:5px; border-radius:50%;
+  background:var(--border2); flex-shrink:0; margin-top:6px;
+}
+
+.alert-box {
+  display:flex; gap:10px; align-items:flex-start;
+  background:rgba(224,154,40,.07); border:1px solid rgba(224,154,40,.2);
+  border-radius:7px; padding:10px 12px; margin-bottom:12px;
+}
+.alert-ico { font-size:13px; flex-shrink:0; margin-top:1px; }
+.alert-txt { font-size:11px; color:#b88a30; line-height:1.6; font-family:var(--fm); }
+
+.docs-row {
+  display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;
+}
+.doc-chip {
+  display:flex; align-items:center; gap:5px;
+  background:var(--surf2); border:1px solid var(--border);
+  border-radius:5px; padding:4px 9px;
+  font-size:10px; color:var(--dim); font-family:var(--fm);
+}
+.doc-chip span { font-size:11px; }
+
+.action-row {
+  display:flex; align-items:center; gap:10px; margin-top:16px;
+}
+.btn-advance {
+  display:flex; align-items:center; gap:7px;
+  padding:9px 20px; border-radius:8px; border:none; cursor:pointer;
+  font-size:12px; font-weight:600; font-family:var(--fn);
+  transition:all .2s ease; white-space:nowrap;
+}
+.btn-advance.primary {
+  color:#fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+}
+.btn-advance.primary:hover { transform:translateY(-1px); filter:brightness(1.1); }
+.btn-advance.done-btn {
+  background:rgba(31,187,120,.1); border:1px solid rgba(31,187,120,.25);
+  color:var(--green); cursor:default;
+}
+.btn-skip {
+  background:none; border:1px solid var(--border); border-radius:8px;
+  padding:9px 14px; font-size:11px; font-family:var(--fm); color:var(--dim);
+  cursor:pointer; transition:all .2s;
+}
+.btn-skip:hover { border-color:var(--border2); color:var(--txt); }
+
+/* ── DETAIL PANEL ── */
+.detail-col {
+  position:sticky; top:24px;
+  display:flex; flex-direction:column; gap:14px;
+}
+
+.detail-card {
+  background:var(--surf); border:1px solid var(--border);
+  border-radius:var(--radius); padding:20px;
+}
+.detail-card h3 {
+  font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--dim); margin-bottom:14px; font-family:var(--fm);
+}
+
+/* progress steps mini */
+.mini-steps { display:flex; flex-direction:column; gap:4px; }
+.mini-step {
+  display:flex; align-items:center; gap:10px;
+  padding:7px 10px; border-radius:7px;
+  font-size:11px; transition:background .2s;
+  cursor:pointer;
+}
+.mini-step:hover { background:var(--surf2); }
+.mini-step.ms-done   { color:var(--dim); }
+.mini-step.ms-active { background:var(--surf2); color:var(--txt); font-weight:500; }
+.mini-step.ms-locked { color:var(--faint); cursor:default; }
+.mini-dot {
+  width:22px; height:22px; border-radius:6px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; font-family:var(--fm); font-weight:600;
+  background:var(--surf3); border:1px solid var(--border); color:var(--faint);
+  transition:all .3s;
+}
+.ms-done .mini-dot   { background:rgba(31,187,120,.12); border-color:rgba(31,187,120,.3); color:var(--green); }
+.ms-active .mini-dot { border-color:var(--border2); color:var(--txt); }
+.mini-label { font-size:11px; line-height:1.3; flex:1; }
+.mini-actor { font-size:9px; color:var(--faint); font-family:var(--fm); }
+
+/* actors legend */
+.actor-legend { display:flex; flex-direction:column; gap:8px; }
+.al-item { display:flex; align-items:center; gap:9px; }
+.al-bar  { width:3px; height:28px; border-radius:2px; flex-shrink:0; }
+.al-info { flex:1; }
+.al-name { font-size:11px; font-weight:500; color:var(--txt); }
+.al-role { font-size:10px; color:var(--dim); font-family:var(--fm); }
+.al-count { font-size:9px; color:var(--faint); font-family:var(--fm); margin-left:auto; }
+
+/* phase overview card */
+.phase-overview { display:flex; flex-direction:column; gap:8px; }
+.po-phase { display:flex; align-items:center; gap:10px; }
+.po-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.po-name { font-size:11px; color:var(--dim); flex:1; }
+.po-bar-outer { width:80px; height:3px; background:var(--surf3); border-radius:3px; overflow:hidden; }
+.po-bar-inner { height:100%; border-radius:3px; transition:width .5s; }
+.po-pct { font-size:10px; font-family:var(--fm); color:var(--faint); width:28px; text-align:right; }
+
+/* ── FOOTER ── */
+footer {
+  border-top:1px solid var(--border);
+  padding:16px 0;
+  display:flex; align-items:center; gap:16px;
+  font-size:10px; color:var(--faint); font-family:var(--fm);
+  flex-wrap:wrap;
+}
+
+/* ── CELEBRATE overlay ── */
+.celebrate {
+  display:none;
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(8,12,18,.9); backdrop-filter:blur(8px);
+  flex-direction:column; align-items:center; justify-content:center; gap:24px;
+}
+.celebrate.show { display:flex; }
+.cel-icon { font-size:64px; animation:bounce 1s ease infinite; }
+.cel-title { font-size:28px; font-weight:600; text-align:center; }
+.cel-sub   { font-size:14px; color:var(--dim); text-align:center; font-family:var(--fm); }
+.cel-btn   {
+  padding:12px 32px; border-radius:10px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  color:#fff; font-size:14px; font-weight:600; font-family:var(--fn);
+  transition:all .2s; margin-top:8px;
+}
+.cel-btn:hover { transform:translateY(-2px); filter:brightness(1.1); }
+
+@keyframes bounce {
+  0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)}
+}
+@keyframes fadeSlideIn {
+  from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)}
+}
+.step-card.just-unlocked {
+  animation: fadeSlideIn .4s ease forwards;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+@media(max-width:800px){
+  main{grid-template-columns:1fr; }
+  .detail-col{position:static;}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-mark">SE</div>
+    <div class="logo-text">
+      <h1>Obra de Execução Direta</h1>
+      <p>Ecossistema SESAI · Fluxo passo a passo</p>
+    </div>
+  </div>
+  <div class="progress-area">
+    <span class="prog-label">progresso</span>
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <span class="prog-count" id="progCount">0 / 13</span>
+  </div>
+</header>
+
+<!-- PHASE TABS -->
+<div class="phase-tabs" id="phaseTabs"></div>
+
+<!-- MAIN -->
+<main>
+  <div class="flow-col" id="flowCol"></div>
+
+  <div class="detail-col">
+
+    <!-- Mini map -->
+    <div class="detail-card">
+      <h3>Mapa do fluxo</h3>
+      <div class="mini-steps" id="miniSteps"></div>
+    </div>
+
+    <!-- Phase progress -->
+    <div class="detail-card">
+      <h3>Progresso por fase</h3>
+      <div class="phase-overview" id="phaseOv"></div>
+    </div>
+
+    <!-- Actor legend -->
+    <div class="detail-card">
+      <h3>Atores</h3>
+      <div class="actor-legend">
+        <div class="al-item"><div class="al-bar" style="background:var(--a-dsei)"></div><div class="al-info"><div class="al-name">DSEI / Gabinete</div><div class="al-role">aprovação · designação · SEI</div></div></div>
+        <div class="al-item"><div class="al-bar" style="background:var(--a-ses)"></div><div class="al-info"><div class="al-name">SESANI</div><div class="al-role">responsável técnico central</div></div></div>
+        <div class="al-item"><div class="al-bar" style="background:var(--a-seofi)"></div><div class="al-info"><div class="al-name">SEOFI</div><div class="al-role">financeiro · SIAFI · almox.</div></div></div>
+        <div class="al-item"><div class="al-bar" style="background:var(--a-selog)"></div><div class="al-info"><div class="al-name">SELOG</div><div class="al-role">logística · cadastro de obras</div></div></div>
+        <div class="al-item"><div class="al-bar" style="background:var(--a-sepat)"></div><div class="al-info"><div class="al-name">SEPAT</div><div class="al-role">patrimônio · retirada material</div></div></div>
+        <div class="al-item"><div class="al-bar" style="background:var(--a-deamb)"></div><div class="al-info"><div class="al-name">DEAMB / COABS</div><div class="al-role">validação · ART · conclusão</div></div></div>
+        <div class="al-item"><div class="al-bar" style="background:var(--a-com)"></div><div class="al-info"><div class="al-name">Comunidade</div><div class="al-role">participação · recebimento</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <span>SESAI · Execução Direta · v3.0</span>
+  <span style="margin-left:auto;">13 etapas · 7 atores · 5 fases</span>
+</footer>
+
+</div><!-- app -->
+
+<!-- CELEBRATE -->
+<div class="celebrate" id="celebrate">
+  <div class="cel-icon">🏁</div>
+  <div class="cel-title">Fluxo concluído!</div>
+  <div class="cel-sub">Todas as 13 etapas da Obra de Execução Direta foram percorridas.</div>
+  <button class="cel-btn" onclick="resetAll()">↺ Reiniciar fluxo</button>
+</div>
+
+<script>
+const PHASES = [
+  { id:'p1', label:'① Pré-obra',         color:'#1fbb78', steps:[0,1,2,3] },
+  { id:'p2', label:'② Distribuição',      color:'#2a8fdd', steps:[4] },
+  { id:'p3', label:'③ Início da Obra',    color:'#e09a28', steps:[5,6,7,8,9] },
+  { id:'p4', label:'④ Acompanhamento',    color:'#9a54e0', steps:[10,11] },
+  { id:'p5', label:'⑤ Conclusão',         color:'#e04444', steps:[12] },
+];
+
+const ACTORS = {
+  dsei:  { label:'DSEI / Gabinete', color:'#2a7abf' },
+  ses:   { label:'SESANI',          color:'#1fbb78' },
+  seofi: { label:'SEOFI',           color:'#e09a28' },
+  selog: { label:'SELOG',           color:'#c8b420' },
+  sepat: { label:'SEPAT',           color:'#1aadcc' },
+  deamb: { label:'DEAMB / COABS',   color:'#9a54e0' },
+  com:   { label:'Comunidade',      color:'#e06040' },
+};
+
+const STEPS = [
+  {
+    num:'1', phase:'p1', actor:'dsei',
+    title:'Identificação dos processos de aquisição e mão de obra',
+    desc:'Etapa que formaliza quais processos estão relacionados à obra, embasando a origem do material e a mão de obra utilizada.',
+    items:[
+      'Identifica o(s) nº do(s) processo(s) no SEI',
+      'Processo de aquisição de material',
+      'Processo de contratação de mão de obra (se necessário)',
+      'Serve como base documental para rastrear toda a origem dos recursos',
+    ],
+    docs:['Processo SEI','Nº aquisição','Contrato MO'],
+    alert:null,
+    btnLabel:'Processos identificados →',
+  },
+  {
+    num:'2', phase:'p1', actor:'dsei',
+    title:'Designação dos responsáveis pela obra',
+    desc:'Atribui formalmente a responsabilidade dos processos a servidores específicos, garantindo accountability em cada frente.',
+    items:[
+      'Emissão de portaria interna ou despacho de designação',
+      'Gestor técnico da obra — SESANI',
+      'Responsável pelo controle de estoque',
+      'Equipe de apoio operacional (AISAN quando aplicável)',
+    ],
+    docs:['Portaria interna','Despacho de designação'],
+    alert:null,
+    btnLabel:'Responsáveis designados →',
+  },
+  {
+    num:'3', phase:'p1', actor:'seofi',
+    title:'Cadastro do estoque de material recebido',
+    desc:'SEOFI registra e liquida o material recebido no SIAFI. Este cadastro é a base financeira e contábil de todo o fluxo.',
+    items:[
+      'Liquidação da nota fiscal no SIAFI',
+      'Registro do material recebido e conferido fisicamente',
+      'Base para emissão de pagamento ao fornecedor',
+      'Este cadastro alimenta a distribuição por obra (etapa 5)',
+    ],
+    docs:['Nota fiscal','Liquidação SIAFI','Guia de recebimento'],
+    alert:'Dificuldade identificada: falta de padronização nos registros de entrada e saída de materiais.',
+    btnLabel:'Estoque cadastrado →',
+  },
+  {
+    num:'4', phase:'p1', actor:'selog',
+    title:'Cadastro de obra e planejamento de macro-etapas',
+    desc:'SELOG cadastra cada obra com sua ficha técnica completa e o planejamento mensal de macro-etapas. Após o cadastro, verifica-se se a obra pode ser iniciada.',
+    items:[
+      'Um cadastro por obra — processo SEI, objeto, Terra Indígena',
+      'Aldeia, etnia, população, coordenadas UTM',
+      'Responsável técnico, datas de início e previsão de conclusão',
+      'Planejamento mensal de macro-etapas da obra',
+      'Tipo: implantação / reforma / reforma e ampliação / ampliação',
+      'Gateway: verificar se a obra possui condições para início',
+    ],
+    docs:['Ficha técnica','Cronograma macro','Planilha orçamentária'],
+    alert:null,
+    btnLabel:'Obra cadastrada →',
+  },
+  {
+    num:'5', phase:'p2', actor:'selog',
+    title:'Distribuição de material por obra',
+    desc:'Material adquirido é formalmente destinado a cada obra. Permite rastreabilidade completa e, se necessário, realocação com justificativa.',
+    items:[
+      'DSEI/Gabinete e SESANI autorizam a destinação por obra',
+      'SEOFI libera fisicamente o material do almoxarifado',
+      'SELOG registra no sistema quais itens vão para qual obra',
+      'Liberação pode ocorrer em remessas conforme etapa da obra',
+      'Realocação possível: SESANI elabora justificativa → DEAMB aprova',
+    ],
+    docs:['Requisição de material','Autorização de destinação','Registro de remessa'],
+    alert:'Dificuldade: falta de rastreabilidade do material até o ponto de uso na obra.',
+    btnLabel:'Material distribuído →',
+  },
+  {
+    num:'6', phase:'p3', actor:'ses',
+    title:'Reunião com a comunidade',
+    desc:'SESANI organiza reunião para alinhar expectativas, apresentar a obra e validar a data de início com a própria comunidade.',
+    items:[
+      'Pode ser presencial ou online conforme viabilidade do DSEI',
+      'Pauta: apresentar a obra, etapas e cronograma',
+      'Alinhar responsabilidades e impactos na aldeia',
+      'Pedir apoio e validar a data de início',
+      'Registrar ATA assinada ou relato fotográfico como comprovação',
+    ],
+    docs:['ATA de reunião','Relato fotográfico','Lista de presença'],
+    alert:null,
+    btnLabel:'Reunião realizada →',
+  },
+  {
+    num:'7', phase:'p3', actor:'ses',
+    title:'Emissão da Ordem de Serviço',
+    desc:'A OS deflagra oficialmente o início da obra. É o marco formal que substitui o início que existiria num contrato licitado.',
+    items:[
+      'Data oficial de início da obra',
+      'Equipe técnica designada para execução',
+      'Escopo claro e detalhado da obra',
+      'Co-assinada pela Coordenação (DSEI/Gabinete) e SESANI',
+    ],
+    docs:['Ordem de Serviço','Escopo de obra'],
+    alert:null,
+    btnLabel:'OS emitida →',
+  },
+  {
+    num:'8', phase:'p3', actor:'deamb',
+    title:'Inserção de ART e demais documentos técnicos',
+    desc:'Quando necessário, SESANI solicita a ART à COABS. Há um processo específico para essa finalidade.',
+    items:[
+      'Aplicável a obras que exigem responsabilidade técnica registrada',
+      'NÃO se aplica a: reforma, manutenção e serviços similares',
+      'SESANI solicita pagamento da ART à COABS',
+      'COABS processa o pagamento e formaliza a ART',
+      'Demais documentos técnicos da obra são anexados nesta etapa',
+    ],
+    docs:['ART','Documentos técnicos','Projeto executivo'],
+    alert:null,
+    btnLabel:'ART inserida →',
+    optional:true,
+    optLabel:'Pular — obra não exige ART',
+  },
+  {
+    num:'9a', phase:'p3', actor:'sepat',
+    title:'Atesto de retirada de material (SEPAT)',
+    desc:'Com a OS em mãos, o técnico SESANI aciona o SEPAT para retirada do material. Ambos assinam o atesto de retirada.',
+    items:[
+      'SESANI aciona o SEPAT para liberação do material',
+      'SESANI e SEPAT assinam o atesto de retirada',
+      'Possibilidade de retirada em remessas por etapa da obra',
+      'O formulário único cobre retirada + entrega (etapa 9b)',
+      'Formulário só se encerra após as duas assinaturas',
+    ],
+    docs:['Atesto de retirada','Formulário único (9a+9b)'],
+    alert:null,
+    btnLabel:'Retirada atestada →',
+  },
+  {
+    num:'9b', phase:'p3', actor:'ses',
+    title:'Atesto de entrega do material na aldeia',
+    desc:'SESANI assina o atesto de entrega do material no local da obra. O formulário iniciado na etapa 9a se encerra aqui.',
+    items:[
+      'Material entregue fisicamente no canteiro de obras na aldeia',
+      'SESANI assina o atesto de entrega',
+      'Formulário único (9a + 9b) se encerra com esta assinatura',
+      'Ciclo documental completo: origem → almoxarifado → obra',
+    ],
+    docs:['Atesto de entrega','Formulário 9a+9b encerrado'],
+    alert:'Dificuldade: conectividade limitada pode atrasar o registro digital da entrega em campo.',
+    btnLabel:'Entrega atestada →',
+  },
+  {
+    num:'10', phase:'p4', actor:'ses',
+    title:'Diário de obras semanal',
+    desc:'Instrumento de acompanhamento contínuo da obra. Preenchido a cada 7 dias com fotos, descritivos e ajuste de cronograma.',
+    items:[
+      'Preenchimento semanal (7 dias) durante toda a execução',
+      'Registro fotográfico e georreferenciado das etapas',
+      'Andamento das atividades e problemas encontrados',
+      'Cronograma de obra e ajuste de cronograma',
+      'Pode ser preenchido também por AISAN e comunidade',
+      'A cada 4 semanas, gera automaticamente o relatório situacional',
+    ],
+    docs:['Diário de obras','Registro fotográfico','Cronograma atualizado'],
+    alert:'Dificuldade: conectividade limitada exige modo offline para registro em campo. Escassez de AISANs para acompanhamento.',
+    btnLabel:'Semana registrada →',
+  },
+  {
+    num:'11', phase:'p4', actor:'deamb',
+    title:'Relatório situacional da obra (mensal)',
+    desc:'Gerado automaticamente a partir do diário de obras a cada 4 semanas. Validado pelo SESANI e enviado ao DEAMB/COABS.',
+    items:[
+      '% executado no mês e acumulado versus previsto',
+      'Curva previsto × executado gerada automaticamente',
+      'Descritivo das atividades do mês por macro-etapa',
+      'Fotos classificadas por etapa construtiva com tags',
+      'Riscos, não conformidades e ações recomendadas',
+      'SESANI valida, emite parecer técnico e envia ao DEAMB',
+      'DEAMB/COABS valida e verifica conformidade do avanço',
+      'Segue modelo de relatório desenvolvido pela COABS',
+    ],
+    docs:['Relatório situacional','Curva S previsto×executado','Parecer técnico SESANI'],
+    alert:null,
+    btnLabel:'Relatório validado →',
+  },
+  {
+    num:'12+13', phase:'p5', actor:'ses',
+    title:'Entrega à comunidade e Termo de Conclusão',
+    desc:'Reunião formal de entrega da obra concluída à comunidade, seguida da emissão do Termo de Conclusão e encerramento do processo.',
+    items:[
+      'Reunião com a comunidade para entrega formal da obra',
+      'Registro fotográfico com presença da liderança local',
+      'Liderança assina o recebimento da obra',
+      'SESANI emite o Termo de Conclusão de Obra',
+      'Documento enviado ao DEAMB/COABS para validação',
+      'DEAMB instrui DSEI/Gabinete a encerrar o processo no SEI',
+    ],
+    docs:['Ata de entrega','Fotos de conclusão','Termo de conclusão','Encerramento SEI'],
+    alert:null,
+    btnLabel:'Obra concluída! 🏁',
+    isLast:true,
+  },
+];
+
+// ── STATE ──
+let currentStep = 0;
+let completedSteps = new Set();
+let openCard = -1;
+
+// ── RENDER PHASE TABS ──
+function renderPhaseTabs() {
+  const el = document.getElementById('phaseTabs');
+  el.innerHTML = PHASES.map(ph => {
+    const total = ph.steps.length;
+    const done  = ph.steps.filter(i => completedSteps.has(i)).length;
+    const active = ph.steps.includes(currentStep);
+    let cls = active ? 'active' : (done === total ? 'done' : '');
+    return `<button class="ptab ${cls}" onclick="jumpToPhase(${ph.steps[0]})"
+      style="${active ? `background:${ph.color}22; border-color:${ph.color}55; color:${ph.color}` : ''}">
+      <div class="ptab-dot" style="background:${ph.color};opacity:${done===total?1:.5}"></div>
+      ${ph.label}
+      <span style="font-size:9px;opacity:.6;">${done}/${total}</span>
+    </button>`;
+  }).join('');
+}
+
+// ── RENDER FLOW CARDS ──
+function renderCards() {
+  const col = document.getElementById('flowCol');
+  col.innerHTML = STEPS.map((s,i) => {
+    const phase = PHASES.find(p=>p.id===s.phase);
+    const actor = ACTORS[s.actor];
+    const isDone    = completedSteps.has(i);
+    const isActive  = i === currentStep;
+    const isOpen    = i === openCard;
+    const isUnlocked = i <= currentStep;
+    const isLocked  = i > currentStep;
+
+    let cls = 'step-card';
+    if (isDone)     cls += ' done';
+    else if (isActive) cls += ' active unlocked';
+    else if (isUnlocked) cls += ' unlocked';
+    if (isOpen) cls += ' open';
+
+    const docsHtml = s.docs.map(d =>
+      `<div class="doc-chip"><span>📄</span>${d}</div>`
+    ).join('');
+
+    const alertHtml = s.alert ?
+      `<div class="alert-box"><div class="alert-ico">⚠️</div><div class="alert-txt">${s.alert}</div></div>` : '';
+
+    const itemsHtml = s.items.map(it =>
+      `<div class="body-item">${it}</div>`
+    ).join('');
+
+    let btnHtml = '';
+    if (!isLocked) {
+      if (isDone) {
+        btnHtml = `<button class="btn-advance done-btn">✓ Concluído</button>`;
+      } else {
+        const bg = `background:linear-gradient(135deg,${phase.color}cc,${phase.color}88)`;
+        btnHtml = `<button class="btn-advance primary" style="${bg}" onclick="advance(${i})">
+          ${s.btnLabel}
+        </button>`;
+        if (s.optional) {
+          btnHtml += `<button class="btn-skip" onclick="advanceOptional(${i})">${s.optLabel}</button>`;
+        }
+      }
+    }
+
+    return `
+    <div class="step-card ${cls}" id="card-${i}" data-step="${i}">
+      <div class="card-header" onclick="toggleCard(${i})">
+        <div class="card-phase-stripe" style="background:${phase.color}"></div>
+        <div class="card-inner-hdr">
+          <div class="step-num">${isDone ? '✓' : s.num}</div>
+          <div class="step-meta">
+            <div class="step-title">${s.title}</div>
+            <div class="step-actor">
+              <div class="actor-dot" style="background:${actor.color}"></div>
+              ${actor.label}
+            </div>
+          </div>
+          <div class="step-right">
+            <div class="step-phase-badge"
+              style="background:${phase.color}18;border:1px solid ${phase.color}44;color:${phase.color}">
+              ${phase.label}
+            </div>
+            ${!isLocked ? `<div class="chevron">▾</div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="body-desc">${s.desc}</p>
+        ${alertHtml}
+        <div class="body-items">${itemsHtml}</div>
+        <div class="docs-row">${docsHtml}</div>
+        <div class="action-row">${btnHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER MINI STEPS ──
+function renderMiniSteps() {
+  const el = document.getElementById('miniSteps');
+  el.innerHTML = STEPS.map((s,i) => {
+    const actor = ACTORS[s.actor];
+    const isDone = completedSteps.has(i);
+    const isActive = i === currentStep;
+    const isLocked = i > currentStep;
+    let cls = isLocked ? 'ms-locked' : (isDone ? 'ms-done' : (isActive ? 'ms-active' : 'ms-done'));
+    return `
+    <div class="mini-step ${cls}" onclick="!${isLocked} && toggleCard(${i})">
+      <div class="mini-dot" style="${isActive ? `border-color:${PHASES.find(p=>p.id===s.phase).color}55` : ''}">${isDone?'✓':s.num}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mini-label">${s.title.substring(0,42)}${s.title.length>42?'…':''}</div>
+        <div class="mini-actor">${actor.label}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER PHASE OVERVIEW ──
+function renderPhaseOv() {
+  const el = document.getElementById('phaseOv');
+  el.innerHTML = PHASES.map(ph => {
+    const total = ph.steps.length;
+    const done  = ph.steps.filter(i => completedSteps.has(i)).length;
+    const pct   = Math.round((done/total)*100);
+    return `
+    <div class="po-phase">
+      <div class="po-dot" style="background:${ph.color}"></div>
+      <div class="po-name">${ph.label}</div>
+      <div class="po-bar-outer"><div class="po-bar-inner" style="width:${pct}%;background:${ph.color}"></div></div>
+      <div class="po-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER PROGRESS ──
+function renderProgress() {
+  const n = completedSteps.size;
+  const total = STEPS.length;
+  document.getElementById('progFill').style.width = `${(n/total)*100}%`;
+  document.getElementById('progCount').textContent = `${n} / ${total}`;
+}
+
+// ── TOGGLE CARD ──
+function toggleCard(i) {
+  if (i > currentStep) return;
+  openCard = (openCard === i) ? -1 : i;
+  renderAll();
+  if (openCard !== -1) {
+    setTimeout(()=>{
+      const el = document.getElementById(`card-${i}`);
+      if (el) el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }, 80);
+  }
+}
+
+// ── ADVANCE ──
+function advance(i) {
+  completedSteps.add(i);
+  currentStep = i + 1;
+  openCard = (currentStep < STEPS.length) ? currentStep : -1;
+  renderAll();
+
+  // scroll to next
+  setTimeout(()=>{
+    const el = document.getElementById(`card-${currentStep}`);
+    if (el) {
+      el.classList.add('just-unlocked');
+      el.scrollIntoView({ behavior:'smooth', block:'center' });
+      setTimeout(()=> el.classList.remove('just-unlocked'), 600);
+    }
+  }, 100);
+
+  if (currentStep >= STEPS.length) {
+    setTimeout(()=> document.getElementById('celebrate').classList.add('show'), 600);
+  }
+}
+
+function advanceOptional(i) { advance(i); }
+
+function jumpToPhase(stepIdx) {
+  if (stepIdx > currentStep) return;
+  openCard = stepIdx;
+  renderAll();
+  setTimeout(()=>{
+    const el = document.getElementById(`card-${stepIdx}`);
+    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 80);
+}
+
+function resetAll() {
+  currentStep = 0;
+  completedSteps.clear();
+  openCard = 0;
+  document.getElementById('celebrate').classList.remove('show');
+  renderAll();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function renderAll() {
+  renderPhaseTabs();
+  renderCards();
+  renderMiniSteps();
+  renderPhaseOv();
+  renderProgress();
+}
+
+// ── INIT ──
+openCard = 0;
+renderAll();
+
+// auto open first card
+setTimeout(()=>{
+  const el = document.getElementById('card-0');
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+}, 200);
+</script>
+</body>
+</html>
