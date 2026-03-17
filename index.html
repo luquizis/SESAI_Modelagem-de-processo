@@ -626,6 +626,14 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
             </select>
           </div>
         </div>
+
+        <div id="apiKeyInfo" style="margin-top:12px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#475569;line-height:1.6">
+          🔑 <strong>Chave de API necessária.</strong>
+          Na primeira vez, você será solicitado a colar sua chave Anthropic (começa com <code style="background:#e2e8f0;padding:1px 5px;border-radius:3px">sk-ant-</code>).
+          Ela fica salva apenas no seu navegador.
+          Obtenha em <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--green);text-decoration:none;font-weight:600">console.anthropic.com ↗</a>
+          <span id="apiKeyStatus" style="margin-left:8px"></span>
+        </div>
       </div>
 
       <!-- STEP 2: generating (hidden) -->
@@ -1967,8 +1975,26 @@ function openProcManager() {
   if (!auth) { openLogin(); return; }
   pmStep = 'describe';
   pmShowStep('describe');
+  // Show API key status
+  const saved = localStorage.getItem('sesai_apikey');
+  const statusEl = document.getElementById('apiKeyStatus');
+  if (statusEl) {
+    if (saved) {
+      statusEl.innerHTML = `<span style="color:var(--green);font-weight:600">✓ Chave salva</span>
+        <button onclick="clearApiKey()" style="margin-left:6px;border:none;background:none;color:var(--gray-400);font-size:11px;cursor:pointer;text-decoration:underline">limpar</button>`;
+    } else {
+      statusEl.innerHTML = `<span style="color:var(--gray-400)">Nenhuma chave salva</span>`;
+    }
+  }
   document.getElementById('procManagerOverlay').classList.add('show');
   setTimeout(() => document.getElementById('pm-proc-name').focus(), 80);
+}
+
+function clearApiKey() {
+  localStorage.removeItem('sesai_apikey');
+  const statusEl = document.getElementById('apiKeyStatus');
+  if (statusEl) statusEl.innerHTML = `<span style="color:var(--gray-400)">Nenhuma chave salva</span>`;
+  toast('Chave de API removida.', 'success');
 }
 
 function closeProcManager() {
@@ -2018,6 +2044,22 @@ async function startGeneration() {
     return;
   }
 
+  // Get or prompt for API key
+  let apiKey = localStorage.getItem('sesai_apikey') || '';
+  if (!apiKey) {
+    apiKey = prompt(
+      'Cole sua chave da API Anthropic (começa com "sk-ant-").\n\n' +
+      'Obtenha em: console.anthropic.com/settings/keys\n\n' +
+      'A chave é salva apenas no seu navegador (localStorage).'
+    )?.trim() || '';
+    if (!apiKey) { toast('Chave de API necessária para usar o assistente de IA.', 'error'); return; }
+    if (!apiKey.startsWith('sk-ant-')) {
+      toast('Chave inválida. Deve começar com "sk-ant-".', 'error'); return;
+    }
+    localStorage.setItem('sesai_apikey', apiKey);
+    toast('Chave salva no navegador.', 'success');
+  }
+
   pmShowStep('generating');
 
   const statusMessages = [
@@ -2036,7 +2078,7 @@ async function startGeneration() {
     if (el2) el2.textContent = statusMessages[msgIdx][1];
   }, 1800);
 
-  const context = document.getElementById('pm-context').value;
+  const context    = document.getElementById('pm-context').value;
   const complexity = document.getElementById('pm-complexity').value;
 
   const complexityGuide = { simples:'3 a 6', medio:'7 a 12', complexo:'13 a 20' }[complexity];
@@ -2051,7 +2093,7 @@ Você deve gerar um fluxo de processo estruturado em JSON, com ${complexityGuide
 
 Os atores disponíveis são:
 - "dsei" = DSEI / Gabinete (aprovação, designação, decisões estratégicas)
-- "ses" = SESANI (responsável técnico, execução, fiscalização)  
+- "ses" = SESANI (responsável técnico, execução, fiscalização)
 - "seofi" = SEOFI (financeiro, orçamento, SIAFI, liquidação)
 - "selog" = SELOG (logística, almoxarifado, distribuição, obras)
 - "sepat" = SEPAT (patrimônio, bens, retirada de material)
@@ -2060,7 +2102,7 @@ Os atores disponíveis são:
 
 As fases disponíveis são:
 - "p1" = Pré-obra / Planejamento
-- "p2" = Distribuição / Contratação  
+- "p2" = Distribuição / Contratação
 - "p3" = Início / Execução
 - "p4" = Acompanhamento / Monitoramento
 - "p5" = Conclusão / Entrega
@@ -2106,6 +2148,7 @@ Gere o fluxo completo com ${complexityGuide} etapas.`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true',
       },
@@ -2122,13 +2165,16 @@ Gere o fluxo completo com ${complexityGuide} etapas.`;
     if (!response.ok) {
       const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
       const msg = err?.error?.message || `HTTP ${response.status}`;
+      // If auth error, clear saved key so user can re-enter
+      if (response.status === 401) {
+        localStorage.removeItem('sesai_apikey');
+        throw new Error('Chave de API inválida ou expirada. Tente novamente para inserir uma nova chave.');
+      }
       throw new Error(msg);
     }
 
-    const data = await response.json();
-    const raw = data.content?.[0]?.text || '';
-
-    // Parse JSON — strip any accidental markdown fences
+    const data  = await response.json();
+    const raw   = data.content?.[0]?.text || '';
     const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
     const parsed = JSON.parse(clean);
 
@@ -2136,16 +2182,15 @@ Gere o fluxo completo com ${complexityGuide} etapas.`;
       throw new Error('Resposta da IA não contém etapas válidas.');
     }
 
-    // Normalize steps to match app schema
     generatedSteps = parsed.steps.map((s, i) => ({
       id: 'ai_' + Date.now() + '_' + i,
       num: String(i + 1),
       phase: PHASES.find(p => p.id === s.phase) ? s.phase : 'p1',
       actor: ACTORS[s.actor] ? s.actor : 'ses',
       title: s.title || `Etapa ${i+1}`,
-      desc: s.desc || '',
+      desc:  s.desc  || '',
       items: Array.isArray(s.items) ? s.items : [],
-      docs: Array.isArray(s.docs) ? s.docs : [],
+      docs:  Array.isArray(s.docs)  ? s.docs  : [],
       btnLabel: s.btnLabel || 'Concluído',
       alert: s.alert || null,
       attachments: [],
