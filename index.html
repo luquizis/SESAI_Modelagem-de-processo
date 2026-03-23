@@ -626,6 +626,7 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   <div class="proc-bar-sep"></div>
   <button class="btn-add-proc" id="btnAddProc" onclick="openNewProc()">＋ Novo processo</button>
   <button class="btn-export-proc" onclick="exportActiveProcess()" title="Exportar processo ativo como JSON">⬇ JSON</button>
+  <button class="btn-export-proc" onclick="gerarBPMN()" title="Gerar diagrama BPMN do processo ativo" style="color:var(--green);border-color:var(--green-l)">⬟ Gerar BPMN</button>
 </div>
 
 <!-- ACTOR FILTER BAR -->
@@ -1373,7 +1374,9 @@ function buildBPMN(stepsData) {
     const label = sanitizeXml(`${s.num}. ${s.title.substring(0, 42)}${s.title.length > 42 ? '…' : ''}`);
 
     taskDefs += `    <task id="${tid}" name="${label}"/>\n`;
-    taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}">
+    taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}"
+          bioc:fill="${col.fill}" bioc:stroke="${col.stroke}"
+          color:background-color="${col.fill}" color:border-color="${col.stroke}">
         <dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/>
         <bpmndi:BPMNLabel/>
       </bpmndi:BPMNShape>\n`;
@@ -1435,9 +1438,13 @@ function buildBPMN(stepsData) {
     const laneId  = `Lane_${a}`;
     const laneY   = Y_POOL + li * LANE_H;
     const actorLabel = ACTORS[a]?.label || a;
+    const lFill  = LANE_FILL[a] || '#f8fafc';
+    const lStroke = BIZAGI_COLORS[a]?.stroke || '#94a3b8';
     const childRefs  = laneElements[a].map(id => `      <flowNodeRef>${id}</flowNodeRef>`).join('\n');
     laneSetXml += `      <lane id="${laneId}" name="${sanitizeXml(actorLabel)}">\n${childRefs}\n      </lane>\n`;
-    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true">
+    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true"
+            bioc:fill="${lFill}" bioc:stroke="${lStroke}"
+            color:background-color="${lFill}" color:border-color="${lStroke}">
         <dc:Bounds x="${POOL_LABEL_W}" y="${Y_POOL + li * LANE_H}" width="${TOTAL_W - POOL_LABEL_W}" height="${LANE_H}"/>
         <bpmndi:BPMNLabel><dc:Bounds x="${POOL_LABEL_W + 2}" y="${Y_POOL + li * LANE_H + LANE_H/2 - 6}" width="${LANE_LABEL_W - 8}" height="12"/></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>\n`;
@@ -1445,16 +1452,18 @@ function buildBPMN(stepsData) {
   laneSetXml += `    </laneSet>\n`;
 
   // ── 6. Assemble XML ──────────────────────────────
+  const procName = sanitizeXml(_activeProc()?.name || 'SESAI — Processo');
   return `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
   xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
   xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
   xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0"
+  xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0"
   targetNamespace="http://sesai.gov.br/bpmn" id="sesai-flow">
 
   <collaboration id="Collab1">
-    <participant id="Pool_SESAI" name="SESAI — Fluxo de Execução Direta" processRef="Proc_Main"/>
+    <participant id="Pool_SESAI" name="${procName}" processRef="Proc_Main"/>
   </collaboration>
 
   <process id="Proc_Main" isExecutable="false">
@@ -2485,12 +2494,8 @@ function switchTab(tab) {
   if(tab==='fb') renderFBPage();
   if(tab==='macro') initMacroPane();
   if(tab==='bpmn') {
-    // Initialize modeler lazily on first open
-    if (!bpmnReady) {
-      loadBPMN(buildBPMN(steps));
-    } else {
-      setTimeout(()=>getModeler()?.get('canvas').zoom('fit-viewport'), 80);
-    }
+    // Always regenerate from current process steps
+    loadBPMN(buildBPMN(steps));
   }
 }
 
@@ -3262,7 +3267,13 @@ function switchToProcess(id) {
   document.getElementById('flowDesc').textContent  = np.desc || '';
   renderFlow();
   updateFBBadge();
-  scheduleBPMNSync();
+  // If BPMN tab is active, regenerate for new process
+  if (document.getElementById('pane-bpmn')?.classList.contains('active')) {
+    bpmnReady = false;
+    loadBPMN(buildBPMN(steps));
+  } else {
+    scheduleBPMNSync();
+  }
 }
 
 function confirmCloseProc(id) {
@@ -3281,6 +3292,14 @@ function removeProcess(id) {
   _saveProcesses();
   renderProcBar();
   toast('Processo removido.', 'success');
+}
+
+function gerarBPMN() {
+  switchTab('bpmn');
+  // Force regeneration from current process steps
+  bpmnReady = false;
+  loadBPMN(buildBPMN(steps));
+  toast('Gerando diagrama BPMN para "' + (_activeProc()?.name||'processo') + '"…', 'success');
 }
 
 function exportActiveProcess() {
