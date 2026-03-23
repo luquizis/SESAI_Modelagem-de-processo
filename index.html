@@ -78,6 +78,56 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 .flow-layout{display:grid;grid-template-columns:1fr 284px;flex:1;overflow:hidden}
 .flow-main{overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:0}
 
+/* UNIFIED 3-COLUMN LAYOUT */
+.unified-layout{display:grid;grid-template-columns:210px 1fr 270px;flex:1;overflow:hidden}
+.u-left{border-right:1px solid var(--gray-200);background:var(--gray-50);overflow-y:auto;display:flex;flex-direction:column;flex-shrink:0}
+.u-left-header{padding:14px 14px 10px;border-bottom:1px solid var(--gray-200)}
+.u-left-title{font-size:12.5px;font-weight:700;color:var(--gray-900);letter-spacing:-.2px;margin-bottom:2px}
+.u-left-sub{font-size:11px;color:var(--gray-400)}
+.u-left-section{padding:10px 12px 8px;border-bottom:1px solid var(--gray-100)}
+.u-left-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:7px}
+.u-stage-btn{display:flex;align-items:center;gap:6px;width:100%;padding:4px 6px;border:none;background:none;border-radius:5px;font-size:11.5px;color:var(--gray-600);cursor:pointer;transition:background var(--transition);text-align:left;margin-bottom:2px}
+.u-stage-btn:hover{background:var(--white)}
+.u-stage-btn.active{background:var(--green-bg);color:var(--green);font-weight:600}
+.u-stage-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.u-stage-count{margin-left:auto;font-size:9.5px;font-family:var(--mono);color:var(--gray-400)}
+.u-lane-btn{display:flex;align-items:center;gap:6px;width:100%;padding:3px 5px;border:none;background:none;border-radius:4px;font-size:11px;color:var(--gray-600);cursor:pointer;transition:background var(--transition);text-align:left;margin-bottom:1px}
+.u-lane-btn:hover{background:var(--white)}
+.u-lane-btn.active{background:var(--white);font-weight:600;box-shadow:var(--shadow-xs)}
+.u-lane-bar{width:3px;height:14px;border-radius:2px;flex-shrink:0}
+.u-legend-item{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-600);margin-bottom:4px}
+.u-legend-icon{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.u-main{overflow-y:auto;padding:20px 20px 24px;display:flex;flex-direction:column;background:var(--white);min-width:0}
+.u-main-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--gray-100)}
+.u-main-header h2{font-size:15px;font-weight:700;color:var(--gray-900);letter-spacing:-.3px}
+.u-main-header p{font-size:11.5px;color:var(--gray-400);margin-top:2px}
+.u-right{border-left:1px solid var(--gray-200);background:var(--gray-50);overflow-y:auto;display:flex;flex-direction:column}
+.u-right-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.u-right-map{border-top:1px solid var(--gray-200);flex-shrink:0}
+.u-right-detail-head{padding:14px 14px 10px;border-bottom:1px solid var(--gray-200);background:var(--white)}
+.u-right-detail-id{font-size:9.5px;font-family:var(--mono);color:var(--gray-400);margin-bottom:4px}
+.u-right-detail-title{font-size:13px;font-weight:700;color:var(--gray-900);line-height:1.4;margin-bottom:8px}
+.u-right-detail-pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:0}
+.u-right-detail-pill{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:8px}
+.u-right-detail-body{padding:12px 14px}
+.u-right-section{margin-bottom:12px}
+.u-right-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:6px}
+.u-right-desc{font-size:12.5px;color:var(--gray-600);line-height:1.7}
+.u-right-list{display:flex;flex-direction:column;gap:3px}
+.u-right-list-item{display:flex;align-items:flex-start;gap:5px;font-size:12px;color:var(--gray-600);line-height:1.5}
+.u-right-list-dot{width:4px;height:4px;border-radius:50%;background:var(--green-l);flex-shrink:0;margin-top:5px}
+.u-chip{font-size:10.5px;padding:2px 7px;border-radius:5px;background:var(--gray-100);color:var(--gray-600);display:inline-flex;align-items:center;gap:3px;margin:2px}
+.u-chip.doc{background:#eff6ff;color:#1d4ed8}
+.u-chip.sys{background:#f0fdf4;color:#166534}
+.u-gateway-row{display:flex;align-items:center;gap:7px;padding:5px 8px;margin:3px 0;background:#fffbeb;border:1px dashed #f59e0b;border-radius:var(--radius-sm);font-size:11px;color:#92400e;cursor:pointer}
+.u-gateway-row:hover{background:#fef3c7}
+.u-gateway-diamond{width:12px;height:12px;background:#f59e0b;transform:rotate(45deg);flex-shrink:0;border-radius:1px}
+
+/* Step card type badge */
+.step-type-badge{font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:5px;display:inline-flex;align-items:center;gap:3px}
+
+@media(max-width:900px){.unified-layout{grid-template-columns:1fr}.u-left,.u-right{display:none}}
+
 .flow-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:16px;flex-wrap:wrap}
 .flow-header h2{font-size:16px;font-weight:700;color:var(--gray-900);letter-spacing:-.3px}
 .flow-header p{font-size:12px;color:var(--gray-400);margin-top:2px}
@@ -584,39 +634,72 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   <div id="actorChips"></div>
 </div>
 
-<!-- PANE: FLOW -->
+<!-- PANE: FLOW — layout unificado 3 colunas -->
 <div class="pane active" id="pane-flow">
-  <div class="flow-layout">
-    <div class="flow-main" id="flowMain">
-      <div class="flow-header">
+  <div class="unified-layout">
+
+    <!-- SIDEBAR ESQUERDA: estágios / lanes / mapa -->
+    <div class="u-left" id="uLeft">
+      <div class="u-left-header">
+        <div class="u-left-title" id="uLeftTitle">Fluxo</div>
+        <div class="u-left-sub" id="uLeftSub">13 etapas</div>
+      </div>
+      <div class="u-left-section">
+        <div class="u-left-label">Filtrar por fase / estágio</div>
+        <div id="uStageFilter"></div>
+      </div>
+      <div class="u-left-section">
+        <div class="u-left-label">Filtrar por ator / lane</div>
+        <div id="uLaneFilter"></div>
+      </div>
+      <div class="u-left-section" id="uLegendSection">
+        <div class="u-left-label">Legenda</div>
+        <div id="uLegend"></div>
+      </div>
+      <div class="u-left-section">
+        <div class="u-left-label">Progresso por fase</div>
+        <div class="phase-bars" id="phaseBars"></div>
+      </div>
+      <div class="u-left-section">
+        <div class="u-left-label">Atores</div>
+        <div class="actor-rows" id="sidebarActors"></div>
+      </div>
+    </div>
+
+    <!-- CENTRO: cards -->
+    <div class="u-main" id="flowMain">
+      <div class="u-main-header">
         <div>
           <h2 id="flowTitle">Fluxo</h2>
-          <p id="flowDesc">Percorra cada etapa e registre contribuições sobre o processo</p>
+          <p id="flowDesc">Percorra cada etapa e registre contribuições</p>
         </div>
-        <div class="progress-wrap">
-          <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
-          <span class="progress-label" id="progLabel">0 / 13</span>
-          <button class="btn-skip" onclick="resetFlow()" style="height:28px;font-size:11px;">↺ Reiniciar</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <input class="macro-search" id="uSearch" placeholder="🔍 Buscar etapa…" oninput="renderFlow()" style="width:180px">
+          <div class="progress-wrap">
+            <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+            <span class="progress-label" id="progLabel">0 / 0</span>
+          </div>
+          <button class="btn-skip" onclick="resetFlow()" style="height:28px;font-size:11px">↺ Reiniciar</button>
         </div>
       </div>
       <div class="phase-filter" id="phaseFilter"></div>
       <div id="stepCards"></div>
       <button class="add-card-btn" id="addCardBtn" onclick="openAddCard()">＋ Adicionar nova etapa</button>
     </div>
-    <div class="flow-sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-label">Mapa do fluxo</div>
-        <div class="mini-map" id="miniMap"></div>
+
+    <!-- PAINEL DIREITO: detalhe do card selecionado + mini-mapa -->
+    <div class="u-right" id="uRight">
+      <div class="u-right-empty" id="uRightEmpty">
+        <div style="font-size:28px;margin-bottom:10px">👆</div>
+        <div style="font-size:12.5px;color:var(--gray-400);text-align:center">Clique em uma etapa<br>para ver detalhes</div>
       </div>
-      <div class="sidebar-section">
-        <div class="sidebar-label">Progresso por fase</div>
-        <div class="phase-bars" id="phaseBars"></div>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-label">Atores — clique para filtrar</div>
-        <div class="actor-rows" id="sidebarActors"></div>
+      <div id="uRightDetail" style="display:none"></div>
+      <div class="u-right-map">
+        <div class="sidebar-label" style="padding:12px 14px 6px">Mapa do fluxo</div>
+        <div class="mini-map" id="miniMap" style="padding:0 14px 14px"></div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -1656,7 +1739,7 @@ function renderActorChips() {
 function setActorFilter(k) { activeActor=k; renderActorChips(); renderCards(); renderMiniMap(); }
 
 // FULL RENDER
-function renderFlow() { rebuildPhaseSteps(); renderActorChips(); renderPhaseFilter(); renderCards(); renderMiniMap(); renderPhaseBars(); renderProgress(); renderSidebarActors(); updateFBStepOptions(); }
+function renderFlow() { rebuildPhaseSteps(); renderActorChips(); renderPhaseFilter(); renderUnifiedLeft(); renderCards(); renderMiniMap(); renderPhaseBars(); renderProgress(); renderSidebarActors(); updateFBStepOptions(); }
 
 function renderPhaseFilter() {
   document.getElementById('phaseFilter').innerHTML = PHASES.map(ph => {
@@ -1678,7 +1761,21 @@ function renderCards() {
       return;
     }
   }
-  const visible = steps.map((s,i)=>({s,i})).filter(({s})=>activeActor===null||s.actor===activeActor);
+  const visible = steps.map((s,i)=>({s,i})).filter(({s,i}) => {
+    if (activeActor !== null && s.actor !== activeActor) return false;
+    if (activeULane  !== null && s._lane !== activeULane)  return false;
+    if (activeUStage !== null) {
+      const isMacro = !!s._stage;
+      if (isMacro && s._stage !== activeUStage) return false;
+      if (!isMacro) {
+        const ph = PHASES.find(p=>p.id===activeUStage);
+        if (ph && s.phase !== activeUStage) return false;
+      }
+    }
+    const q = document.getElementById('uSearch')?.value?.toLowerCase()||'';
+    if (q && !s.title.toLowerCase().includes(q) && !s.desc?.toLowerCase().includes(q)) return false;
+    return true;
+  });
   if (visible.length===0 && activeActor) {
     document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa para o ator selecionado.</div></div>`;
     return;
@@ -1791,7 +1888,7 @@ function renderCards() {
       draggable="${isEditMode?'true':'false'}"
       ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})" ondragleave="dragLeave(event)" ondrop="dragDrop(event,${i})" ondragend="dragEnd(event)">
       <div class="card-left-bar" style="background:${ph.color}"></div>
-      <div class="card-top" onclick="toggleCard(${i})">
+      <div class="card-top" onclick="toggleCard(${i});showStepDetail(${i})">
         ${isEditMode?`<div class="drag-handle" title="Arrastar para reordenar">⠿</div>`:''}
         <div class="step-index">${isDone?'✓':sanitize(s.num)}</div>
         <div class="step-info">
@@ -1799,6 +1896,7 @@ function renderCards() {
           <div class="step-meta-row">
             <span class="actor-pill" style="background:${ac.bg};color:${ac.color}">● ${ac.label}</span>
             <span class="phase-pill-sm">${ph.label}</span>
+            ${s._btype && typeof MACRO_BPMN_TYPES !== 'undefined' && MACRO_BPMN_TYPES[s._btype] ? `<span class="step-type-badge" style="background:${MACRO_BPMN_TYPES[s._btype].bg};color:${MACRO_BPMN_TYPES[s._btype].color}">${MACRO_BPMN_TYPES[s._btype].icon}</span>` : ''}
             ${atts.length>0?`<span style="font-size:10.5px;color:var(--gray-400)">📎 ${atts.length}</span>`:''}
             ${(s.comments&&s.comments.length)?`<span style="font-size:10.5px;color:var(--gray-400)">💬 ${s.comments.length}</span>`:''}
           </div>
@@ -1818,8 +1916,201 @@ function renderCards() {
         ${buildCardComments(i, s)}
         ${footerHtml?`<div class="card-footer">${footerHtml}</div>`:''}
       </div>
-    </div>`;
+    </div>${s._gw && typeof MACRO_GATEWAYS !== 'undefined' && MACRO_GATEWAYS[s._gw] ? `
+    <div class="u-gateway-row" onclick="showStepDetail(${i})">
+      <div class="u-gateway-diamond"></div>
+      <span style="font-weight:700;font-size:10px;color:#d97706">${sanitize(s._gw)}</span>
+      <span>${sanitize(MACRO_GATEWAYS[s._gw].question)}</span>
+    </div>` : ''}`;
   }).join('');
+}
+
+/* ── UNIFIED LEFT SIDEBAR ──────────────────────────── */
+function renderUnifiedLeft() {
+  const proc = _activeProc();
+  const isMacro = steps.length > 0 && !!steps[0]._stage;
+
+  // Header
+  document.getElementById('uLeftTitle').textContent = proc.name;
+  document.getElementById('uLeftSub').textContent   = steps.length + ' etapas';
+
+  // Stage/phase filter
+  const stageEl = document.getElementById('uStageFilter');
+  if (isMacro) {
+    // Group by _stage
+    const stageCounts = {};
+    steps.forEach(s => { stageCounts[s._stage] = (stageCounts[s._stage]||0)+1; });
+    // Get stage metadata from MACRO_STAGES if available
+    const stageNames = {};
+    if (typeof MACRO_STAGES !== 'undefined') {
+      MACRO_STAGES.forEach(st => { stageNames[st.id] = { name: st.name, color: st.color }; });
+    }
+    const allStages = ['STAGE_ALL', ...Object.keys(stageCounts)];
+    stageEl.innerHTML = allStages.map(sid => {
+      const isSAll = sid === 'STAGE_ALL';
+      const meta   = stageNames[sid] || { name: sid.replace('STAGE_','Estágio '), color: '#6b7280' };
+      const count  = isSAll ? steps.length : (stageCounts[sid]||0);
+      const isAct  = (activeUStage||'STAGE_ALL') === sid;
+      return `<button class="u-stage-btn ${isAct?'active':''}" onclick="setUStage('${sid}')">
+        <div class="u-stage-dot" style="background:${meta.color}"></div>
+        <span style="flex:1;font-size:11px">${isSAll?'Todos':meta.name.replace(/^\d+\.\s*/,'')}</span>
+        <span class="u-stage-count">${count}</span>
+      </button>`;
+    }).join('');
+    document.getElementById('uLegendSection').style.display = '';
+    // Legend
+    document.getElementById('uLegend').innerHTML = Object.entries(MACRO_BPMN_TYPES||{}).map(([,t])=>
+      `<div class="u-legend-item"><div class="u-legend-icon" style="background:${t.bg};color:${t.color}">${t.icon}</div>${t.label}</div>`
+    ).join('') + `<div class="u-legend-item" style="margin-top:4px"><div style="width:18px;height:12px;border:1.5px dashed #f59e0b;background:#fffbeb;transform:rotate(45deg);border-radius:1px;flex-shrink:0;margin:3px"></div>Gateway</div>`;
+  } else {
+    // Group by PHASES
+    stageEl.innerHTML = PHASES.map(ph => {
+      const count = ph.steps.length;
+      if (!count) return '';
+      const done = ph.steps.filter(i=>doneSteps.has(i)).length;
+      const isAct = (activeUStage||'ALL') === ph.id;
+      return `<button class="u-stage-btn ${isAct?'active':''}" onclick="setUStage('${ph.id}')">
+        <div class="u-stage-dot" style="background:${ph.color}"></div>
+        <span style="flex:1;font-size:11px">${ph.label}</span>
+        <span class="u-stage-count">${done}/${count}</span>
+      </button>`;
+    }).join('');
+    // All option at top
+    const allIsAct = !activeUStage || activeUStage === 'ALL';
+    stageEl.innerHTML = `<button class="u-stage-btn ${allIsAct?'active':''}" onclick="setUStage('ALL')">
+      <div class="u-stage-dot" style="background:var(--gray-400)"></div>
+      <span style="flex:1;font-size:11px">Todas as fases</span>
+      <span class="u-stage-count">${steps.length}</span>
+    </button>` + stageEl.innerHTML;
+    document.getElementById('uLegendSection').style.display = 'none';
+  }
+
+  // Lane/actor filter
+  const laneEl = document.getElementById('uLaneFilter');
+  if (isMacro && typeof MACRO_LANES !== 'undefined') {
+    const usedLanes = [...new Set(steps.map(s=>s._lane).filter(Boolean))];
+    laneEl.innerHTML = `<button class="u-lane-btn ${!activeULane?'active':''}" onclick="setULane(null)">
+      <div class="u-lane-bar" style="background:var(--gray-300)"></div>Todas
+    </button>` + usedLanes.map(lk => {
+      const l = MACRO_LANES[lk]||{name:lk,color:'#555'};
+      return `<button class="u-lane-btn ${activeULane===lk?'active':''}" onclick="setULane('${lk}')">
+        <div class="u-lane-bar" style="background:${l.color}"></div>${l.name}
+      </button>`;
+    }).join('');
+  } else {
+    // Actor filter as lanes
+    const actorKeys = [...new Set(steps.map(s=>s.actor))].filter(k=>ACTORS[k]);
+    laneEl.innerHTML = `<button class="u-lane-btn ${activeActor===null?'active':''}" onclick="setActorFilter(null)">
+      <div class="u-lane-bar" style="background:var(--gray-300)"></div>Todos os atores
+    </button>` + actorKeys.map(k => {
+      const ac = ACTORS[k];
+      return `<button class="u-lane-btn ${activeActor===k?'active':''}" onclick="setActorFilter('${k}')">
+        <div class="u-lane-bar" style="background:${ac.color}"></div>${ac.label}
+      </button>`;
+    }).join('');
+  }
+}
+
+let activeUStage = null;
+let activeULane  = null;
+
+function setUStage(id) {
+  activeUStage = (id === 'ALL' || id === 'STAGE_ALL') ? null : id;
+  renderFlow();
+}
+function setULane(lane) {
+  activeULane = lane;
+  activeActor = null; // clear actor filter
+  renderFlow();
+}
+
+/* ── RIGHT PANEL DETAIL ────────────────────────────── */
+function showStepDetail(idx) {
+  const s = steps[idx];
+  if (!s) return;
+  document.getElementById('uRightEmpty').style.display  = 'none';
+  document.getElementById('uRightDetail').style.display = 'block';
+
+  const isMacro = !!s._stage;
+  const lane  = (isMacro && typeof MACRO_LANES !== 'undefined') ? (MACRO_LANES[s._lane]||{name:s._lane||'',color:'#555',bg:'#eee'}) : null;
+  const btype = (isMacro && typeof MACRO_BPMN_TYPES !== 'undefined') ? (MACRO_BPMN_TYPES[s._btype]||{icon:'📋',label:'Tarefa',bg:'#f3f4f6',color:'#374151'}) : null;
+  const ac    = ACTORS[s.actor]||{label:s.actor||'',color:'#555',bg:'#eee'};
+  const ph    = PHASES.find(p=>p.id===s.phase)||{label:'',color:'#555'};
+
+  const stageName = isMacro && typeof MACRO_STAGES !== 'undefined'
+    ? (MACRO_STAGES.find(x=>x.id===s._stage)?.name || s._stage) : ph.label;
+  const stageColor = isMacro && typeof MACRO_STAGES !== 'undefined'
+    ? (MACRO_STAGES.find(x=>x.id===s._stage)?.color || '#555') : ph.color;
+
+  const docsHtml = (s.docs||[]).length
+    ? (s.docs||[]).map(d=>`<span class="u-chip doc">📄 ${sanitize(d)}</span>`).join('')
+    : '<span style="font-size:11.5px;color:var(--gray-400)">Nenhum</span>';
+
+  const sysHtml = (s._systems||[]).length
+    ? (s._systems||[]).map(x=>`<span class="u-chip sys">⚙️ ${sanitize(x)}</span>`).join('')
+    : '';
+
+  const itemsHtml = (s.items||[]).length
+    ? (s.items||[]).map(it=>`<div class="u-right-list-item"><div class="u-right-list-dot"></div>${sanitize(it)}</div>`).join('')
+    : '';
+
+  const inputsHtml = (s._inputs||[]).length
+    ? (s._inputs||[]).map(x=>`<div class="u-right-list-item"><div class="u-right-list-dot"></div>${sanitize(x)}</div>`).join('')
+    : '';
+
+  const reqHtml = (s._requirements||[]).length
+    ? (s._requirements||[]).map(x=>`<div class="u-right-list-item"><div class="u-right-list-dot" style="background:#d97706"></div>${sanitize(x)}</div>`).join('')
+    : '';
+
+  const childHtml = (s._children||[]).length
+    ? (s._children||[]).map(x=>`<div class="u-right-list-item"><div class="u-right-list-dot" style="background:#0369a1"></div>${sanitize(x)}</div>`).join('')
+    : '';
+
+  // Gateway after this step
+  let gwHtml = '';
+  if (s._gw && typeof MACRO_GATEWAYS !== 'undefined') {
+    const gw = MACRO_GATEWAYS[s._gw];
+    if (gw) gwHtml = `<div class="u-right-section">
+      <div class="u-right-section-label">Gateway após esta etapa</div>
+      <div class="u-gateway-row">
+        <div class="u-gateway-diamond"></div>
+        <div><strong style="font-size:10px">${sanitize(s._gw)}</strong><br>${sanitize(gw.question)}</div>
+      </div>
+    </div>`;
+  }
+
+  const cmts = s.comments||[];
+  const cmtBadge = cmts.length ? ` <span style="background:var(--green-bg);color:var(--green);border-radius:8px;padding:1px 6px;font-size:10px">${cmts.length}</span>` : '';
+
+  document.getElementById('uRightDetail').innerHTML = `
+    <div class="u-right-detail-head">
+      <div class="u-right-detail-id">${sanitize(s.id||s.num||String(idx+1))}</div>
+      <div class="u-right-detail-title">${sanitize(s.title)}</div>
+      <div class="u-right-detail-pills">
+        ${lane ? `<span class="u-right-detail-pill" style="background:${lane.bg};color:${lane.color}">● ${sanitize(lane.name)}</span>` :
+                 `<span class="u-right-detail-pill" style="background:${ac.bg};color:${ac.color}">● ${sanitize(ac.label)}</span>`}
+        ${btype ? `<span class="u-right-detail-pill" style="background:${btype.bg};color:${btype.color}">${btype.icon} ${btype.label}</span>` : ''}
+        <span class="u-right-detail-pill" style="background:${stageColor}18;color:${stageColor}">${sanitize(stageName)}</span>
+      </div>
+    </div>
+    <div class="u-right-detail-body">
+      ${s.desc ? `<div class="u-right-section"><div class="u-right-desc">${sanitize(s.desc)}</div></div>` : ''}
+      ${itemsHtml ? `<div class="u-right-section"><div class="u-right-section-label">Atividades</div><div class="u-right-list">${itemsHtml}</div></div>` : ''}
+      ${inputsHtml ? `<div class="u-right-section"><div class="u-right-section-label">Entradas</div><div class="u-right-list">${inputsHtml}</div></div>` : ''}
+      ${reqHtml ? `<div class="u-right-section"><div class="u-right-section-label">Requisitos</div><div class="u-right-list">${reqHtml}</div></div>` : ''}
+      ${childHtml ? `<div class="u-right-section"><div class="u-right-section-label">Subatividades</div><div class="u-right-list">${childHtml}</div></div>` : ''}
+      <div class="u-right-section"><div class="u-right-section-label">Documentos</div>${docsHtml}</div>
+      ${sysHtml ? `<div class="u-right-section"><div class="u-right-section-label">Sistemas</div>${sysHtml}</div>` : ''}
+      ${gwHtml}
+      <div class="u-right-section">
+        <div class="u-right-section-label">Contribuições${cmtBadge}</div>
+        ${cmts.length === 0 ? '<div style="font-size:11.5px;color:var(--gray-400);font-style:italic">Nenhuma ainda.</div>' :
+          cmts.map(c=>{
+            const ty2 = {validacao:{icon:'✅',color:'#166534'},sugestao:{icon:'💡',color:'#92400e'},problema:{icon:'⚠️',color:'#991b1b'},duvida:{icon:'❓',color:'#1e40af'}}[c.type]||{icon:'💬',color:'#555'};
+            return `<div style="margin-bottom:8px;padding:7px 9px;background:var(--gray-100);border-radius:var(--radius-sm);font-size:12px"><strong>${sanitize(c.name)}</strong> <span style="color:${ty2.color}">${ty2.icon}</span><br>${sanitize(c.text)}</div>`;
+          }).join('')}
+      </div>
+    </div>`;
 }
 
 function renderMiniMap() {
