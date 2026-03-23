@@ -1125,17 +1125,42 @@ function _defaultProcesses() {
 function _loadProcesses() {
   try {
     const raw = localStorage.getItem('sesai_proc_v1');
-    if (!raw) return _defaultProcesses();
-    const p = JSON.parse(raw);
-    if (!p || !p.list || !p.list.length) return _defaultProcesses();
-    p.list.forEach(proc => {
-      proc.steps = (proc.steps||[]).map(s => ({...s, attachments:s.attachments||[], comments:s.comments||[]}));
-      proc.feedbacks  = proc.feedbacks  || [];
-      proc.doneSteps  = proc.doneSteps  || [];
-      proc.currentStep = proc.currentStep || 0;
-    });
-    return p;
-  } catch { return _defaultProcesses(); }
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && p.list && p.list.length) {
+        p.list.forEach(proc => {
+          proc.steps = (proc.steps||[]).map(s => ({...s, attachments:s.attachments||[], comments:s.comments||[]}));
+          // If steps is empty, restore defaults for p2
+          if (!proc.steps.length && proc.id === 'p2') {
+            proc.steps = JSON.parse(JSON.stringify(DEFAULT_STEPS));
+          }
+          proc.feedbacks   = proc.feedbacks  || [];
+          proc.doneSteps   = proc.doneSteps  || [];
+          proc.currentStep = proc.currentStep || 0;
+        });
+        return p;
+      }
+    }
+  } catch(e) { console.warn('loadProcesses:', e); }
+
+  // Try migrating old sesai_steps_v4 data
+  try {
+    const oldSteps = localStorage.getItem('sesai_steps_v4');
+    if (oldSteps) {
+      const parsed = JSON.parse(oldSteps);
+      if (parsed && parsed.length) {
+        const migrated = parsed.map(s => ({...s, attachments:s.attachments||[], comments:s.comments||[]}));
+        return {
+          active: 'p2',
+          list: [{ id:'p2', name:'Execução Direta de Obras', icon:'🏗',
+            desc:'Fluxo de execução direta — ' + migrated.length + ' etapas',
+            steps: migrated, feedbacks: [], doneSteps: [], currentStep: 0 }],
+        };
+      }
+    }
+  } catch(e) {}
+
+  return _defaultProcesses();
 }
 function _saveProcesses() {
   try { localStorage.setItem('sesai_proc_v1', JSON.stringify(PROCS)); } catch(e) { console.warn(e); }
@@ -1654,6 +1679,14 @@ function renderPhaseFilter() {
 
 function renderCards() {
   const isEditMode = !!auth;
+  // Safety: if steps empty, try to reload from active process
+  if (!steps || steps.length === 0) {
+    steps = _activeProc().steps;
+    if (!steps || steps.length === 0) {
+      document.getElementById('stepCards').innerHTML = '<div class="no-results"><div class="no-results-icon">📋</div><div>Nenhuma etapa encontrada. Faça login para adicionar etapas.</div></div>';
+      return;
+    }
+  }
   const visible = steps.map((s,i)=>({s,i})).filter(({s})=>activeActor===null||s.actor===activeActor);
   if (visible.length===0 && activeActor) {
     document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa para o ator selecionado.</div></div>`;
@@ -3214,6 +3247,12 @@ function _createProcess(name, icon, desc, stepsArr) {
 }
 
 /* INIT */
+// Clear old isolated keys from v4/v5 (data already migrated into sesai_proc_v1)
+if (localStorage.getItem('sesai_proc_v1')) {
+  // Already on v6 - safe to remove old keys
+  localStorage.removeItem('sesai_steps_v4');
+  localStorage.removeItem('sesai_fb_v4');
+}
 document.getElementById('actorFilterBar').style.display = 'flex';
 renderProcBar();
 document.getElementById('flowTitle').textContent = _activeProc().name;
