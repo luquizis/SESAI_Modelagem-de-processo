@@ -407,6 +407,68 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 .preview-step-actor{font-size:11px;padding:1px 7px;border-radius:8px;display:inline-flex;align-items:center;gap:3px}
 .preview-step-desc{font-size:11.5px;color:var(--gray-500);margin-top:4px;line-height:1.5}
 .preview-warning{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;border-radius:var(--radius-sm);padding:9px 12px;line-height:1.6}
+
+/* ═══ MACROPROCESSO PANE ═══ */
+.macro-layout{display:grid;grid-template-columns:220px 1fr 280px;flex:1;overflow:hidden}
+.macro-sidebar{border-right:1px solid var(--gray-200);background:var(--gray-50);overflow-y:auto;display:flex;flex-direction:column}
+.macro-sb-section{padding:14px 14px 10px;border-bottom:1px solid var(--gray-200)}
+.macro-sb-title{font-size:13px;font-weight:700;color:var(--gray-900)}
+.macro-sb-sub{font-size:10.5px;color:var(--gray-400);margin-top:2px}
+.macro-sb-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:8px}
+.stage-btn{display:flex;align-items:center;gap:7px;width:100%;padding:5px 7px;border:none;background:none;border-radius:5px;font-size:11.5px;color:var(--gray-600);cursor:pointer;transition:background var(--transition);text-align:left;margin-bottom:2px}
+.stage-btn:hover{background:var(--white)}
+.stage-btn.active{background:var(--green-bg);color:var(--green);font-weight:600}
+.stage-btn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stage-btn-count{margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--gray-400)}
+.lane-btn{display:flex;align-items:center;gap:6px;width:100%;padding:4px 6px;border:none;background:none;border-radius:4px;font-size:11px;color:var(--gray-600);cursor:pointer;transition:background var(--transition);text-align:left;margin-bottom:1px}
+.lane-btn:hover{background:var(--white)}
+.lane-btn.active{background:var(--white);font-weight:600;box-shadow:var(--shadow-xs)}
+.lane-bar{width:3px;height:16px;border-radius:2px;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--gray-600);margin-bottom:5px}
+.macro-main{overflow-y:auto;padding:20px;background:var(--white);display:flex;flex-direction:column}
+.macro-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--gray-200)}
+.macro-header h2{font-size:15px;font-weight:700;color:var(--gray-900);letter-spacing:-.3px}
+.macro-header p{font-size:11.5px;color:var(--gray-400);margin-top:2px}
+.macro-search{height:30px;padding:0 10px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px;outline:none;font-family:var(--font);width:200px;transition:border-color var(--transition)}
+.macro-search:focus{border-color:var(--green-l);box-shadow:0 0 0 3px var(--green-ring)}
+.macro-stage-header{display:flex;align-items:center;gap:8px;padding:8px 0 6px;margin-top:8px;margin-bottom:6px;border-bottom:2px solid var(--gray-100)}
+.macro-stage-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500)}
+.macro-stage-badge{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--gray-100);color:var(--gray-500);font-family:var(--mono)}
+.macro-act{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:5px;cursor:pointer;transition:all var(--transition);background:var(--white)}
+.macro-act:hover{border-color:var(--gray-300);box-shadow:var(--shadow-sm);background:var(--gray-50)}
+.macro-act.selected{border-color:var(--green-l);background:var(--green-bg);box-shadow:0 0 0 2px var(--green-ring)}
+.macro-act.is-subprocess{border-left:3px solid var(--green)}
+.macro-act-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.macro-act-body{flex:1;min-width:0}
+.macro-act-id{font-size:9px;font-weight:700;color:var(--gray-300);font-family:var(--mono);margin-bottom:2px}
+.macro-act-name{font-size:12.5px;font-weight:600;color:var(--gray-900);line-height:1.3;margin-bottom:4px}
+.macro-act-meta{display:flex;gap:5px;flex-wrap:wrap}
+.macro-act-lane{font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px}
+.macro-act-type{font-size:10px;color:var(--gray-400);padding:1px 6px;border-radius:8px;background:var(--gray-100)}
+.macro-act-docs{font-size:10px;color:var(--gray-400);margin-top:3px}
+.macro-gateway{display:flex;align-items:center;gap:8px;padding:6px 10px;margin:3px 0;background:#fffbeb;border:1px dashed #f59e0b;border-radius:var(--radius-sm);font-size:11px;color:#92400e;cursor:pointer}
+.macro-gateway:hover{background:#fef3c7}
+.macro-gateway-diamond{width:14px;height:14px;background:#f59e0b;transform:rotate(45deg);flex-shrink:0;border-radius:2px}
+.macro-no-results{text-align:center;padding:48px;color:var(--gray-400);font-size:13px}
+.macro-detail{border-left:1px solid var(--gray-200);background:var(--gray-50);overflow-y:auto}
+.macro-detail-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.macro-detail-head{padding:16px 16px 12px;border-bottom:1px solid var(--gray-200);background:var(--white)}
+.macro-detail-title{font-size:13px;font-weight:700;color:var(--gray-900);line-height:1.4;margin-bottom:6px}
+.macro-detail-id{font-size:10px;font-family:var(--mono);color:var(--gray-400);margin-bottom:8px}
+.macro-detail-pills{display:flex;gap:5px;flex-wrap:wrap}
+.macro-detail-pill{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:8px}
+.macro-detail-body{padding:14px 16px}
+.macro-detail-section{margin-bottom:14px}
+.macro-detail-section-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:6px}
+.macro-detail-desc{font-size:12.5px;color:var(--gray-600);line-height:1.7}
+.macro-detail-list{display:flex;flex-direction:column;gap:4px}
+.macro-detail-list-item{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--gray-600);line-height:1.5}
+.macro-detail-list-dot{width:4px;height:4px;border-radius:50%;background:var(--green-l);flex-shrink:0;margin-top:6px}
+.macro-chip{font-size:10.5px;padding:2px 8px;border-radius:5px;background:var(--gray-100);color:var(--gray-600);display:inline-flex;align-items:center;gap:4px;margin:2px}
+.macro-chip.doc{background:#eff6ff;color:#1d4ed8}
+.macro-chip.sys{background:#f0fdf4;color:#166534}
+@media(max-width:900px){.macro-layout{grid-template-columns:1fr}.macro-sidebar,.macro-detail{display:none}}
+
 /* MOBILE DRAWER */
 .drawer-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(15,23,42,.4);backdrop-filter:blur(2px)}
 .drawer-overlay.show{display:block}
@@ -445,6 +507,7 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   </div>
   <div class="tab-nav">
     <button class="tab-btn active" id="tab-flow" onclick="switchTab('flow')">Fluxo Interativo <span class="tab-count" id="tc-flow">0 / 13</span></button>
+    <button class="tab-btn" id="tab-macro" onclick="switchTab('macro')">Macroprocesso <span class="tab-count">52 ativ.</span></button>
     <button class="tab-btn" id="tab-bpmn" onclick="switchTab('bpmn')">Diagrama BPMN <span class="tab-count">editável</span></button>
     <button class="tab-btn" id="tab-fb" onclick="switchTab('fb')">Contribuições <span class="tab-count" id="tc-fb">0</span></button>
   </div>
@@ -506,6 +569,54 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
         <div class="sidebar-label">Atores — clique para filtrar</div>
         <div class="actor-rows" id="sidebarActors"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANE: MACROPROCESSO -->
+<div class="pane" id="pane-macro">
+  <div class="macro-layout">
+    <!-- Sidebar: stages + filter -->
+    <div class="macro-sidebar">
+      <div class="macro-sb-section">
+        <div class="macro-sb-title">Da Demanda à Licitação</div>
+        <div class="macro-sb-sub">Macroprocesso SESAI — Vol. 2</div>
+      </div>
+      <div class="macro-sb-section">
+        <div class="macro-sb-label">Filtrar por estágio</div>
+        <div id="stageFilter"></div>
+      </div>
+      <div class="macro-sb-section">
+        <div class="macro-sb-label">Filtrar por lane</div>
+        <div id="laneFilter"></div>
+      </div>
+      <div class="macro-sb-section">
+        <div class="macro-sb-label">Legenda</div>
+        <div id="macroLegend"></div>
+      </div>
+    </div>
+    <!-- Main: activity cards + detail panel -->
+    <div class="macro-main" id="macroMain">
+      <div class="macro-header">
+        <div>
+          <h2 id="macroHeaderTitle">Da Identificação da Demanda à Licitação</h2>
+          <p id="macroHeaderSub">52 atividades · 12 lanes · 7 gateways · 6 subprocessos</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="macro-search" id="macroSearch" placeholder="🔍 Buscar atividade…" oninput="renderMacroCards()">
+          <button class="btn-skip" style="height:32px;font-size:11px" onclick="exportMacroBPMN()">⬇ BPMN</button>
+          <button class="btn-skip" style="height:32px;font-size:11px" onclick="printMacro()">🖨 Imprimir</button>
+        </div>
+      </div>
+      <div id="macroCards"></div>
+    </div>
+    <!-- Detail panel -->
+    <div class="macro-detail" id="macroDetail">
+      <div class="macro-detail-empty" id="macroDetailEmpty">
+        <div style="font-size:28px;margin-bottom:10px">👆</div>
+        <div style="font-size:13px;color:var(--gray-400)">Clique em uma atividade<br>para ver detalhes</div>
+      </div>
+      <div id="macroDetailContent" style="display:none"></div>
     </div>
   </div>
 </div>
@@ -1903,12 +2014,14 @@ function applyAuth() {
    TABS
 ═══════════════════════════════════════════════════ */
 function switchTab(tab) {
-  ['flow','bpmn','fb'].forEach(t=>{
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
-    document.getElementById('pane-'+(t==='fb'?'fb':t)).classList.toggle('active',t===tab);
+  ['flow','macro','bpmn','fb'].forEach(t=>{
+    document.getElementById('tab-'+t)?.classList.toggle('active',t===tab);
+    const pane = document.getElementById('pane-'+(t==='fb'?'fb':t));
+    if (pane) pane.classList.toggle('active',t===tab);
   });
   document.getElementById('actorFilterBar').style.display=tab==='flow'?'flex':'none';
   if(tab==='fb') renderFBPage();
+  if(tab==='macro') initMacroPane();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -2243,6 +2356,926 @@ function applyGeneratedFlow() {
   renderFlow();
   scheduleBPMNSync();
   toast(`✓ "${title}" aplicado — ${steps.length} etapas carregadas.`, 'success');
+}
+
+/* ═══════════════════════════════════════════════════
+   MACROPROCESSO — Da Demanda à Licitação (SESAI Vol.2)
+   Specification: SESAI_VOL2_PROC_001
+   52 atividades · 12 lanes · 7 gateways · 6 subprocessos
+   Source: process_specification YAML
+═══════════════════════════════════════════════════ */
+
+/* ── LANES (YAML: lanes) ─────────────────────────── */
+const MACRO_LANES = {
+  LANE_COMUNIDADE:  { name:'Comunidade Indígena',                     color:'#7c2d12', bg:'#fff1f2' },
+  LANE_CONDISI:     { name:'CONDISI / Controle Social',               color:'#92400e', bg:'#fef3c7' },
+  LANE_DSEI:        { name:'DSEI',                                    color:'#1b4d8a', bg:'#eff6ff' },
+  LANE_DIASI:       { name:'DIASI',                                   color:'#164e63', bg:'#ecfeff' },
+  LANE_SESANI:      { name:'SESANI',                                  color:'#1b4332', bg:'#f0faf4' },
+  LANE_SELOG:       { name:'SELOG',                                   color:'#713f12', bg:'#fffbeb' },
+  LANE_DEAMB:       { name:'DEAMB / SESAI',                           color:'#4c1d95', bg:'#f5f3ff' },
+  LANE_DAPSI:       { name:'DAPSI',                                   color:'#065f46', bg:'#ecfdf5' },
+  LANE_AGU_CONJUR:  { name:'AGU / CONJUR / PGF',                      color:'#374151', bg:'#f9fafb' },
+  LANE_CGPO_CORISC: { name:'CGPO / CORISC / SESAI',                   color:'#1e3a8a', bg:'#eff6ff' },
+  LANE_LICITACAO:   { name:'Agente de Contratação / Pregoeiro',        color:'#3730a3', bg:'#eef2ff' },
+  LANE_SEOFI:       { name:'SEOFI',                                   color:'#78350f', bg:'#fff7ed' },
+};
+
+/* ── BPMN ELEMENT TYPES ──────────────────────────── */
+const MACRO_BPMN_TYPES = {
+  user_task:                  { icon:'👤', label:'Tarefa humana',         bg:'#dbeafe', color:'#1e40af' },
+  send_task:                  { icon:'📤', label:'Envio / encaminhamento', bg:'#ede9fe', color:'#5b21b6' },
+  service_task:               { icon:'⚙️', label:'Sistema / serviço',     bg:'#d1fae5', color:'#065f46' },
+  subprocess:                 { icon:'📦', label:'Subprocesso',           bg:'#e0f2fe', color:'#0369a1' },
+  intermediate_message_event: { icon:'✉️', label:'Evento intermediário',  bg:'#fef9c3', color:'#854d0e' },
+};
+
+/* ── STAGES (YAML: stage_grouping) ──────────────── */
+const MACRO_STAGES = [
+  { id:'STAGE_ALL', name:'Todos os estágios',                    color:'#6b7280', acts:null },
+  { id:'STAGE_1',   name:'1. Identificação da Demanda',          color:'#1b4d8a',
+    acts:['ACT_001','ACT_002','ACT_003','ACT_004','ACT_005','ACT_006','ACT_007'] },
+  { id:'STAGE_2',   name:'2. Planejamento Anual de Contratações',color:'#713f12',
+    acts:['ACT_008','ACT_009','ACT_010','ACT_011','ACT_012','ACT_013'] },
+  { id:'STAGE_3',   name:'3. Elaboração de Projetos',            color:'#1b4332',
+    acts:['ACT_014','ACT_015','ACT_016','ACT_017','ACT_018','ACT_019','ACT_020'] },
+  { id:'STAGE_4',   name:'4. Fase Preparatória da Licitação',    color:'#164e63',
+    acts:['ACT_021','ACT_022','ACT_023','ACT_024','ACT_025','ACT_026','ACT_027','ACT_028','ACT_029'] },
+  { id:'STAGE_5',   name:'5. Edital e Análise Jurídica',         color:'#374151',
+    acts:['ACT_030','ACT_031','ACT_032','ACT_033','ACT_034','ACT_035','ACT_036','ACT_037','ACT_038','ACT_039'] },
+  { id:'STAGE_6',   name:'6. Fase Externa e Contratação',        color:'#3730a3',
+    acts:['ACT_040','ACT_041','ACT_042','ACT_043','ACT_044','ACT_045','ACT_046','ACT_047','ACT_048','ACT_049','ACT_050','ACT_051','ACT_052'] },
+];
+
+/* ── GATEWAYS (YAML: gateways) ───────────────────── */
+const MACRO_GATEWAYS = {
+  GW_001:{ after:'ACT_008', stage:'STAGE_2',
+    name:'Tipo de abertura administrativa',
+    question:'Necessita apoio técnico para projeto?',
+    paths:[
+      { cond:'Necessita apoio técnico para projeto', target:'ACT_014' },
+      { cond:'Segue por processo de contratação',    target:'ACT_009' },
+    ]},
+  GW_002:{ after:'ACT_010', stage:'STAGE_2',
+    name:'DFD consistente e completo?',
+    question:'DFD está completo e consistente?',
+    paths:[
+      { cond:'Sim — segue para aprovação',     target:'ACT_011' },
+      { cond:'Não — retorna para reelaboração', target:'ACT_009', is_return:true },
+    ]},
+  GW_003:{ after:'ACT_020', stage:'STAGE_3',
+    name:'Projeto validado tecnicamente?',
+    question:'Projeto aprovado na validação técnica?',
+    paths:[
+      { cond:'Sim — segue para fase preparatória', target:'ACT_021' },
+      { cond:'Não — retorna para ajuste do projeto', target:'ACT_014', is_return:true },
+    ]},
+  GW_004:{ after:'ACT_029', stage:'STAGE_4',
+    name:'TR validado?',
+    question:'Termo de Referência foi validado?',
+    paths:[
+      { cond:'Sim — elaborar edital',       target:'ACT_030' },
+      { cond:'Não — ajustar TR', target:'ACT_028', is_return:true },
+    ]},
+  GW_005:{ after:'ACT_034', stage:'STAGE_5',
+    name:'Parecer jurídico favorável?',
+    question:'Parecer jurídico foi favorável?',
+    paths:[
+      { cond:'Sim — seguir para conformidade',    target:'ACT_036' },
+      { cond:'Não — saneamento jurídico', target:'ACT_035', is_return:true },
+    ]},
+  GW_006:{ after:'ACT_042', stage:'STAGE_6',
+    name:'Necessidade de ajustar edital?',
+    question:'Houve impugnações que exigem ajuste do edital?',
+    paths:[
+      { cond:'Não — conduzir certame',           target:'ACT_043' },
+      { cond:'Sim — retornar para ajuste do edital', target:'ACT_030', is_return:true },
+    ]},
+  GW_007:{ after:'ACT_044', stage:'STAGE_6',
+    name:'Resultado recursal mantido?',
+    question:'O resultado da licitação foi mantido após recursos?',
+    paths:[
+      { cond:'Sim — adjudicar objeto',     target:'ACT_045' },
+      { cond:'Não — retornar ao certame',  target:'ACT_043', is_return:true },
+    ]},
+};
+
+/* ── DOCUMENTS (YAML: data_objects) ──────────────── */
+const MACRO_DOCS = {
+  DOC_PDSI:              { name:'Plano Distrital de Saúde Indígena (PDSI)',     stage:'STAGE_1' },
+  DOC_ATA_CONDISI:       { name:'Ata de reunião do CONDISI',                    stage:'STAGE_1' },
+  DOC_OFICIO_ABERTURA:   { name:'Ofício/Termo de abertura do processo',         stage:'STAGE_2' },
+  DOC_DFD:               { name:'Documento de Formalização da Demanda (DFD)',   stage:'STAGE_2' },
+  DOC_PCA:               { name:'Plano de Contratações Anual (PCA)',            stage:'STAGE_2' },
+  DOC_PROJETO_BASICO:    { name:'Projeto Básico',                               stage:'STAGE_3' },
+  DOC_PROJETO_EXECUTIVO: { name:'Projeto Executivo',                            stage:'STAGE_3' },
+  DOC_PLANILHA:          { name:'Planilha Orçamentária',                        stage:'STAGE_3' },
+  DOC_ART_RRT_TRT:       { name:'ART / RRT / TRT',                             stage:'STAGE_3' },
+  DOC_MAPA_RISCOS:       { name:'Mapa de Riscos',                               stage:'STAGE_4' },
+  DOC_ETP:               { name:'Estudo Técnico Preliminar (ETP)',              stage:'STAGE_4' },
+  DOC_TJTR:              { name:'Termo de Justificativas Técnicas Relevantes (TJTR)', stage:'STAGE_4' },
+  DOC_TR:                { name:'Termo de Referência (TR)',                     stage:'STAGE_4' },
+  DOC_MINUTA_EDITAL:     { name:'Minuta do Edital',                             stage:'STAGE_5' },
+  DOC_MINUTA_CONTRATO:   { name:'Minuta do Contrato',                           stage:'STAGE_5' },
+  DOC_PARECER_JURIDICO:  { name:'Parecer Jurídico',                             stage:'STAGE_5' },
+  DOC_EDITAL_PUBLICADO:  { name:'Edital Publicado',                             stage:'STAGE_6' },
+  DOC_ATA_CERTAME:       { name:'Ata do Certame',                               stage:'STAGE_6' },
+  DOC_TERMO_HOMOLOGACAO: { name:'Termo de Homologação',                         stage:'STAGE_6' },
+  DOC_CONTRATO_FINAL:    { name:'Contrato Final',                               stage:'STAGE_6' },
+};
+
+/* ── SYSTEMS (YAML: systems) ─────────────────────── */
+const MACRO_SYSTEMS = {
+  SYS_SIASI:        'SIASI',
+  SYS_SEI:          'SEI',
+  SYS_PGC:          'ComprasGov / PGC',
+  SYS_ETP_DIGITAL:  'ComprasGov / ETP Digital',
+  SYS_RISCOS:       'ComprasGov / Riscos Digital',
+  SYS_TR_DIGITAL:   'TR Digital / modelos AGU-MGI',
+  SYS_PNCP:         'PNCP',
+  SYS_SIASG:        'SIASG / ComprasNet',
+  SYS_SAPIENS:      'SAPIENS',
+  SYS_SINAPI:       'SINAPI',
+  SYS_SICRO:        'SICRO',
+  SYS_ORCAFASCIO:   'OrçaFascio',
+  SYS_CIPI:         'CIPI',
+  SYS_OBRASGOV:     'Obrasgov.br',
+};
+
+/* ── ACTIVITIES (YAML: activities — all 52) ─────── */
+const MACRO_ACTIVITIES = [
+  // ── STAGE 1: Identificação da Demanda ──────────
+  { id:'ACT_001', stage:'STAGE_1', lane:'LANE_COMUNIDADE', type:'user_task',
+    name:'Escutar necessidade local de infraestrutura',
+    desc:'Manifestação da necessidade pela comunidade, lideranças ou representantes locais, relatando precariedades, ausências de unidades, problemas sanitários ou necessidade de ampliação/reforma.',
+    inputs:[], outputs:['Demanda inicial'],
+    docs:[], systems:[] },
+
+  { id:'ACT_002', stage:'STAGE_1', lane:'LANE_DSEI', type:'user_task',
+    name:'Registrar demanda localmente',
+    desc:'O DSEI sistematiza a demanda recebida, registra a necessidade e inicia sua tradução administrativa preliminar. A demanda deve ser identificada territorialmente com descrição mínima do problema.',
+    inputs:['Demanda inicial'], outputs:['Registro preliminar da demanda'],
+    docs:[], systems:['SYS_SEI'] },
+
+  { id:'ACT_003', stage:'STAGE_1', lane:'LANE_DIASI', type:'user_task',
+    name:'Analisar situação de saúde da comunidade',
+    desc:'Avaliação da pertinência da demanda à luz do contexto de saúde, acesso, cobertura assistencial e condições de atendimento.',
+    inputs:['Registro preliminar da demanda','Dados SIASI'], outputs:['Análise da situação de saúde'],
+    docs:[], systems:['SYS_SIASI'] },
+
+  { id:'ACT_004', stage:'STAGE_1', lane:'LANE_CONDISI', type:'user_task',
+    name:'Definir prioridades e consolidar planejamento',
+    desc:'Priorização conjunta entre conselho distrital, comunidade e instâncias locais, combinando análise técnica e demanda social.',
+    inputs:['Análise da situação de saúde','Registro preliminar da demanda'],
+    outputs:['Priorização social validada','DOC_ATA_CONDISI'],
+    docs:['DOC_ATA_CONDISI'], systems:[] },
+
+  { id:'ACT_005', stage:'STAGE_1', lane:'LANE_DSEI', type:'user_task',
+    name:'Formatar PDSI',
+    desc:'Consolidação documental das diretrizes, metas, estratégias e ações priorizadas no planejamento distrital.',
+    inputs:['Priorização social validada'], outputs:['DOC_PDSI'],
+    docs:['DOC_PDSI'], systems:[] },
+
+  { id:'ACT_006', stage:'STAGE_1', lane:'LANE_DSEI', type:'send_task',
+    name:'Submeter PDSI para revisão e homologação',
+    desc:'Envio do PDSI consolidado para revisão técnica e posterior homologação institucional.',
+    inputs:['DOC_PDSI'], outputs:['PDSI submetido'],
+    docs:['DOC_PDSI'], systems:['SYS_SEI'] },
+
+  { id:'ACT_007', stage:'STAGE_1', lane:'LANE_DEAMB', type:'service_task',
+    name:'Publicar PDSI',
+    desc:'Publicação oficial do PDSI validado, conferindo-lhe validade institucional e transparência.',
+    inputs:['PDSI submetido'], outputs:['PDSI publicado'],
+    docs:['DOC_PDSI'], systems:['SYS_SEI'] },
+
+  // ── STAGE 2: Planejamento Anual de Contratações ─
+  { id:'ACT_008', stage:'STAGE_2', lane:'LANE_DSEI', type:'user_task',
+    name:'Abrir processo administrativo no SEI',
+    desc:'Após a publicação do PDSI, cada obra prevista gera processo administrativo específico no SEI. Pode seguir por apoio técnico para projeto (→ ACT_014) ou diretamente por processo de contratação (→ ACT_009).',
+    inputs:['PDSI publicado'], outputs:['DOC_OFICIO_ABERTURA','Processo SEI aberto'],
+    docs:['DOC_OFICIO_ABERTURA'], systems:['SYS_SEI'],
+    gateway_after:'GW_001' },
+
+  { id:'ACT_009', stage:'STAGE_2', lane:'LANE_SESANI', type:'user_task',
+    name:'Elaborar DFD da obra',
+    desc:'O SESANI elabora o Documento de Formalização da Demanda com justificativa técnica, localização, beneficiários, evidências, riscos preliminares e demais elementos exigidos pela NLLC.',
+    inputs:['Processo SEI aberto','DOC_PDSI'], outputs:['DOC_DFD'],
+    docs:['DOC_DFD'], systems:['SYS_PGC'],
+    requirements:[
+      'Descrição sucinta do objeto','Grau de prioridade',
+      'Quantitativos quando couber','Valor estimado preliminar',
+      'Localização detalhada','Acessibilidade',
+      'Beneficiários estimados','Tipo de intervenção',
+      'Dados epidemiológicos','Evidências fotográficas',
+      'Condições ambientais e sanitárias','Indicação no PDSI',
+      'Data pretendida da contratação','Dependência de outras contratações',
+      'Área requisitante e responsável',
+    ] },
+
+  { id:'ACT_010', stage:'STAGE_2', lane:'LANE_SELOG', type:'user_task',
+    name:'Revisar consistência do DFD',
+    desc:'O SELOG revisa consistência, clareza, formatação e conformidade administrativa do DFD antes de sua consolidação no PCA.',
+    inputs:['DOC_DFD'], outputs:['DFD revisado'],
+    docs:['DOC_DFD'], systems:[],
+    gateway_after:'GW_002' },
+
+  { id:'ACT_011', stage:'STAGE_2', lane:'LANE_DSEI', type:'user_task',
+    name:'Aprovar DFD prioritário',
+    desc:'A coordenação do DSEI aprova as demandas prioritárias a serem levadas ao Plano de Contratações Anual.',
+    inputs:['DFD revisado'], outputs:['DFD aprovado'],
+    docs:['DOC_DFD'], systems:[] },
+
+  { id:'ACT_012', stage:'STAGE_2', lane:'LANE_SELOG', type:'user_task',
+    name:'Consolidar PCA',
+    desc:'Consolidação dos DFDs aprovados no Plano de Contratações Anual, com cronograma, prioridade e previsões orçamentárias.',
+    inputs:['DFD aprovado'], outputs:['DOC_PCA'],
+    docs:['DOC_PCA'], systems:['SYS_PGC','SYS_PNCP','SYS_SEI'] },
+
+  { id:'ACT_013', stage:'STAGE_2', lane:'LANE_DEAMB', type:'service_task',
+    name:'Aprovar e publicar PCA',
+    desc:'Validação institucional do PCA e publicação para conferir publicidade e oficialidade ao planejamento anual de contratações.',
+    inputs:['DOC_PCA'], outputs:['PCA publicado'],
+    docs:['DOC_PCA'], systems:['SYS_PNCP'] },
+
+  // ── STAGE 3: Elaboração de Projetos ────────────
+  { id:'ACT_014', stage:'STAGE_3', lane:'LANE_SESANI', type:'user_task',
+    name:'Definir objeto técnico da obra',
+    desc:'Transformação da demanda aprovada em declaração técnica preliminar do objeto da obra, definindo escopo, tipo de intervenção, parâmetros e aderência territorial.',
+    inputs:['PCA publicado','DOC_DFD'], outputs:['Objeto técnico preliminar'],
+    docs:[], systems:[] },
+
+  { id:'ACT_015', stage:'STAGE_3', lane:'LANE_SESANI', type:'user_task',
+    name:'Elaborar estudos de viabilidade e levantamentos técnicos',
+    desc:'Realização de estudos de solo, topografia, condições ambientais, acesso e demais análises preliminares necessárias para embasar o projeto.',
+    inputs:['Objeto técnico preliminar'], outputs:['Levantamentos técnicos'],
+    docs:[], systems:[] },
+
+  { id:'ACT_016', stage:'STAGE_3', lane:'LANE_SESANI', type:'user_task',
+    name:'Desenvolver projeto básico',
+    desc:'Elaboração do projeto básico com elementos suficientes para definir a obra, seus métodos, custos e prazo conforme Lei 14.133/21.',
+    inputs:['Levantamentos técnicos'], outputs:['DOC_PROJETO_BASICO'],
+    docs:['DOC_PROJETO_BASICO'], systems:[] },
+
+  { id:'ACT_017', stage:'STAGE_3', lane:'LANE_SESANI', type:'subprocess',
+    name:'Desenvolver projeto executivo e complementares',
+    desc:'Elaboração detalhada do projeto executivo e dos projetos complementares: arquitetura, estrutura, elétrico, hidrossanitário, prevenção de incêndio e climatização quando aplicável.',
+    inputs:['DOC_PROJETO_BASICO'], outputs:['DOC_PROJETO_EXECUTIVO'],
+    docs:['DOC_PROJETO_EXECUTIVO'], systems:[],
+    children:['Projeto arquitetônico','Projeto estrutural','Projeto elétrico','Projeto hidrossanitário','Projeto prevenção de incêndio','Projeto de climatização'] },
+
+  { id:'ACT_018', stage:'STAGE_3', lane:'LANE_SESANI', type:'user_task',
+    name:'Elaborar orçamento da obra',
+    desc:'Construção da planilha orçamentária detalhada, incluindo quantitativos, custos diretos e indiretos, BDI, curva ABC e cronograma físico-financeiro.',
+    inputs:['DOC_PROJETO_EXECUTIVO'], outputs:['DOC_PLANILHA'],
+    docs:['DOC_PLANILHA'], systems:['SYS_SINAPI','SYS_SICRO','SYS_ORCAFASCIO'] },
+
+  { id:'ACT_019', stage:'STAGE_3', lane:'LANE_SESANI', type:'user_task',
+    name:'Emitir responsabilidades técnicas',
+    desc:'Formalização da responsabilidade técnica dos profissionais que elaboraram peças técnicas e orçamento (ART, RRT, TRT).',
+    inputs:['DOC_PROJETO_EXECUTIVO','DOC_PLANILHA'], outputs:['DOC_ART_RRT_TRT'],
+    docs:['DOC_ART_RRT_TRT'], systems:[] },
+
+  { id:'ACT_020', stage:'STAGE_3', lane:'LANE_DEAMB', type:'user_task',
+    name:'Validar tecnicamente o projeto',
+    desc:'Análise técnica central do projeto pelo DEAMB, verificando aderência a padrões, viabilidade e completude de todas as peças técnicas.',
+    inputs:['DOC_PROJETO_BASICO','DOC_PROJETO_EXECUTIVO','DOC_PLANILHA','DOC_ART_RRT_TRT'],
+    outputs:['Parecer técnico do projeto'],
+    docs:[], systems:[],
+    gateway_after:'GW_003' },
+
+  // ── STAGE 4: Fase Preparatória da Licitação ────
+  { id:'ACT_021', stage:'STAGE_4', lane:'LANE_DIASI', type:'send_task',
+    name:'Solicitar parecer de pertinência do DAPSI',
+    desc:'Nos casos de estabelecimentos de saúde, a DIASI solicita ao DAPSI parecer de pertinência assistencial antes de avançar na fase preparatória.',
+    inputs:['Parecer técnico do projeto'], outputs:['Solicitação de pertinência'],
+    docs:[], systems:['SYS_SEI'] },
+
+  { id:'ACT_022', stage:'STAGE_4', lane:'LANE_DAPSI', type:'user_task',
+    name:'Emitir parecer de pertinência',
+    desc:'Análise de pertinência assistencial do estabelecimento de saúde proposto, verificando necessidade, cobertura e adequação à rede de atenção.',
+    inputs:['Solicitação de pertinência'], outputs:['Parecer de pertinência'],
+    docs:['Parecer de pertinência assistencial'], systems:[] },
+
+  { id:'ACT_023', stage:'STAGE_4', lane:'LANE_SELOG', type:'user_task',
+    name:'Abrir processo licitatório no SEI',
+    desc:'Abertura do processo de licitação no tipo processual correspondente a execução de obras e construção, com numeração própria.',
+    inputs:['Parecer de pertinência','DOC_DFD','DOC_PCA'], outputs:['Processo licitatório aberto'],
+    docs:[], systems:['SYS_SEI'] },
+
+  { id:'ACT_024', stage:'STAGE_4', lane:'LANE_DSEI', type:'user_task',
+    name:'Designar Equipe de Planejamento da Contratação (EPC)',
+    desc:'Formalização da Equipe de Planejamento da Contratação com competências técnicas, administrativas e jurídicas conforme exige a NLLC.',
+    inputs:['Processo licitatório aberto'], outputs:['EPC designada'],
+    docs:['Portaria de designação da EPC'], systems:['SYS_SEI'] },
+
+  { id:'ACT_025', stage:'STAGE_4', lane:'LANE_SESANI', type:'user_task',
+    name:'Elaborar mapa de riscos',
+    desc:'Identificar, avaliar e tratar riscos do objeto, da seleção de fornecedores e da gestão contratual, com probabilidade, impacto e respostas planejadas.',
+    inputs:['EPC designada','DOC_DFD','DOC_PROJETO_BASICO'], outputs:['DOC_MAPA_RISCOS'],
+    docs:['DOC_MAPA_RISCOS'], systems:['SYS_RISCOS'] },
+
+  { id:'ACT_026', stage:'STAGE_4', lane:'LANE_SESANI', type:'user_task',
+    name:'Elaborar ETP',
+    desc:'Produção do Estudo Técnico Preliminar com descrição da necessidade, requisitos, levantamento de mercado, solução escolhida, estimativas, valor, sustentabilidade e viabilidade da contratação.',
+    inputs:['DOC_DFD','DOC_PROJETO_BASICO','DOC_MAPA_RISCOS'], outputs:['DOC_ETP'],
+    docs:['DOC_ETP'], systems:['SYS_ETP_DIGITAL','SYS_SEI'] },
+
+  { id:'ACT_027', stage:'STAGE_4', lane:'LANE_SELOG', type:'user_task',
+    name:'Anexar documentos complementares da fase preparatória',
+    desc:'Inserção do TJTR, planilhas, curvas, memórias, ART/RRT e demais documentos complementares necessários antes da elaboração do TR.',
+    inputs:['DOC_ETP','DOC_PLANILHA','DOC_ART_RRT_TRT'],
+    outputs:['DOC_TJTR','Fase preparatória complementada'],
+    docs:['DOC_TJTR'], systems:['SYS_SEI'] },
+
+  { id:'ACT_028', stage:'STAGE_4', lane:'LANE_SESANI', type:'user_task',
+    name:'Elaborar Termo de Referência',
+    desc:'Consolidar o objeto, requisitos, modelo de execução, modelo de gestão, critérios de seleção, valor estimado, cronograma, adequação orçamentária e anexos técnicos.',
+    inputs:['DOC_ETP','DOC_MAPA_RISCOS','DOC_TJTR','DOC_PLANILHA'], outputs:['DOC_TR'],
+    docs:['DOC_TR'], systems:['SYS_TR_DIGITAL'] },
+
+  { id:'ACT_029', stage:'STAGE_4', lane:'LANE_DEAMB', type:'user_task',
+    name:'Validar TR e anexos',
+    desc:'Conferência técnica do Termo de Referência e seus anexos pelo DEAMB antes da elaboração do edital, verificando completude e conformidade com o projeto e o ETP.',
+    inputs:['DOC_TR'], outputs:['TR validado'],
+    docs:['DOC_TR'], systems:[],
+    gateway_after:'GW_004' },
+
+  // ── STAGE 5: Edital e Análise Jurídica ─────────
+  { id:'ACT_030', stage:'STAGE_5', lane:'LANE_SELOG', type:'user_task',
+    name:'Elaborar minuta do edital',
+    desc:'Converter o conteúdo técnico do TR em instrumento convocatório com regras, prazos, documentos exigidos, critérios de julgamento e condições de participação.',
+    inputs:['TR validado'], outputs:['DOC_MINUTA_EDITAL'],
+    docs:['DOC_MINUTA_EDITAL'], systems:[] },
+
+  { id:'ACT_031', stage:'STAGE_5', lane:'LANE_SELOG', type:'user_task',
+    name:'Elaborar minuta do contrato',
+    desc:'Preparar a minuta contratual com obrigações das partes, pagamentos, prazos, modelo de fiscalização e condições jurídicas da contratação.',
+    inputs:['TR validado'], outputs:['DOC_MINUTA_CONTRATO'],
+    docs:['DOC_MINUTA_CONTRATO'], systems:[] },
+
+  { id:'ACT_032', stage:'STAGE_5', lane:'LANE_SELOG', type:'user_task',
+    name:'Emitir declarações e checklist de conformidade',
+    desc:'Preparar declaração de uso de modelos AGU/MGI, declarações orçamentárias, adequação e listas de verificação exigidas pela NLLC.',
+    inputs:['DOC_MINUTA_EDITAL','DOC_MINUTA_CONTRATO'], outputs:['Declarações formais'],
+    docs:['Declarações formais'], systems:['SYS_SEI'] },
+
+  { id:'ACT_033', stage:'STAGE_5', lane:'LANE_SELOG', type:'send_task',
+    name:'Encaminhar processo para análise jurídica',
+    desc:'Enviar processo completo à assessoria jurídica (CONJUR/AGU) para controle de legalidade, incluindo TR, minutas e demais peças.',
+    inputs:['DOC_TR','DOC_MINUTA_EDITAL','DOC_MINUTA_CONTRATO','Declarações formais'],
+    outputs:['Processo jurídico submetido'],
+    docs:[], systems:['SYS_SAPIENS','SYS_SEI'] },
+
+  { id:'ACT_034', stage:'STAGE_5', lane:'LANE_AGU_CONJUR', type:'user_task',
+    name:'Emitir parecer jurídico',
+    desc:'Avaliação jurídica do edital, contrato e demais peças da fase preparatória pela CONJUR/AGU, com manifestação formal de conformidade ou recomendações de ajuste.',
+    inputs:['Processo jurídico submetido'], outputs:['DOC_PARECER_JURIDICO'],
+    docs:['DOC_PARECER_JURIDICO'], systems:['SYS_SAPIENS'],
+    gateway_after:'GW_005' },
+
+  { id:'ACT_035', stage:'STAGE_5', lane:'LANE_SELOG', type:'user_task',
+    name:'Realizar saneamento jurídico e ajustes',
+    desc:'Correção dos pontos levantados no parecer jurídico e atualização dos documentos do edital e contrato com os ajustes necessários.',
+    inputs:['DOC_PARECER_JURIDICO'], outputs:['Processo saneado'],
+    docs:[], systems:['SYS_SEI'] },
+
+  { id:'ACT_036', stage:'STAGE_5', lane:'LANE_SELOG', type:'send_task',
+    name:'Submeter para conformidade técnica e processual',
+    desc:'Encaminhar o processo saneado para conformidade técnica no DEAMB e conformidade processual na COEA, garantindo adequação antes da publicação.',
+    inputs:['Processo saneado'], outputs:['Processo em conformidade'],
+    docs:[], systems:['SYS_SEI'] },
+
+  { id:'ACT_037', stage:'STAGE_5', lane:'LANE_CGPO_CORISC', type:'user_task',
+    name:'Verificar disponibilidade orçamentária',
+    desc:'Análise orçamentária detalhada e emissão de nota de disponibilidade para a contratação, confirmando crédito suficiente no exercício.',
+    inputs:['Processo em conformidade'], outputs:['Disponibilidade orçamentária confirmada'],
+    docs:['Nota de disponibilidade orçamentária'], systems:['SYS_SEI'] },
+
+  { id:'ACT_038', stage:'STAGE_5', lane:'LANE_CGPO_CORISC', type:'user_task',
+    name:'Autorizar despesa',
+    desc:'Autorizar a despesa segundo a governança aplicável, inclusive com submissão ao Comitê de Governança para contratos de maior valor conforme regulamento interno.',
+    inputs:['Disponibilidade orçamentária confirmada'], outputs:['Despesa autorizada'],
+    docs:['Despacho de autorização da despesa'], systems:[] },
+
+  { id:'ACT_039', stage:'STAGE_5', lane:'LANE_SELOG', type:'send_task',
+    name:'Solicitar publicação do edital',
+    desc:'Marco final da instrução processual — encaminhar edital finalizado e autorizado para publicação oficial nos sistemas e canais obrigatórios.',
+    inputs:['Despesa autorizada','DOC_MINUTA_EDITAL'], outputs:['Solicitação de publicação'],
+    docs:[], systems:['SYS_SEI'] },
+
+  // ── STAGE 6: Fase Externa e Contratação ────────
+  { id:'ACT_040', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'service_task',
+    name:'Publicar edital',
+    desc:'Publicação oficial do edital e início formal da fase externa da licitação, com divulgação obrigatória no PNCP, DOU e SIASG/ComprasNet.',
+    inputs:['Solicitação de publicação'], outputs:['DOC_EDITAL_PUBLICADO'],
+    docs:['DOC_EDITAL_PUBLICADO'], systems:['SYS_PNCP','SYS_SIASG'] },
+
+  { id:'ACT_041', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'intermediate_message_event',
+    name:'Divulgar edital e abrir prazo para propostas',
+    desc:'Abertura do período para esclarecimentos, impugnações e apresentação de propostas pelos licitantes interessados.',
+    inputs:['DOC_EDITAL_PUBLICADO'], outputs:['Fase competitiva aberta'],
+    docs:[], systems:['SYS_SIASG'] },
+
+  { id:'ACT_042', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'user_task',
+    name:'Receber esclarecimentos e impugnações',
+    desc:'Tratamento das manifestações dos interessados antes da abertura da disputa, com resposta a pedidos de esclarecimento e julgamento de impugnações ao edital.',
+    inputs:['Fase competitiva aberta'], outputs:['Edital ajustado ou confirmado'],
+    docs:[], systems:['SYS_SIASG'],
+    gateway_after:'GW_006' },
+
+  { id:'ACT_043', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'subprocess',
+    name:'Conduzir certame eletrônico',
+    desc:'Abertura das propostas, fase de lances eletrônicos, julgamento por critério definido no edital, verificação de habilitação e declaração do vencedor.',
+    inputs:['Edital ajustado ou confirmado'], outputs:['DOC_ATA_CERTAME','Resultado preliminar'],
+    docs:['DOC_ATA_CERTAME'], systems:['SYS_SIASG'],
+    children:['Abertura de propostas','Fase de lances eletrônicos','Classificação das propostas','Verificação de habilitação','Declaração do vencedor'] },
+
+  { id:'ACT_044', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'user_task',
+    name:'Analisar recursos administrativos',
+    desc:'Recepção e decisão sobre recursos administrativos interpostos pelos licitantes, com prazo legal e fundamentação da decisão.',
+    inputs:['Resultado preliminar'], outputs:['Resultado definitivo'],
+    docs:[], systems:['SYS_SIASG'],
+    gateway_after:'GW_007' },
+
+  { id:'ACT_045', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'user_task',
+    name:'Adjudicar objeto ao vencedor',
+    desc:'Atribuição formal do objeto licitado ao licitante que apresentou a proposta mais vantajosa e foi devidamente habilitado.',
+    inputs:['Resultado definitivo'], outputs:['Objeto adjudicado'],
+    docs:['Despacho de adjudicação'], systems:['SYS_SIASG'] },
+
+  { id:'ACT_046', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'user_task',
+    name:'Homologar licitação',
+    desc:'Validação do processo licitatório pela autoridade competente, declarando a regularidade de todos os atos praticados e o vencedor final.',
+    inputs:['Objeto adjudicado'], outputs:['DOC_TERMO_HOMOLOGACAO'],
+    docs:['DOC_TERMO_HOMOLOGACAO'], systems:['SYS_SIASG','SYS_SEI'] },
+
+  { id:'ACT_047', stage:'STAGE_6', lane:'LANE_DEAMB', type:'user_task',
+    name:'Realizar análise técnica final para contratação',
+    desc:'Verificação final da conformidade da proposta vencedora com o TR e o edital, emitindo autorização técnica para seguir à contratação.',
+    inputs:['DOC_TERMO_HOMOLOGACAO'], outputs:['Autorização técnica final'],
+    docs:['Autorização técnica final'], systems:[] },
+
+  { id:'ACT_048', stage:'STAGE_6', lane:'LANE_CGPO_CORISC', type:'user_task',
+    name:'Descentralizar crédito orçamentário',
+    desc:'Transferência formal de créditos orçamentários necessários à execução da contratação entre unidades gestoras quando aplicável.',
+    inputs:['Autorização técnica final'], outputs:['Crédito descentralizado'],
+    docs:[], systems:['SYS_SEI'] },
+
+  { id:'ACT_049', stage:'STAGE_6', lane:'LANE_CGPO_CORISC', type:'service_task',
+    name:'Cadastrar projeto no CIPI',
+    desc:'Cadastro dos dados da obra/projeto no sistema CIPI para controle de investimentos públicos antes da emissão do empenho.',
+    inputs:['Crédito descentralizado'], outputs:['Projeto cadastrado no CIPI'],
+    docs:[], systems:['SYS_CIPI'] },
+
+  { id:'ACT_050', stage:'STAGE_6', lane:'LANE_SEOFI', type:'user_task',
+    name:'Emitir empenho',
+    desc:'Registro contábil da reserva orçamentária correspondente à contratação no SIAFI, formalizado pela Nota de Empenho (NE).',
+    inputs:['Projeto cadastrado no CIPI'], outputs:['Empenho emitido'],
+    docs:['Nota de Empenho (NE)'], systems:['SYS_SEI'] },
+
+  { id:'ACT_051', stage:'STAGE_6', lane:'LANE_SELOG', type:'user_task',
+    name:'Redigir contrato final',
+    desc:'Inserção dos dados da empresa vencedora e fechamento definitivo do instrumento contratual com todas as cláusulas e condições.',
+    inputs:['Empenho emitido'], outputs:['DOC_CONTRATO_FINAL'],
+    docs:['DOC_CONTRATO_FINAL'], systems:['SYS_SEI'] },
+
+  { id:'ACT_052', stage:'STAGE_6', lane:'LANE_LICITACAO', type:'user_task',
+    name:'Assinar e publicar contrato',
+    desc:'Formalização do contrato com assinatura das partes e publicação obrigatória do extrato no DOU e PNCP, encerrando o macroprocesso.',
+    inputs:['DOC_CONTRATO_FINAL'], outputs:['Contrato assinado e publicado'],
+    docs:['DOC_CONTRATO_FINAL'], systems:['SYS_SEI','SYS_PNCP','SYS_OBRASGOV'] },
+];
+
+/* ── STATE ───────────────────────────────────────── */
+let macroActiveStage  = 'STAGE_ALL';
+let macroActiveLane   = null;
+let macroSelectedAct  = null;
+let macroInitialized  = false;
+
+/* ── INIT ────────────────────────────────────────── */
+function initMacroPane() {
+  if (macroInitialized) return;
+  macroInitialized = true;
+  renderMacroSidebar();
+  renderMacroCards();
+}
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+function renderMacroSidebar() {
+  // Stage filter
+  document.getElementById('stageFilter').innerHTML = MACRO_STAGES.map(s => `
+    <button class="stage-btn ${s.id === macroActiveStage ? 'active' : ''}" onclick="setMacroStage('${s.id}')">
+      <div class="stage-btn-dot" style="background:${s.color}"></div>
+      ${s.name}
+      <span class="stage-btn-count">${s.acts ? s.acts.length : MACRO_ACTIVITIES.length}</span>
+    </button>`).join('');
+
+  // Lane filter
+  document.getElementById('laneFilter').innerHTML =
+    `<button class="lane-btn ${!macroActiveLane ? 'active' : ''}" onclick="setMacroLane(null)">
+      <div class="lane-bar" style="background:var(--gray-300)"></div>Todas as lanes
+    </button>` +
+    Object.entries(MACRO_LANES).map(([k, l]) => `
+    <button class="lane-btn ${macroActiveLane === k ? 'active' : ''}" onclick="setMacroLane('${k}')">
+      <div class="lane-bar" style="background:${l.color}"></div>${l.name}
+    </button>`).join('');
+
+  // Legend
+  document.getElementById('macroLegend').innerHTML =
+    Object.entries(MACRO_BPMN_TYPES).map(([, t]) => `
+      <div class="legend-item">
+        <div style="width:20px;height:20px;border-radius:4px;background:${t.bg};color:${t.color};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">${t.icon}</div>
+        ${t.label}
+      </div>`).join('') + `
+    <div class="legend-item" style="margin-top:6px">
+      <div style="width:18px;height:18px;border:1.5px dashed #f59e0b;background:#fffbeb;transform:rotate(45deg);border-radius:2px;flex-shrink:0;margin:1px"></div>
+      Gateway XOR (decisão / retorno)
+    </div>`;
+}
+
+function setMacroStage(id) { macroActiveStage = id; renderMacroSidebar(); renderMacroCards(); }
+function setMacroLane(lane){ macroActiveLane  = lane; renderMacroSidebar(); renderMacroCards(); }
+
+/* ── MAIN CARD LIST ──────────────────────────────── */
+function renderMacroCards() {
+  const query = (document.getElementById('macroSearch')?.value || '').toLowerCase();
+  const stg = MACRO_STAGES.find(s => s.id === macroActiveStage);
+  const allowedActs = stg?.acts || null;
+
+  const visible = MACRO_ACTIVITIES.filter(a => {
+    if (allowedActs && !allowedActs.includes(a.id)) return false;
+    if (macroActiveLane && a.lane !== macroActiveLane) return false;
+    if (query && !a.name.toLowerCase().includes(query) && !a.desc.toLowerCase().includes(query)) return false;
+    return true;
+  });
+
+  if (!visible.length) {
+    document.getElementById('macroCards').innerHTML = `<div class="macro-no-results">🔍 Nenhuma atividade encontrada.</div>`;
+    return;
+  }
+
+  const grouped = {};
+  visible.forEach(a => { (grouped[a.stage] = grouped[a.stage]||[]).push(a); });
+
+  let html = '';
+  MACRO_STAGES.slice(1).forEach(st => {
+    const acts = grouped[st.id];
+    if (!acts?.length) return;
+    html += `<div class="macro-stage-header">
+      <div style="width:10px;height:10px;border-radius:50%;background:${st.color};flex-shrink:0"></div>
+      <div class="macro-stage-name">${st.name}</div>
+      <div class="macro-stage-badge">${acts.length} ativ.</div>
+    </div>`;
+    acts.forEach(a => {
+      const lane  = MACRO_LANES[a.lane]  || { name:a.lane, color:'#555', bg:'#eee' };
+      const btype = MACRO_BPMN_TYPES[a.type] || { icon:'📋', bg:'#f3f4f6', color:'#374151', label:'Tarefa' };
+      const isSubproc = a.type === 'subprocess';
+      const isSelected = macroSelectedAct === a.id;
+      const docsShort = (a.docs||[]).slice(0,2).map(d => MACRO_DOCS[d]?.name||d).join(' · ');
+      const sysShort  = (a.systems||[]).slice(0,3).map(s => MACRO_SYSTEMS[s]||s).join(', ');
+
+      html += `<div class="macro-act${isSubproc?' is-subprocess':''}${isSelected?' selected':''}"
+        id="mact-${a.id}" onclick="selectMacroAct('${a.id}')">
+        <div class="macro-act-icon" style="background:${btype.bg};color:${btype.color}">${btype.icon}</div>
+        <div class="macro-act-body">
+          <div class="macro-act-id">${a.id}</div>
+          <div class="macro-act-name">${sanitize(a.name)}</div>
+          <div class="macro-act-meta">
+            <span class="macro-act-lane" style="background:${lane.bg};color:${lane.color}">● ${lane.name}</span>
+            <span class="macro-act-type">${btype.label}</span>
+          </div>
+          ${docsShort ? `<div class="macro-act-docs">📄 ${sanitize(docsShort)}</div>` : ''}
+          ${sysShort  ? `<div class="macro-act-docs">⚙️ ${sanitize(sysShort)}</div>`  : ''}
+        </div>
+      </div>`;
+
+      // Inject gateway if this activity has one after it
+      const gwKey = Object.keys(MACRO_GATEWAYS).find(k => MACRO_GATEWAYS[k].after === a.id);
+      if (gwKey) {
+        const gw = MACRO_GATEWAYS[gwKey];
+        html += `<div class="macro-gateway" onclick="showGatewayDetail('${gwKey}')">
+          <div class="macro-gateway-diamond"></div>
+          <div style="flex:1">
+            <span style="font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.05em">${gwKey}</span>
+            &nbsp;<span>${sanitize(gw.question)}</span>
+          </div>
+          <span style="font-size:10px;color:#d97706">▶ ${gw.paths.length} caminhos</span>
+        </div>`;
+      }
+    });
+  });
+
+  document.getElementById('macroCards').innerHTML = html;
+}
+
+/* ── ACTIVITY SELECTION ──────────────────────────── */
+function selectMacroAct(id) {
+  macroSelectedAct = id;
+  document.querySelectorAll('.macro-act.selected').forEach(el => el.classList.remove('selected'));
+  document.getElementById('mact-'+id)?.classList.add('selected');
+  const a = MACRO_ACTIVITIES.find(x => x.id === id);
+  if (a) showActDetail(a);
+}
+
+/* ── GATEWAY DETAIL ──────────────────────────────── */
+function showGatewayDetail(gwId) {
+  const gw = MACRO_GATEWAYS[gwId];
+  if (!gw) return;
+  const cont = document.getElementById('macroDetailContent');
+  document.getElementById('macroDetailEmpty').style.display = 'none';
+  cont.style.display = 'block';
+
+  const pathsHtml = gw.paths.map(p => `
+    <div class="macro-detail-list-item">
+      <div class="macro-detail-list-dot" style="background:${p.is_return ? '#d97706':'var(--green-l)'}"></div>
+      <div>
+        <span style="font-weight:600;color:${p.is_return?'#92400e':'var(--green)'}">${p.is_return?'↩ Retorno:':'→'}</span>
+        ${sanitize(p.cond)} <span style="font-size:10.5px;color:var(--gray-400);font-family:var(--mono)">(→ ${p.target})</span>
+      </div>
+    </div>`).join('');
+
+  cont.innerHTML = `
+    <div class="macro-detail-head">
+      <div class="macro-detail-id">${gwId}</div>
+      <div class="macro-detail-title">${sanitize(gw.name)}</div>
+      <div class="macro-detail-pills">
+        <span class="macro-detail-pill" style="background:#fef9c3;color:#854d0e">⬟ Gateway XOR</span>
+        <span class="macro-detail-pill" style="background:#f3f4f6;color:#374151">${gw.stage}</span>
+      </div>
+    </div>
+    <div class="macro-detail-body">
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Pergunta de decisão</div>
+        <div class="macro-detail-desc" style="font-weight:600;color:#92400e;font-size:13px">${sanitize(gw.question)}</div>
+      </div>
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Atividade anterior</div>
+        <div class="macro-detail-desc" style="font-family:var(--mono);font-size:12px">${gw.after}</div>
+      </div>
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Caminhos possíveis</div>
+        <div class="macro-detail-list">${pathsHtml}</div>
+      </div>
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Tipo</div>
+        <div class="macro-detail-desc">Gateway exclusivo (XOR) — apenas um caminho é seguido. O caminho de retorno leva ao ponto de correção mais próximo, não ao início do processo.</div>
+      </div>
+    </div>`;
+}
+
+/* ── ACTIVITY DETAIL ─────────────────────────────── */
+function showActDetail(a) {
+  const lane  = MACRO_LANES[a.lane]  || { name:a.lane, color:'#555', bg:'#eee' };
+  const btype = MACRO_BPMN_TYPES[a.type] || { icon:'📋', label:'Tarefa', bg:'#f3f4f6', color:'#374151' };
+  const stage = MACRO_STAGES.find(s => s.id === a.stage);
+  const cont  = document.getElementById('macroDetailContent');
+  document.getElementById('macroDetailEmpty').style.display = 'none';
+  cont.style.display = 'block';
+
+  const docsHtml = (a.docs||[]).length
+    ? (a.docs||[]).map(d => `<span class="macro-chip doc">📄 ${sanitize(MACRO_DOCS[d]?.name||d)}</span>`).join('')
+    : '<span style="color:var(--gray-400);font-size:12px">Nenhum documento direto</span>';
+
+  const sysHtml = (a.systems||[]).length
+    ? (a.systems||[]).map(s => `<span class="macro-chip sys">⚙️ ${sanitize(MACRO_SYSTEMS[s]||s)}</span>`).join('')
+    : '<span style="color:var(--gray-400);font-size:12px">Nenhum sistema</span>';
+
+  const makeList = (arr, color='var(--green-l)') => arr?.length
+    ? arr.map(i => `<div class="macro-detail-list-item"><div class="macro-detail-list-dot" style="background:${color}"></div>${sanitize(i)}</div>`).join('')
+    : '';
+
+  const gwKey = a.gateway_after;
+  const gwHtml = gwKey ? `
+    <div class="macro-detail-section">
+      <div class="macro-detail-section-label">Gateway após esta atividade</div>
+      <div class="macro-detail-desc" style="cursor:pointer;color:var(--green);text-decoration:underline"
+        onclick="showGatewayDetail('${gwKey}')">⬟ ${sanitize(MACRO_GATEWAYS[gwKey]?.name||gwKey)} →</div>
+    </div>` : '';
+
+  cont.innerHTML = `
+    <div class="macro-detail-head">
+      <div class="macro-detail-id">${a.id}</div>
+      <div class="macro-detail-title">${sanitize(a.name)}</div>
+      <div class="macro-detail-pills">
+        <span class="macro-detail-pill" style="background:${lane.bg};color:${lane.color}">● ${lane.name}</span>
+        <span class="macro-detail-pill" style="background:${btype.bg};color:${btype.color}">${btype.icon} ${btype.label}</span>
+      </div>
+    </div>
+    <div class="macro-detail-body">
+      ${stage ? `<div class="macro-detail-section">
+        <div class="macro-detail-section-label">Estágio</div>
+        <div style="font-size:11.5px;font-weight:600;color:${stage.color}">${stage.name}</div>
+      </div>` : ''}
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Descrição</div>
+        <div class="macro-detail-desc">${sanitize(a.desc)}</div>
+      </div>
+      ${(a.inputs||[]).length ? `<div class="macro-detail-section">
+        <div class="macro-detail-section-label">Entradas</div>
+        <div class="macro-detail-list">${makeList(a.inputs)}</div>
+      </div>` : ''}
+      ${(a.outputs||[]).length ? `<div class="macro-detail-section">
+        <div class="macro-detail-section-label">Saídas</div>
+        <div class="macro-detail-list">${makeList(a.outputs,'#0369a1')}</div>
+      </div>` : ''}
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Documentos produzidos</div>
+        ${docsHtml}
+      </div>
+      <div class="macro-detail-section">
+        <div class="macro-detail-section-label">Sistemas utilizados</div>
+        ${sysHtml}
+      </div>
+      ${(a.children||[]).length ? `<div class="macro-detail-section">
+        <div class="macro-detail-section-label">Subatividades (subprocesso)</div>
+        <div class="macro-detail-list">${makeList(a.children,'#0369a1')}</div>
+      </div>` : ''}
+      ${(a.requirements||[]).length ? `<div class="macro-detail-section">
+        <div class="macro-detail-section-label">Requisitos de conteúdo do documento</div>
+        <div class="macro-detail-list">${makeList(a.requirements,'#d97706')}</div>
+      </div>` : ''}
+      ${gwHtml}
+    </div>`;
+}
+
+/* ── EXPORT BPMN ─────────────────────────────────── */
+function exportMacroBPMN() {
+  const LANE_H = 120, TASK_W = 180, TASK_H = 70, STEP_X = 220;
+  const POOL_LABEL_W = 30, LANE_LABEL_W = 130;
+  const ELEM_X0 = POOL_LABEL_W + LANE_LABEL_W;
+  const laneKeys = Object.keys(MACRO_LANES);
+  const totalH = laneKeys.length * LANE_H;
+  const totalW = ELEM_X0 + MACRO_ACTIVITIES.length * STEP_X + 160;
+
+  const laneYMap = {};
+  laneKeys.forEach((k, i) => { laneYMap[k] = POOL_LABEL_W + i * LANE_H + LANE_H / 2; });
+
+  const stepXMap = {};
+  MACRO_ACTIVITIES.forEach((a, i) => { stepXMap[a.id] = ELEM_X0 + 80 + i * STEP_X; });
+
+  let taskDefs = '', taskShapes = '', sfDefs = '', sfEdges = '', laneSetXml = '', laneShapes = '';
+
+  // Lanes
+  laneKeys.forEach((lk, li) => {
+    const l = MACRO_LANES[lk];
+    const laneActs = MACRO_ACTIVITIES.filter(a => a.lane === lk).map(a => `        <flowNodeRef>${a.id}</flowNodeRef>`).join('\n');
+    laneSetXml += `      <lane id="${lk}" name="${sanitizeXml(l.name)}">\n${laneActs}\n      </lane>\n`;
+    laneShapes += `      <bpmndi:BPMNShape id="sh_${lk}" bpmnElement="${lk}" isHorizontal="true">
+        <dc:Bounds x="${POOL_LABEL_W}" y="${POOL_LABEL_W + li * LANE_H}" width="${totalW - POOL_LABEL_W}" height="${LANE_H}"/>
+      </bpmndi:BPMNShape>\n`;
+  });
+
+  // Tasks + sequence flows (linear main sequence)
+  MACRO_ACTIVITIES.forEach((a, i) => {
+    const tag = a.type === 'subprocess' ? 'subProcess' : 'task';
+    taskDefs += `    <${tag} id="${a.id}" name="${sanitizeXml(a.name)}"></${tag}>\n`;
+    const cx = stepXMap[a.id], cy = laneYMap[a.lane];
+    taskShapes += `      <bpmndi:BPMNShape id="sh_${a.id}" bpmnElement="${a.id}">
+        <dc:Bounds x="${cx - TASK_W/2}" y="${cy - TASK_H/2}" width="${TASK_W}" height="${TASK_H}"/>
+      </bpmndi:BPMNShape>\n`;
+    if (i < MACRO_ACTIVITIES.length - 1) {
+      const next = MACRO_ACTIVITIES[i+1];
+      const sfId = `sf_${a.id}_${next.id}`;
+      const nx = stepXMap[next.id], ny = laneYMap[next.lane];
+      sfDefs  += `    <sequenceFlow id="${sfId}" sourceRef="${a.id}" targetRef="${next.id}"/>\n`;
+      sfEdges += buildEdge(sfId, cx + TASK_W/2, cy, nx - TASK_W/2, ny);
+    }
+  });
+
+  // Gateways
+  let gwDefs = '', gwShapes = '';
+  const GW_SIZE = 44;
+  Object.entries(MACRO_GATEWAYS).forEach(([gwId, gw]) => {
+    const srcAct = MACRO_ACTIVITIES.find(a => a.id === gw.after);
+    if (!srcAct) return;
+    const cx = stepXMap[srcAct.id] + TASK_W/2 + 30;
+    const cy = laneYMap[srcAct.lane];
+    gwDefs  += `    <exclusiveGateway id="${gwId}" name="${sanitizeXml(gw.question)}"/>\n`;
+    gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId}" bpmnElement="${gwId}" isMarkerVisible="true">
+        <dc:Bounds x="${cx}" y="${cy - GW_SIZE/2}" width="${GW_SIZE}" height="${GW_SIZE}"/>
+      </bpmndi:BPMNShape>\n`;
+  });
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  targetNamespace="http://sesai.gov.br/macro" id="SESAI_VOL2_PROC_001">
+
+  <collaboration id="Collab_Macro">
+    <participant id="Pool_Macro" name="SESAI — Da Identificação da Demanda à Licitação" processRef="Proc_Macro"/>
+  </collaboration>
+
+  <process id="Proc_Macro" isExecutable="false">
+    <laneSet id="LaneSet_Macro">
+${laneSetXml}    </laneSet>
+
+    <startEvent id="EV_START_MACRO" name="Demanda de infraestrutura identificada"/>
+    <endEvent   id="EV_END_MACRO"   name="Contrato assinado e publicado"/>
+    <endEvent   id="EV_END_ALT"     name="Demanda não priorizada"/>
+
+${taskDefs}${gwDefs}${sfDefs}  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiag_Macro">
+    <bpmndi:BPMNPlane id="Plane_Macro" bpmnElement="Collab_Macro">
+      <bpmndi:BPMNShape id="sh_Pool_Macro" bpmnElement="Pool_Macro" isHorizontal="true">
+        <dc:Bounds x="0" y="${POOL_LABEL_W}" width="${totalW}" height="${totalH}"/>
+      </bpmndi:BPMNShape>
+${laneShapes}${taskShapes}${gwShapes}${sfEdges}    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>`;
+
+  dlFile(xml, 'sesai-macroprocesso-vol2-demanda-licitacao.bpmn', 'application/xml');
+  toast('BPMN do macroprocesso exportado (52 atividades, 12 lanes, 7 gateways).', 'success');
+}
+
+/* ── PRINT ───────────────────────────────────────── */
+function printMacro() {
+  const date = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  const win = window.open('', '_blank');
+
+  const rows = MACRO_ACTIVITIES.map(a => {
+    const lane  = MACRO_LANES[a.lane]  || { name:a.lane, color:'#555', bg:'#f3f4f6' };
+    const btype = MACRO_BPMN_TYPES[a.type] || { icon:'📋', label:'Tarefa' };
+    const stage = MACRO_STAGES.find(s => s.id === a.stage);
+    const docsStr = (a.docs||[]).map(d => MACRO_DOCS[d]?.name||d).join('; ');
+    const sysStr  = (a.systems||[]).map(s => MACRO_SYSTEMS[s]||s).join(', ');
+    const gwKey   = a.gateway_after;
+    return `<tr>
+      <td style="font-weight:700;color:#1b4332;font-family:monospace;font-size:9px">${a.id}</td>
+      <td style="font-weight:600;font-size:10.5px">${a.name}</td>
+      <td><span style="background:${lane.bg};color:${lane.color};padding:1px 5px;border-radius:8px;font-size:9px;font-weight:600">${lane.name}</span></td>
+      <td style="font-size:9.5px;color:${stage?.color||'#555'}">${stage?.name?.replace(/^\d+\. /,'')||''}</td>
+      <td style="font-size:9.5px">${btype.icon} ${btype.label}</td>
+      <td style="font-size:9px;color:#1d4ed8">${docsStr}</td>
+      <td style="font-size:9px;color:#166534">${sysStr}</td>
+      <td style="font-size:9px;color:#92400e">${gwKey ? `⬟ ${gwKey}` : ''}</td>
+    </tr>`;
+  }).join('');
+
+  const gwRows = Object.entries(MACRO_GATEWAYS).map(([k,gw]) => {
+    const paths = gw.paths.map(p => `${p.is_return?'↩ ':''}<b>${p.cond}</b> → ${p.target}`).join('<br>');
+    return `<tr>
+      <td style="font-weight:700;font-family:monospace;font-size:9px;color:#92400e">${k}</td>
+      <td style="font-weight:600;font-size:10.5px">${gw.name}</td>
+      <td style="font-size:9.5px;color:#92400e;font-style:italic">${gw.question}</td>
+      <td style="font-size:9px;line-height:1.5">${paths}</td>
+    </tr>`;
+  }).join('');
+
+  win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+<title>SESAI — Macroprocesso Vol.2: Da Demanda à Licitação</title>
+<style>
+@page{size:A3 landscape;margin:10mm}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:10.5px;color:#111;background:white}
+.h{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2.5px solid #1b4332;padding-bottom:8px;margin-bottom:10px}
+.title{font-size:16px;font-weight:700;color:#1b4332}
+.sub{font-size:10.5px;color:#555;margin-top:2px}
+.section-title{font-size:11px;font-weight:700;color:#1b4332;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;border-left:3px solid #1b4332;padding-left:8px}
+table{width:100%;border-collapse:collapse}
+th{background:#1b4332;color:white;padding:4px 5px;text-align:left;font-size:9.5px}
+td{padding:3px 4px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+tr:nth-child(even) td{background:#f8fafc}
+.foot{margin-top:8px;font-size:8px;color:#aaa;display:flex;justify-content:space-between;border-top:1px solid #eee;padding-top:5px}
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<div class="h">
+  <div>
+    <div class="title">SESAI — Macroprocesso Vol. 2: Da Identificação da Demanda à Licitação</div>
+    <div class="sub">Ministério da Saúde · Secretaria Especial de Saúde Indígena · ID: SESAI_VOL2_PROC_001</div>
+  </div>
+  <div style="text-align:right;font-size:9.5px;color:#666;line-height:1.7">
+    <div><b>Gerado em:</b> ${date}</div>
+    <div><b>Atividades:</b> ${MACRO_ACTIVITIES.length} · <b>Lanes:</b> ${Object.keys(MACRO_LANES).length} · <b>Gateways:</b> ${Object.keys(MACRO_GATEWAYS).length} · <b>Subprocessos:</b> 2</div>
+  </div>
+</div>
+<div class="section-title">Atividades do Macroprocesso</div>
+<table>
+  <thead><tr>
+    <th style="width:6%">ID</th><th style="width:19%">Atividade</th>
+    <th style="width:13%">Lane (Ator)</th><th style="width:14%">Estágio</th>
+    <th style="width:9%">Tipo BPMN</th><th style="width:22%">Documentos</th>
+    <th style="width:11%">Sistemas</th><th style="width:6%">Gateway</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="section-title">Gateways de Decisão e Fluxos de Retorno</div>
+<table>
+  <thead><tr>
+    <th style="width:7%">ID</th><th style="width:22%">Nome</th>
+    <th style="width:25%">Pergunta de decisão</th><th>Caminhos possíveis</th>
+  </tr></thead>
+  <tbody>${gwRows}</tbody>
+</table>
+<div class="foot">
+  <span>SESAI / Ministério da Saúde — Macroprocesso Vol. 2 — documento gerado automaticamente</span>
+  <span>Total: ${MACRO_ACTIVITIES.length} atividades · ${Object.keys(MACRO_GATEWAYS).length} gateways</span>
+</div>
+<script>window.onload=()=>window.print()<\/script>
+</body></html>`);
+  win.document.close();
 }
 
 /* ═══════════════════════════════════════════════════
