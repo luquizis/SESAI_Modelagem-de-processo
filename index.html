@@ -503,6 +503,91 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 /* Offline indicator */
 .offline-bar{display:none;background:#92400e;color:white;font-size:12px;font-weight:600;text-align:center;padding:6px;flex-shrink:0}
 .offline-bar.show{display:block}
+
+/* ── THEMES ──────────────────────────────────────────── */
+/* White (default — already set in :root) */
+
+/* Green theme */
+body.theme-green {
+  --white:    #f0faf4;
+  --gray-50:  #e8f5ed;
+  --gray-100: #d1ead9;
+  --gray-200: #b0d4bc;
+  --gray-300: #80b490;
+  --gray-400: #559967;
+  --gray-500: #2e7248;
+  --gray-600: #1b5c34;
+  --gray-700: #144527;
+  --gray-900: #0a2a17;
+  --green:    #0a3d1f;
+  --green-m:  #145a2d;
+  --green-l:  #1b6e3e;
+  --green-bg: #c6e8d0;
+}
+body.theme-green .topbar,
+body.theme-green .proc-bar,
+body.theme-green #procBar { background:#1b4332;border-bottom-color:#144527 }
+body.theme-green .brand-name,
+body.theme-green .brand-sub,
+body.theme-green .tab-btn  { color:#a7f3d0 }
+body.theme-green .tab-btn.active { color:white;border-bottom-color:white }
+body.theme-green .tab-count { background:#0a3d1f;color:#a7f3d0 }
+body.theme-green .tab-btn.active .tab-count { background:rgba(255,255,255,.2);color:white }
+body.theme-green .step-card { background:#e8f5ed;border-color:#b0d4bc }
+body.theme-green .flow-sidebar { background:#d1ead9 }
+body.theme-green .flow-header h2 { color:#0a2a17 }
+
+/* Black / Dark theme */
+body.theme-black {
+  --white:    #1e293b;
+  --gray-50:  #0f172a;
+  --gray-100: #1e293b;
+  --gray-200: #334155;
+  --gray-300: #475569;
+  --gray-400: #64748b;
+  --gray-500: #94a3b8;
+  --gray-600: #cbd5e1;
+  --gray-700: #e2e8f0;
+  --gray-900: #f8fafc;
+  --green:    #4ade80;
+  --green-m:  #22c55e;
+  --green-l:  #16a34a;
+  --green-bg: #052e16;
+  --green-ring: rgba(74,222,128,.2);
+  --red-l:    #450a0a;
+}
+body.theme-black .topbar  { background:#0f172a;border-bottom-color:#1e293b }
+body.theme-black #procBar { background:#0f172a;border-bottom-color:#1e293b }
+body.theme-black .brand-name { color:#f1f5f9 }
+body.theme-black .brand-sub  { color:#64748b }
+body.theme-black .tab-btn    { color:#94a3b8 }
+body.theme-black .tab-btn:hover { background:#1e293b }
+body.theme-black .tab-btn.active { color:#4ade80;border-bottom-color:#4ade80 }
+body.theme-black .tab-count      { background:#1e293b;color:#64748b }
+body.theme-black .tab-btn.active .tab-count { background:#052e16;color:#4ade80 }
+body.theme-black .step-card      { background:#1e293b;border-color:#334155;color:#e2e8f0 }
+body.theme-black .step-title     { color:#f1f5f9 }
+body.theme-black .card-desc      { color:#94a3b8 }
+body.theme-black .flow-sidebar   { background:#0f172a;border-left-color:#1e293b }
+body.theme-black .flow-header h2 { color:#f1f5f9 }
+body.theme-black .flow-header p  { color:#64748b }
+body.theme-black .flow-main      { background:#0f172a }
+body.theme-black .edit-bar       { background:#1a1000;border-bottom-color:#92400e }
+body.theme-black .modal          { background:#1e293b;border-color:#334155 }
+body.theme-black .modal-head     { border-bottom-color:#334155 }
+body.theme-black .modal-head h3  { color:#f1f5f9 }
+body.theme-black .m-input,
+body.theme-black .m-textarea,
+body.theme-black .m-select       { background:#0f172a;border-color:#334155;color:#e2e8f0 }
+body.theme-black .phase-btn      { color:#94a3b8;background:#1e293b;border-color:#334155 }
+body.theme-black .actor-filter-bar { background:#0f172a;border-bottom-color:#1e293b }
+body.theme-black .actor-filter-label { color:#64748b }
+body.theme-black .sidebar-section { border-bottom-color:#1e293b }
+body.theme-black .sidebar-label  { color:#64748b }
+body.theme-black .mm-item        { background:#334155 }
+body.theme-black .mm-title       { color:#cbd5e1 }
+body.theme-black .mm-actor       { color:#64748b }
+body.theme-black .step-card.locked { background:#161f2e }
 </style>
 </head>
 <body>
@@ -531,12 +616,24 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
         <span style="font-size:10px;color:var(--gray-300);margin-left:4px">Sair</span>
       </div>
     </div>
+    <!-- SUPABASE INDICATOR -->
+    <button onclick="openSbConfig()" id="sbIndicator" title="Configurar Supabase"
+      style="height:26px;padding:0 9px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:11px;cursor:pointer;font-family:var(--font);flex-shrink:0">⚫ local</button>
+    <!-- THEME TOGGLE -->
+    <div style="display:flex;gap:3px;padding:3px;background:var(--gray-100);border-radius:var(--radius-sm);margin-right:4px">
+      <button onclick="setTheme('white')" id="theme-white" title="Tema claro"
+        style="width:22px;height:22px;border-radius:4px;border:none;background:white;cursor:pointer;font-size:11px;font-weight:700;color:#555;transition:all .15s" title="Claro">W</button>
+      <button onclick="setTheme('green')" id="theme-green" title="Tema verde"
+        style="width:22px;height:22px;border-radius:4px;border:none;background:#1b4332;cursor:pointer;font-size:11px;font-weight:700;color:white;transition:all .15s" title="Verde">G</button>
+      <button onclick="setTheme('black')" id="theme-black" title="Tema escuro"
+        style="width:22px;height:22px;border-radius:4px;border:none;background:#0f172a;cursor:pointer;font-size:11px;font-weight:700;color:white;transition:all .15s" title="Escuro">B</button>
+    </div>
     <button class="btn-contribute" onclick="openFB()">+ Contribuir</button>
   </div>
 </div>
 
 <!-- PROCESS BAR -->
-<div style="height:40px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 8px;gap:2px;flex-shrink:0;overflow-x:auto" id="procBar">
+<div class="proc-bar" id="procBar" style="height:40px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 8px;gap:2px;flex-shrink:0;overflow-x:auto">
   <div id="procTabs" style="display:flex;align-items:center;gap:2px;height:100%"></div>
   <div style="width:1px;height:18px;background:var(--gray-200);flex-shrink:0;margin:0 4px"></div>
   <button id="btnAddProc" onclick="openNewProc()" style="display:none;height:26px;padding:0 10px;border-radius:var(--radius-sm);border:1px dashed var(--gray-300);background:none;font-size:11.5px;font-weight:600;color:var(--gray-400);cursor:pointer;flex-shrink:0">＋ Novo processo</button>
@@ -553,14 +650,13 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   <button class="btn-exit" onclick="doLogout()">Sair</button>
 </div>
 
-<!-- ACTOR FILTER BAR -->
-<div class="actor-filter-bar" id="actorFilterBar" style="display:none">
-  <span class="actor-filter-label">Filtrar por ator</span>
-  <div id="actorChips"></div>
-</div>
-
 <!-- PANE: FLOW -->
 <div class="pane active" id="pane-flow">
+  <!-- ACTOR FILTER BAR (inside pane so it doesn't overlap) -->
+  <div class="actor-filter-bar" id="actorFilterBar" style="display:none">
+    <span class="actor-filter-label">Filtrar por ator</span>
+    <div id="actorChips"></div>
+  </div>
   <div class="flow-layout">
 
     <!-- CENTER: cards -->
@@ -840,6 +936,75 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   </div>
 </div>
 
+<!-- MODAL: SUPABASE CONFIG -->
+<div class="overlay" id="sbConfigOverlay">
+  <div class="modal" style="width:540px">
+    <div class="modal-head">
+      <h3>⚡ Configurar Supabase</h3>
+      <p>Conecte a ferramenta à nuvem para compartilhar entre os 6 usuários</p>
+    </div>
+    <div class="modal-body">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:#1e40af;line-height:1.7">
+        <strong>Passos para configurar:</strong><br>
+        1. Acesse <a href="https://supabase.com" target="_blank" style="color:#1d4ed8;font-weight:700">supabase.com ↗</a> e crie um projeto gratuito<br>
+        2. Em <strong>Settings → API</strong>, copie a URL e a chave <em>anon public</em><br>
+        3. Em <strong>SQL Editor</strong>, execute o script abaixo para criar as tabelas<br>
+        4. Em <strong>Authentication → Users</strong>, convide os 6 usuários por e-mail
+      </div>
+      <label class="m-label">Project URL</label>
+      <input class="m-input" id="sb-url-input" placeholder="https://xxxxxx.supabase.co" style="font-family:var(--mono);font-size:12px">
+      <label class="m-label">Anon Public Key</label>
+      <input class="m-input" id="sb-key-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." style="font-family:var(--mono);font-size:12px">
+      <div style="margin-top:10px">
+        <label class="m-label">Script SQL (execute no Supabase SQL Editor)</label>
+        <textarea readonly style="width:100%;height:120px;font-family:var(--mono);font-size:10.5px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:8px;background:var(--gray-50);resize:none;color:var(--gray-700)"
+          onclick="this.select()"
+          id="sbSqlScript">-- Execute este script no Supabase SQL Editor
+
+create table if not exists processes (
+  id text primary key,
+  name text not null,
+  icon text default '📋',
+  description text default '',
+  steps jsonb default '[]',
+  feedbacks jsonb default '[]',
+  history jsonb default '[]',
+  updated_by uuid references auth.users(id),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table if not exists user_progress (
+  user_id uuid references auth.users(id),
+  process_id text references processes(id) on delete cascade,
+  done_steps jsonb default '[]',
+  current_step int default 0,
+  updated_at timestamptz default now(),
+  primary key (user_id, process_id)
+);
+
+-- Allow all authenticated users to read and write
+alter table processes enable row level security;
+alter table user_progress enable row level security;
+
+create policy "All authenticated users can read processes"
+  on processes for select to authenticated using (true);
+create policy "All authenticated users can write processes"
+  on processes for all to authenticated using (true);
+create policy "Users manage their own progress"
+  on user_progress for all to authenticated using (auth.uid() = user_id);
+        </textarea>
+        <button onclick="document.getElementById('sbSqlScript').select();document.execCommand('copy');toast('SQL copiado!','success')" 
+          class="btn-skip" style="width:100%;height:32px;margin-top:6px">📋 Copiar SQL</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="document.getElementById('sbConfigOverlay').classList.remove('show')">Cancelar</button>
+      <button class="btn-ok green" onclick="saveSbConfig()">Salvar e conectar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: VALIDAÇÃO -->
 <div class="overlay" id="validationOverlay">
   <div class="modal" style="width:500px">
@@ -931,16 +1096,24 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 <!-- MODAL: LOGIN -->
 <div class="overlay" id="loginOverlay">
   <div class="modal">
-    <div class="modal-head"><h3>Acesso de editor</h3><p>Entre com suas credenciais SESAI para editar o fluxo</p></div>
+    <div class="modal-head">
+      <h3>Acesso de editor</h3>
+      <p id="loginModalDesc">Entre com seu e-mail e senha para editar os processos</p>
+    </div>
     <div class="modal-body">
-      <label class="m-label">Usuário</label>
-      <input class="m-input" id="loginU" placeholder="usuario" onkeydown="if(event.key==='Enter')doLogin()">
+      <label class="m-label">E-mail</label>
+      <input class="m-input" id="loginU" type="email" placeholder="seu@email.com" onkeydown="if(event.key==='Enter')doLogin()">
       <label class="m-label">Senha</label>
       <input class="m-input" type="password" id="loginP" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-      <div class="m-error" id="loginErr">⚠️ Usuário ou senha incorretos.</div>
-      <div class="login-hint">Acesso de teste: <strong>editor / sesai2024</strong></div>
+      <div class="m-error" id="loginErr" style="display:none">⚠️ E-mail ou senha incorretos.</div>
+      <div class="login-hint" id="loginHint">
+        <span id="loginHintText">Acesso local (sem nuvem): <strong>editor / sesai2024</strong></span>
+      </div>
     </div>
-    <div class="modal-foot"><button class="btn-cancel" onclick="closeLogin()">Cancelar</button><button class="btn-ok green" onclick="doLogin()">Entrar</button></div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeLogin()">Cancelar</button>
+      <button class="btn-ok green" onclick="doLogin()">Entrar</button>
+    </div>
   </div>
 </div>
 
@@ -1104,11 +1277,168 @@ const DEFAULT_STEPS = [
   { id:'s12', num:'12+13',phase:'p5', actor:'ses',   title:'Entrega à comunidade e Termo de Conclusão', desc:'Reunião formal de entrega à comunidade, emissão do Termo de Conclusão e encerramento do processo no SEI.', items:['Reunião com a comunidade para entrega formal da obra','Registro fotográfico com presença da liderança local','Liderança local assina o recebimento da obra','SESANI emite o Termo de Conclusão de Obra','DEAMB valida e instrui encerramento do processo SEI'], docs:['Ata de entrega','Fotos de conclusão','Termo de conclusão','Encerramento SEI'], alert:null, btnLabel:'Obra entregue! 🏁', isLast:true, attachments:[] },
 ];
 
-/* --- MULTI-PROCESS STATE ----------------------------
-   Each process: { id, name, icon, desc, steps[], feedbacks[], doneSteps[], currentStep }
-   Processes are stored in localStorage under 'sesai_proc_v1'
-   MACRO_ACTIVITIES (defined later) get added as p_indireta after load
----------------------------------------------------- */
+/* ====================================================
+   SUPABASE BACKEND — shared storage for 6 users
+   localStorage kept as offline cache / fallback
+   
+   SETUP: Replace SUPABASE_URL and SUPABASE_ANON_KEY
+   with values from your Supabase project settings.
+   Run the SQL in the config modal to create tables.
+   ==================================================== */
+const SUPABASE_URL      = localStorage.getItem('sb_url')  || 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = localStorage.getItem('sb_key')  || 'YOUR_SUPABASE_ANON_KEY';
+const SB_CONFIGURED = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+
+// Detect new-style publishable key (sb_publishable_...) vs old anon JWT (eyJ...)
+const SB_NEW_KEY = SUPABASE_ANON_KEY.startsWith('sb_publishable_');
+
+// Supabase HTTP helpers — supports both old and new key formats
+async function sbFetch(path, opts = {}) {
+  const token = sbSession?.access_token;
+  const headers = {
+    'Content-Type': 'application/json',
+    'Prefer': opts.prefer || 'return=representation',
+    ...opts.headers,
+  };
+  if (SB_NEW_KEY) {
+    // New format: sb_publishable_ key goes in sb-publishable-key header
+    headers['sb-publishable-key'] = SUPABASE_ANON_KEY;
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+  } else {
+    // Legacy format: anon JWT goes in apikey + Authorization
+    headers['apikey'] = SUPABASE_ANON_KEY;
+    headers['Authorization'] = 'Bearer ' + (token || SUPABASE_ANON_KEY);
+  }
+  const res = await fetch(SUPABASE_URL + path, {
+    headers,
+    method: opts.method || 'GET',
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  return res.status === 204 ? null : res.json();
+}
+
+// Build auth headers for raw fetch calls (sign-in / refresh)
+function sbAuthHeaders() {
+  if (SB_NEW_KEY) return { 'sb-publishable-key': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+  return { 'apikey': SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+}
+
+// Auth session
+let sbSession = null;
+try { sbSession = JSON.parse(localStorage.getItem('sb_session')); } catch {}
+
+async function sbSignIn(email, password) {
+  const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: sbAuthHeaders(),
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) throw new Error((await res.json()).error_description || 'Login inválido');
+  sbSession = await res.json();
+  localStorage.setItem('sb_session', JSON.stringify(sbSession));
+  return sbSession;
+}
+
+async function sbSignOut() {
+  try { await sbFetch('/auth/v1/logout', { method: 'POST' }); } catch {}
+  sbSession = null;
+  localStorage.removeItem('sb_session');
+}
+
+async function sbRefreshSession() {
+  if (!sbSession?.refresh_token) return false;
+  try {
+    const res = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST',
+      headers: sbAuthHeaders(),
+      body: JSON.stringify({ refresh_token: sbSession.refresh_token }),
+    });
+    if (!res.ok) return false;
+    sbSession = await res.json();
+    localStorage.setItem('sb_session', JSON.stringify(sbSession));
+    return true;
+  } catch { return false; }
+}
+
+// Load processes from Supabase (returns null if not configured)
+async function sbLoadProcesses() {
+  if (!SB_CONFIGURED || !sbSession) return null;
+  try {
+    const rows = await sbFetch('/rest/v1/processes?select=*&order=created_at.asc');
+    if (!rows || !rows.length) return null;
+    const list = rows.map(r => ({
+      id:          r.id,
+      name:        r.name,
+      icon:        r.icon || '📋',
+      desc:        r.description || '',
+      steps:       (r.steps||[]).map(s=>({...s,attachments:s.attachments||[],comments:s.comments||[]})),
+      feedbacks:   r.feedbacks || [],
+      history:     r.history   || [],
+      doneSteps:   [],
+      currentStep: 0,
+      _sbId:       r.id,
+    }));
+    // Load this user's progress
+    const uid = sbSession.user?.id;
+    if (uid) {
+      try {
+        const prog = await sbFetch('/rest/v1/user_progress?user_id=eq.' + uid + '&select=*');
+        (prog||[]).forEach(p => {
+          const proc = list.find(l => l.id === p.process_id);
+          if (proc) { proc.doneSteps = p.done_steps||[]; proc.currentStep = p.current_step||0; }
+        });
+      } catch {}
+    }
+    return { active: list[0]?.id, list };
+  } catch(e) {
+    console.warn('Supabase load failed:', e.message);
+    return null;
+  }
+}
+
+// Save single process to Supabase
+async function sbSaveProcess(proc) {
+  if (!SB_CONFIGURED || !sbSession) return;
+  const uid = sbSession.user?.id;
+  const toSave = {
+    id:        proc.id,
+    name:      proc.name,
+    icon:      proc.icon,
+    description: proc.desc,
+    steps:     proc.id === 'p_indireta' ? [] : proc.steps,
+    feedbacks: proc.feedbacks,
+    history:   proc.history || [],
+    updated_by: uid,
+  };
+  try {
+    await sbFetch('/rest/v1/processes', {
+      method:  'POST',
+      prefer:  'resolution=merge-duplicates,return=minimal',
+      body:    toSave,
+    });
+    // Save user progress separately
+    if (uid) {
+      await sbFetch('/rest/v1/user_progress', {
+        method:  'POST',
+        prefer:  'resolution=merge-duplicates,return=minimal',
+        body:    { user_id: uid, process_id: proc.id, done_steps: proc.doneSteps||[], current_step: proc.currentStep||0 },
+      });
+    }
+  } catch(e) { console.warn('Supabase save failed:', e.message); }
+}
+
+async function sbDeleteProcess(id) {
+  if (!SB_CONFIGURED || !sbSession) return;
+  try { await sbFetch('/rest/v1/processes?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' }); }
+  catch(e) { console.warn('Supabase delete failed:', e.message); }
+}
+
+/* ====================================================
+   MULTI-PROCESS STATE
+   Source of truth: Supabase when online + configured
+   Fallback: localStorage (offline / not configured)
+   ==================================================== */
 function _defaultProcesses() {
   return {
     active: 'p_direta',
@@ -1116,7 +1446,7 @@ function _defaultProcesses() {
       id:'p_direta', name:'Execução Direta de Obras', icon:'🏗',
       desc:'Fluxo de execução direta — 13 etapas',
       steps: JSON.parse(JSON.stringify(DEFAULT_STEPS)),
-      feedbacks:[], doneSteps:[], currentStep:0,
+      feedbacks:[], history:[], doneSteps:[], currentStep:0,
     }],
   };
 }
@@ -1129,42 +1459,31 @@ function _loadProcesses() {
         p.list.forEach(proc => {
           proc.steps       = (proc.steps||[]).map(s=>({...s,attachments:s.attachments||[],comments:s.comments||[]}));
           proc.feedbacks   = proc.feedbacks  || [];
+          proc.history     = proc.history    || [];
           proc.doneSteps   = proc.doneSteps  || [];
           proc.currentStep = proc.currentStep|| 0;
-          // Restore direta if empty
           if (!proc.steps.length && proc.id==='p_direta')
             proc.steps = JSON.parse(JSON.stringify(DEFAULT_STEPS));
-          // Always strip saved indireta — will be rebuilt from MACRO_ACTIVITIES below
           if (proc.id === 'p_indireta') proc.steps = [];
         });
         return p;
       }
     }
   } catch(e) { console.warn('loadProcesses:', e); }
-  // Migrate old v4 data
-  try {
-    const old = localStorage.getItem('sesai_steps_v4');
-    if (old) {
-      const parsed = JSON.parse(old);
-      if (parsed && parsed.length) {
-        const migrated = parsed.map(s=>({...s,attachments:s.attachments||[],comments:s.comments||[]}));
-        return { active:'p_direta', list:[{
-          id:'p_direta', name:'Execução Direta de Obras', icon:'🏗',
-          desc:'Execução direta — '+migrated.length+' etapas',
-          steps:migrated, feedbacks:[], doneSteps:[], currentStep:0,
-        }]};
-      }
-    }
-  } catch(e) {}
   return _defaultProcesses();
 }
 function _saveProcesses() {
+  // 1. Always save to localStorage (offline cache)
   try {
-    // Don't save indireta steps — they're rebuilt from MACRO_ACTIVITIES on load
     const toSave = JSON.parse(JSON.stringify(PROCS));
     toSave.list.forEach(p => { if(p.id==='p_indireta') p.steps=[]; });
     localStorage.setItem('sesai_proc_v1', JSON.stringify(toSave));
-  } catch(e) { console.warn(e); }
+  } catch(e) { console.warn('localStorage save:', e); }
+  // 2. If Supabase configured, save to cloud (async, non-blocking)
+  if (SB_CONFIGURED && sbSession) {
+    const active = _activeProc();
+    if (active) sbSaveProcess(active).catch(()=>{});
+  }
 }
 
 let PROCS           = _loadProcesses();
@@ -1176,6 +1495,27 @@ let steps     = _activeProc().steps;
 let feedbacks = _activeProc().feedbacks;
 function saveSteps() { _saveProcesses(); }
 function loadSteps() { return _activeProc().steps; }
+
+// Load from Supabase and refresh UI (called after login)
+async function sbLoadAndRefresh() {
+  const cloud = await sbLoadProcesses();
+  if (cloud && cloud.list.length) {
+    // Merge: cloud is authoritative, but keep local p_indireta (rebuilt from MACRO_ACTIVITIES)
+    const indireta = PROCS.list.find(p => p.id === 'p_indireta');
+    PROCS = cloud;
+    if (indireta && !PROCS.list.find(p => p.id === 'p_indireta')) {
+      PROCS.list.unshift(indireta);
+    }
+    activeProcessId = PROCS.active || PROCS.list[0]?.id;
+    steps     = _activeProc().steps;
+    feedbacks = _activeProc().feedbacks;
+    localStorage.setItem('sesai_proc_v1', JSON.stringify(PROCS));
+    renderProcBar();
+    renderFlow();
+    updateFBBadge();
+    toast('Processos carregados da nuvem (' + cloud.list.length + ' processos).', 'success');
+  }
+}
 
 let currentStep = _activeProc().currentStep||0;
 let doneSteps   = new Set(_activeProc().doneSteps||[]);
@@ -2141,18 +2481,75 @@ function formatBytes(bytes) {
 /* ===================================================
    AUTH
 =================================================== */
-function openLogin()  { document.getElementById('loginOverlay').classList.add('show'); setTimeout(()=>document.getElementById('loginU').focus(),80); }
-function closeLogin() { document.getElementById('loginOverlay').classList.remove('show'); document.getElementById('loginErr').classList.remove('show'); }
-function doLogin() {
-  const u=document.getElementById('loginU').value.trim().toLowerCase(), p=document.getElementById('loginP').value;
-  const user=USERS[u];
-  if(user&&user.pass===p) {
-    auth={...user,username:u}; closeLogin(); applyAuth();
-    toast(`Bem-vindo, ${sanitize(user.name)}!`,'success');
-    document.getElementById('loginU').value=''; document.getElementById('loginP').value='';
-  } else { document.getElementById('loginErr').classList.add('show'); }
+function openLogin() {
+  const hint = document.getElementById('loginHintText');
+  if (hint) hint.innerHTML = SB_CONFIGURED
+    ? '🔒 Login via Supabase — use seu e-mail cadastrado'
+    : 'Sem nuvem configurada. Local: <strong>editor / sesai2024</strong>';
+  const uInput = document.getElementById('loginU');
+  if (uInput) uInput.type = SB_CONFIGURED ? 'email' : 'text';
+  document.getElementById('loginOverlay').classList.add('show');
+  setTimeout(()=>document.getElementById('loginU')?.focus(), 80);
 }
-function doLogout() { auth=null; editCard=-1; applyAuth(); renderFlow(); toast('Sessão encerrada.','success'); }
+function closeLogin() {
+  document.getElementById('loginOverlay').classList.remove('show');
+  const err = document.getElementById('loginErr');
+  if (err) { err.classList.remove('show'); err.style.display='none'; err.textContent=''; }
+}
+async function doLogin() {
+  const u = document.getElementById('loginU').value.trim();
+  const p = document.getElementById('loginP').value;
+  const errEl = document.getElementById('loginErr');
+  const btn = document.querySelector('#loginOverlay .btn-ok');
+  if (btn) { btn.textContent = 'Entrando…'; btn.disabled = true; }
+
+  if (SB_CONFIGURED) {
+    // Supabase Auth — email + password
+    try {
+      await sbSignIn(u, p);
+      const meta = sbSession?.user?.user_metadata || {};
+      auth = {
+        name:     meta.name || u.split('@')[0],
+        role:     meta.role || 'Editor',
+        initials: (meta.name || u).substring(0,2).toUpperCase(),
+        canEdit:  true,
+        username: u,
+        email:    u,
+      };
+      closeLogin();
+      applyAuth();
+      toast('Bem-vindo, ' + sanitize(auth.name) + '!', 'success');
+      document.getElementById('loginU').value = '';
+      document.getElementById('loginP').value = '';
+      // Load shared processes from cloud
+      await sbLoadAndRefresh();
+    } catch(e) {
+      errEl.textContent = e.message || 'E-mail ou senha incorretos.';
+      errEl.classList.add('show');
+    }
+  } else {
+    // Fallback: local users (for use without Supabase configured)
+    const user = USERS[u];
+    if (user && user.pass === p) {
+      auth = {...user, username: u};
+      closeLogin(); applyAuth();
+      toast('Bem-vindo, ' + sanitize(user.name) + '!', 'success');
+      document.getElementById('loginU').value = '';
+      document.getElementById('loginP').value = '';
+    } else {
+      errEl.textContent = 'Usuário ou senha incorretos.';
+      errEl.classList.add('show');
+    }
+  }
+  if (btn) { btn.textContent = 'Entrar'; btn.disabled = false; }
+}
+
+async function doLogout() {
+  if (SB_CONFIGURED && sbSession) await sbSignOut();
+  auth = null; editCard = -1;
+  applyAuth(); renderFlow();
+  toast('Sessão encerrada.', 'success');
+}
 
 /* ===================================================
    TABS
@@ -2979,6 +3376,7 @@ function removeProcess(id) {
   PROCS.list = PROCS.list.filter(p=>p.id!==id);
   if (activeProcessId===id) switchToProcess(PROCS.list[0].id);
   _saveProcesses(); renderProcBar();
+  if (SB_CONFIGURED && sbSession) sbDeleteProcess(id).catch(()=>{});
   toast('Processo removido.','success');
 }
 
@@ -3032,7 +3430,7 @@ function switchTab(tab) {
     document.getElementById('tab-'+t)?.classList.toggle('active',t===tab);
     document.getElementById('pane-'+t)?.classList.toggle('active',t===tab);
   });
-  document.getElementById('actorFilterBar').style.display = tab==='flow'?'flex':'none';
+  // actorFilterBar is inside pane-flow — shows automatically with the pane
   if (tab==='fb') renderFBPage();
   if (tab==='bpmn') { bpmnReady=false; loadBPMN(buildBPMN(steps)); }
 }
@@ -3063,6 +3461,7 @@ function applyAuth() {
   document.getElementById('bpmnIndicator').classList.toggle('edit',on);
   document.getElementById('bpmnIndText').textContent=on?'Modo de edição':'Somente leitura';
   if(bpmnSelected){document.getElementById('ppSave').style.display=on?'block':'none';document.getElementById('ppLock').style.display=on?'none':'block';document.getElementById('ppName').disabled=!on;document.getElementById('ppDoc').disabled=!on;}
+  updateSbIndicator();
   renderProcBar();
   renderFlow();
 }
@@ -3441,21 +3840,102 @@ function showStepDetail(idx) {
     </div>`;
 }
 
+/* --- SUPABASE CONFIG ----------------------------------- */
+function openSbConfig() {
+  document.getElementById('sb-url-input').value = localStorage.getItem('sb_url') || '';
+  document.getElementById('sb-key-input').value = localStorage.getItem('sb_key') || '';
+  document.getElementById('sbConfigOverlay').classList.add('show');
+}
+
+async function saveSbConfig() {
+  const url = document.getElementById('sb-url-input').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('sb-key-input').value.trim();
+  if (!url || !key) { toast('Preencha URL e chave.', 'error'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  document.getElementById('sbConfigOverlay').classList.remove('show');
+  toast('Supabase configurado! Recarregue a página para ativar.', 'success');
+  setTimeout(() => location.reload(), 1800);
+}
+
+function updateSbIndicator() {
+  const el = document.getElementById('sbIndicator');
+  if (!el) return;
+  if (!SB_CONFIGURED) {
+    el.textContent = '⚫ local';
+    el.title = 'Dados salvos apenas neste dispositivo. Clique para configurar Supabase.';
+    el.style.color = 'var(--gray-400)';
+  } else if (sbSession) {
+    el.textContent = '🟢 nuvem';
+    el.title = 'Conectado ao Supabase — dados sincronizados entre todos os usuários.';
+    el.style.color = 'var(--green)';
+  } else {
+    el.textContent = '🟡 offline';
+    el.title = 'Supabase configurado mas não autenticado.';
+    el.style.color = '#d97706';
+  }
+}
+
 /* --- INIT ---------------------------------------------- */
 // Clear legacy keys
 localStorage.removeItem('sesai_steps_v4');
 localStorage.removeItem('sesai_fb_v4');
-document.getElementById('actorFilterBar').style.display='flex';
-// Set flow title from active process
+// Theme
+function setTheme(t) {
+  document.body.classList.remove('theme-white','theme-green','theme-black');
+  if (t !== 'white') document.body.classList.add('theme-' + t);
+  localStorage.setItem('sesai_theme', t);
+  ['white','green','black'].forEach(name => {
+    const btn = document.getElementById('theme-' + name);
+    if (!btn) return;
+    btn.style.outline = t === name ? '2px solid var(--green)' : 'none';
+    btn.style.outlineOffset = '1px';
+  });
+}
+setTheme(localStorage.getItem('sesai_theme') || 'white');
+
+// Actor filter is inside pane-flow
+document.getElementById('actorFilterBar').style.display = 'flex';
+// Set flow title
 document.getElementById('flowTitle').textContent = _activeProc()?.name || 'Fluxo';
-document.getElementById('flowDesc').textContent  = _activeProc()?.desc || 'Percorra cada etapa e registre contribuições sobre o processo';
+document.getElementById('flowDesc').textContent  = _activeProc()?.desc || '';
 renderProcBar();
 renderFlow();
 updateFBBadge();
 document.getElementById('tc-flow').textContent = steps.length;
+
+// Supabase: try to restore session and load from cloud
+updateSbIndicator();
+(async () => {
+  if (SB_CONFIGURED && sbSession) {
+    // Try to refresh expired token
+    const ok = await sbRefreshSession();
+    if (ok) {
+      const meta = sbSession?.user?.user_metadata || {};
+      const email = sbSession?.user?.email || '';
+      auth = {
+        name:     meta.name || email.split('@')[0],
+        role:     meta.role || 'Editor',
+        initials: (meta.name || email).substring(0,2).toUpperCase(),
+        canEdit:  true,
+        username: email,
+        email,
+      };
+      applyAuth();
+      updateSbIndicator();
+      await sbLoadAndRefresh();
+    } else {
+      // Session expired — clear it
+      sbSession = null;
+      localStorage.removeItem('sb_session');
+      updateSbIndicator();
+    }
+  }
+})();
+
 // Offline detection
-window.addEventListener('online',  () => document.getElementById('offlineBar')?.classList.remove('show'));
-window.addEventListener('offline', () => document.getElementById('offlineBar')?.classList.add('show'));
+window.addEventListener('online',  () => { document.getElementById('offlineBar')?.classList.remove('show'); updateSbIndicator(); });
+window.addEventListener('offline', () => { document.getElementById('offlineBar')?.classList.add('show'); updateSbIndicator(); });
 if (!navigator.onLine) document.getElementById('offlineBar')?.classList.add('show');
 </script>
 </body>
