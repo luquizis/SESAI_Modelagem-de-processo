@@ -489,11 +489,27 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   .flow-sidebar{display:none}
   .fb-stats{grid-template-columns:1fr 1fr}
   .fab-map{display:flex;align-items:center;justify-content:center}
+  .tab-btn{padding:0 10px;font-size:12px}
+  .topbar{padding:0 12px}
+  .flow-header{flex-direction:column;gap:8px}
+  .progress-wrap{width:100%}
+  #flowSearch{width:120px}
+  .flow-main{padding:12px}
 }
+@media(max-width:480px){
+  .tab-btn span.tab-count{display:none}
+  .brand-name,.brand-sub{display:none}
+}
+/* Offline indicator */
+.offline-bar{display:none;background:#92400e;color:white;font-size:12px;font-weight:600;text-align:center;padding:6px;flex-shrink:0}
+.offline-bar.show{display:block}
 </style>
 </head>
 <body>
 <div class="app">
+
+<!-- OFFLINE BAR -->
+<div class="offline-bar" id="offlineBar">📵 Sem conexão — a ferramenta continua funcionando offline. Alterações salvas localmente.</div>
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -525,7 +541,9 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
   <div style="width:1px;height:18px;background:var(--gray-200);flex-shrink:0;margin:0 4px"></div>
   <button id="btnAddProc" onclick="openNewProc()" style="display:none;height:26px;padding:0 10px;border-radius:var(--radius-sm);border:1px dashed var(--gray-300);background:none;font-size:11.5px;font-weight:600;color:var(--gray-400);cursor:pointer;flex-shrink:0">＋ Novo processo</button>
   <button onclick="exportActiveProcess()" style="height:26px;padding:0 8px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:11px;color:var(--gray-400);cursor:pointer;flex-shrink:0;margin-left:auto" title="Exportar JSON">⬇ JSON</button>
-  <button onclick="gerarBPMN()" style="height:26px;padding:0 10px;border-radius:var(--radius-sm);border:1px solid var(--green-l);background:none;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;flex-shrink:0" title="Gerar BPMN do processo ativo">⬟ Gerar BPMN</button>
+  <button onclick="openValidation()" style="height:26px;padding:0 9px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:11px;color:var(--gray-500);cursor:pointer;flex-shrink:0" title="Validar processo">✔ Validar</button>
+  <button onclick="openHistory()" style="height:26px;padding:0 9px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:11px;color:var(--gray-500);cursor:pointer;flex-shrink:0" title="Histórico de alterações">📋 Histórico</button>
+  <button onclick="gerarBPMN()" style="height:26px;padding:0 10px;border-radius:var(--radius-sm);border:1px solid var(--green-l);background:none;font-size:11px;font-weight:600;color:var(--green);cursor:pointer;flex-shrink:0" title="Gerar BPMN do processo ativo">⬟ BPMN</button>
 </div>
 
 <!-- EDIT BAR -->
@@ -544,23 +562,38 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 <!-- PANE: FLOW -->
 <div class="pane active" id="pane-flow">
   <div class="flow-layout">
+
+    <!-- CENTER: cards -->
     <div class="flow-main" id="flowMain">
       <div class="flow-header">
         <div>
-          <h2>Fluxo de Obra — Execução Direta</h2>
-          <p>Percorra cada etapa e registre contribuições sobre o processo</p>
+          <h2 id="flowTitle">Fluxo</h2>
+          <p id="flowDesc">Percorra cada etapa e registre contribuições sobre o processo</p>
         </div>
-        <div class="progress-wrap">
+        <div class="progress-wrap" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input id="flowSearch" placeholder="🔍 Buscar…" oninput="renderFlow()"
+            style="height:28px;padding:0 9px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:12px;font-family:var(--font);outline:none;width:150px">
           <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
-          <span class="progress-label" id="progLabel">0 / 13</span>
-          <button class="btn-skip" onclick="resetFlow()" style="height:28px;font-size:11px;">↺ Reiniciar</button>
+          <span class="progress-label" id="progLabel">0 / 0</span>
+          <button class="btn-skip" onclick="resetFlow()" style="height:28px;font-size:11px">↺ Reiniciar</button>
         </div>
       </div>
       <div class="phase-filter" id="phaseFilter"></div>
       <div id="stepCards"></div>
       <button class="add-card-btn" id="addCardBtn" onclick="openAddCard()">＋ Adicionar nova etapa</button>
     </div>
+
+    <!-- RIGHT SIDEBAR: detail + mini-map + progress -->
     <div class="flow-sidebar">
+      <!-- Detail panel -->
+      <div class="sidebar-section" style="flex:0 0 auto;padding:0;border-bottom:1px solid var(--gray-200)">
+        <div id="detailPanelEmpty" style="padding:20px 14px;text-align:center;color:var(--gray-400);font-size:12px">
+          <div style="font-size:22px;margin-bottom:6px">👆</div>
+          Clique em uma etapa para ver detalhes
+        </div>
+        <div id="detailPanelContent" style="display:none;max-height:360px;overflow-y:auto"></div>
+      </div>
+      <!-- Mini-map -->
       <div class="sidebar-section">
         <div class="sidebar-label">Mapa do fluxo</div>
         <div class="mini-map" id="miniMap"></div>
@@ -574,6 +607,7 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
         <div class="actor-rows" id="sidebarActors"></div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -803,6 +837,24 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
       <button class="btn-cancel" onclick="closeProcManager()">Cancelar</button>
       <button class="btn-ok green" id="pmActionBtn" onclick="pmAction()">Próximo →</button>
     </div>
+  </div>
+</div>
+
+<!-- MODAL: VALIDAÇÃO -->
+<div class="overlay" id="validationOverlay">
+  <div class="modal" style="width:500px">
+    <div class="modal-head"><h3 id="validationTitle">Validação do processo</h3><p>Verificação automática de completude</p></div>
+    <div class="modal-body" id="validationBody" style="max-height:400px;overflow-y:auto"></div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeValidation()">Fechar</button></div>
+  </div>
+</div>
+
+<!-- MODAL: HISTÓRICO -->
+<div class="overlay" id="historyOverlay">
+  <div class="modal" style="width:520px">
+    <div class="modal-head"><h3 id="historyTitle">Histórico de alterações</h3><p>Registro de todas as mudanças no processo</p></div>
+    <div class="modal-body" id="historyBody" style="max-height:420px;overflow-y:auto"></div>
+    <div class="modal-foot"><button class="btn-cancel" onclick="closeHistory()">Fechar</button></div>
   </div>
 </div>
 
@@ -1603,7 +1655,12 @@ function renderPhaseFilter() {
 
 function renderCards() {
   const isEditMode = !!auth;
-  const visible = steps.map((s,i)=>({s,i})).filter(({s})=>activeActor===null||s.actor===activeActor);
+  const q = (document.getElementById('flowSearch')?.value||'').toLowerCase();
+  const visible = steps.map((s,i)=>({s,i})).filter(({s})=> {
+    if (activeActor!==null && s.actor!==activeActor) return false;
+    if (q && !s.title.toLowerCase().includes(q) && !(s.desc||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
   if (visible.length===0 && activeActor) {
     document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa para o ator selecionado.</div></div>`;
     return;
@@ -1716,7 +1773,7 @@ function renderCards() {
       draggable="${isEditMode?'true':'false'}"
       ondragstart="dragStart(event,${i})" ondragover="dragOver(event,${i})" ondragleave="dragLeave(event)" ondrop="dragDrop(event,${i})" ondragend="dragEnd(event)">
       <div class="card-left-bar" style="background:${ph.color}"></div>
-      <div class="card-top" onclick="toggleCard(${i})">
+      <div class="card-top" onclick="toggleCard(${i});showStepDetail(${i})">
         ${isEditMode?`<div class="drag-handle" title="Arrastar para reordenar">⠿</div>`:''}
         <div class="step-index">${isDone?'✓':sanitize(s.num)}</div>
         <div class="step-info">
@@ -1725,6 +1782,7 @@ function renderCards() {
             <span class="actor-pill" style="background:${ac.bg};color:${ac.color}">● ${ac.label}</span>
             <span class="phase-pill-sm">${ph.label}</span>
             ${atts.length>0?`<span style="font-size:10.5px;color:var(--gray-400)">📎 ${atts.length}</span>`:''}
+            ${(s.comments&&s.comments.length)?`<span style="font-size:10.5px;color:var(--gray-400)">💬 ${s.comments.length}</span>`:''}
           </div>
         </div>
         <div class="step-actions" onclick="event.stopPropagation()">
@@ -1739,6 +1797,7 @@ function renderCards() {
         <div class="docs-row">${s.docs.map(d=>`<div class="doc-chip">📄 ${sanitize(d)}</div>`).join('')}</div>
         ${attHtml}
         ${editPanelHtml}
+        ${buildCardComments(i, s)}
         ${footerHtml?`<div class="card-footer">${footerHtml}</div>`:''}
       </div>
     </div>`;
@@ -1964,7 +2023,7 @@ async function saveEdit(i) {
     const phase=document.getElementById(`ep-phase-${i}`)?.value;
     const btn  =document.getElementById(`ep-btn-${i}`)?.value.trim();
     const alert=document.getElementById(`ep-alert-${i}`)?.value.trim();
-    if (title) steps[i].title=title;
+    if (title) { addHistory('Etapa editada', i, `Título: "${steps[i].title}" → "${title}"`); steps[i].title=title; }
     if (desc!=null) steps[i].desc=desc;
     if (actor) steps[i].actor=actor;
     if (phase) steps[i].phase=phase;
@@ -2152,7 +2211,7 @@ function closeDrawer(){document.getElementById('mapDrawer').classList.remove('sh
 
 /* KEYBOARD */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeCelebrate();closeLogin();closeFB();closeDrawer();closeConfirm();closeProcManager();if(editCard!==-1){editCard=-1;renderFlow();}}
+  if(e.key==='Escape'){closeCelebrate();closeLogin();closeFB();closeDrawer();closeConfirm();closeProcManager();closeValidation();closeHistory();closeNewProc();if(editCard!==-1){editCard=-1;renderFlow();}}
 });
 
 /* TOAST */
@@ -2894,6 +2953,8 @@ function switchToProcess(id) {
   editCard        = -1;
   activeActor     = null;
   renderProcBar();
+  document.getElementById('flowTitle').textContent = np.name;
+  document.getElementById('flowDesc').textContent  = np.desc || '';
   renderFlow();
   updateFBBadge();
   document.getElementById('tc-flow').textContent = steps.length;
@@ -2980,6 +3041,7 @@ function switchTab(tab) {
 function advance(i) {
   doneSteps.add(i); currentStep=i+1; openCard=currentStep<steps.length?currentStep:-1; editCard=-1;
   _activeProc().doneSteps=[...doneSteps]; _activeProc().currentStep=currentStep; _saveProcesses();
+  addHistory('Etapa concluída', i, steps[i]?.title?.substring(0,50)||'');
   renderFlow();
   setTimeout(()=>{ const el=document.getElementById('card-'+currentStep); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); },100);
   if(currentStep>=steps.length) setTimeout(()=>document.getElementById('celebrateOverlay').classList.add('show'),600);
@@ -3128,15 +3190,273 @@ function bReset(){if(!confirm('Restaurar o diagrama baseado no fluxo atual?'))re
 
 function openProcManager() { openNewProc(); }
 function closeProcManager() { closeNewProc(); }
+
+/* ================================================
+   1. VALIDATION — alertas automáticos por processo
+================================================ */
+function validateProcess(proc) {
+  const issues = [];
+  const s = proc.steps || [];
+  if (s.length === 0) { issues.push({ type:'error', msg:'Processo sem etapas.' }); return issues; }
+  s.forEach((step, i) => {
+    if (!step.title?.trim())
+      issues.push({ type:'error', msg:`Etapa ${i+1}: sem título.`, step: i });
+    if (!ACTORS[step.actor])
+      issues.push({ type:'error', msg:`Etapa ${step.num||i+1} ("${step.title?.substring(0,30)}"): ator desconhecido "${step.actor}".`, step: i });
+    if (!step.items || step.items.filter(Boolean).length === 0)
+      issues.push({ type:'warn', msg:`Etapa ${step.num||i+1} ("${step.title?.substring(0,30)}"): sem atividades no checklist.`, step: i });
+    if (!step.docs || step.docs.filter(Boolean).length === 0)
+      issues.push({ type:'info', msg:`Etapa ${step.num||i+1} ("${step.title?.substring(0,30)}"): sem documentos listados.`, step: i });
+  });
+  const hasConclusion = s.some(st => st.isLast || st.btnLabel?.toLowerCase().includes('entregue') || st.phase === 'p5');
+  if (!hasConclusion)
+    issues.push({ type:'warn', msg:'Processo não tem etapa de conclusão marcada (fase "Conclusão" ou botão de entrega).' });
+  const actors = [...new Set(s.map(st => st.actor))];
+  if (actors.length === 1)
+    issues.push({ type:'info', msg:`Processo tem apenas um ator (${ACTORS[actors[0]]?.label||actors[0]}). Verifique se há outros responsáveis.` });
+  return issues;
+}
+
+function openValidation() {
+  const proc = _activeProc();
+  const issues = validateProcess(proc);
+  const errors = issues.filter(i=>i.type==='error');
+  const warns  = issues.filter(i=>i.type==='warn');
+  const infos  = issues.filter(i=>i.type==='info');
+  const colors = { error:'#991b1b', warn:'#92400e', info:'#1e40af' };
+  const bgs    = { error:'#fee2e2', warn:'#fef3c7', info:'#dbeafe' };
+  const icons  = { error:'⛔', warn:'⚠️', info:'ℹ️' };
+  const html = issues.length === 0
+    ? `<div style="text-align:center;padding:32px"><div style="font-size:32px;margin-bottom:8px">✅</div><div style="font-size:14px;font-weight:600;color:var(--green)">Processo válido!</div><div style="font-size:12.5px;color:var(--gray-400);margin-top:4px">Nenhum problema encontrado em "${sanitize(proc.name)}".</div></div>`
+    : `<div style="margin-bottom:12px;font-size:12.5px;color:var(--gray-600)">${errors.length} erro(s) · ${warns.length} aviso(s) · ${infos.length} sugestão(ões)</div>` +
+      issues.map(iss => `<div onclick="${iss.step!=null?`toggleCard(${iss.step});closeValidation()`:''}" style="display:flex;gap:9px;align-items:flex-start;padding:9px 11px;background:${bgs[iss.type]};border-radius:var(--radius-sm);margin-bottom:6px;cursor:${iss.step!=null?'pointer':'default'}">
+        <span style="font-size:15px;flex-shrink:0">${icons[iss.type]}</span>
+        <span style="font-size:12.5px;color:${colors[iss.type]};line-height:1.5">${sanitize(iss.msg)}</span>
+      </div>`).join('');
+  document.getElementById('validationBody').innerHTML = html;
+  document.getElementById('validationTitle').textContent = `Validação — ${sanitize(proc.name)}`;
+  document.getElementById('validationOverlay').classList.add('show');
+}
+function closeValidation() { document.getElementById('validationOverlay').classList.remove('show'); }
+
+/* ================================================
+   2. HISTÓRICO DE VERSÕES — log por processo
+================================================ */
+function addHistory(action, stepIdx, detail) {
+  if (!auth) return;
+  const proc = _activeProc();
+  if (!proc.history) proc.history = [];
+  proc.history.unshift({
+    ts: Date.now(),
+    time: new Date().toLocaleString('pt-BR'),
+    user: auth.name,
+    role: auth.role,
+    action,
+    stepIdx: stepIdx ?? null,
+    stepTitle: stepIdx != null ? (steps[stepIdx]?.title?.substring(0,50) || '') : '',
+    detail: detail || '',
+  });
+  // Keep last 200 entries
+  if (proc.history.length > 200) proc.history = proc.history.slice(0, 200);
+  _saveProcesses();
+}
+
+function openHistory() {
+  const proc = _activeProc();
+  const hist = proc.history || [];
+  const typeColors = {
+    'Etapa editada':'#1e40af', 'Etapa adicionada':'#166534', 'Etapa removida':'#991b1b',
+    'Etapa reordenada':'#92400e', 'Etapa concluída':'#166534', 'Fluxo reiniciado':'#6b7280',
+    'Anexo adicionado':'#1e40af', 'Contribuição adicionada':'#5b21b6',
+  };
+  document.getElementById('historyTitle').textContent = `Histórico — ${sanitize(proc.name)}`;
+  document.getElementById('historyBody').innerHTML = hist.length === 0
+    ? '<div style="text-align:center;padding:32px;color:var(--gray-400);font-size:13px">Nenhuma alteração registrada ainda.<br><small>As alterações aparecem aqui a partir do próximo login.</small></div>'
+    : hist.map(h => `<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-100)">
+        <div style="width:3px;background:${typeColors[h.action]||'var(--gray-300)'};border-radius:2px;flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:600;color:${typeColors[h.action]||'var(--gray-600)'}">${sanitize(h.action)}</span>
+            ${h.stepTitle?`<span style="font-size:11px;color:var(--gray-400);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">• ${sanitize(h.stepTitle)}</span>`:''}
+          </div>
+          ${h.detail?`<div style="font-size:11.5px;color:var(--gray-500);margin-top:2px">${sanitize(h.detail)}</div>`:''}
+          <div style="font-size:10.5px;color:var(--gray-400);margin-top:3px">${sanitize(h.user)} · ${sanitize(h.time)}</div>
+        </div>
+      </div>`).join('');
+  document.getElementById('historyOverlay').classList.add('show');
+}
+function closeHistory() { document.getElementById('historyOverlay').classList.remove('show'); }
+
+/* ================================================
+   3. INLINE COMMENTS — contribuições por etapa
+================================================ */
+function buildCardComments(stepIdx, s) {
+  const cmts = s.comments || [];
+  const FB_T = {
+    validacao:{icon:'✅',label:'Validação',bg:'#dcfce7',color:'#166534'},
+    sugestao: {icon:'💡',label:'Sugestão', bg:'#fef3c7',color:'#92400e'},
+    problema: {icon:'⚠️',label:'Problema', bg:'#fee2e2',color:'#991b1b'},
+    duvida:   {icon:'❓',label:'Dúvida',   bg:'#dbeafe',color:'#1e40af'},
+  };
+  const rows = cmts.map((c,ci) => {
+    const ac = ACTORS[c.actor]||{color:'#64748b'};
+    const ty = FB_T[c.type]||{icon:'💬',label:'Contribuição',bg:'#f3f4f6',color:'#555'};
+    const del = auth
+      ? `<button onclick="event.stopPropagation();deleteCardComment(${stepIdx},${ci})" style="border:none;background:none;color:var(--gray-300);font-size:11px;cursor:pointer;padding:0 2px;line-height:1" title="Apagar">×</button>`
+      : '';
+    return `<div style="display:flex;gap:8px;margin-bottom:7px">
+      <div style="width:22px;height:22px;border-radius:50%;background:${ac.color};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:white">${sanitize((c.name||'?').charAt(0).toUpperCase())}</div>
+      <div style="flex:1;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:0 7px 7px 7px;padding:6px 9px">
+        <div style="font-size:10px;color:var(--gray-400);margin-bottom:3px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+          <strong style="color:var(--gray-700)">${sanitize(c.name)}</strong>
+          <span style="font-size:9px;font-weight:600;padding:1px 5px;border-radius:7px;background:${ty.bg};color:${ty.color}">${ty.icon} ${ty.label}</span>
+          <span>${sanitize(c.time)}</span>${del}
+        </div>
+        <div style="font-size:12px;color:var(--gray-700);line-height:1.5">${sanitize(c.text)}</div>
+      </div></div>`;
+  }).join('');
+  return `<div style="padding-top:12px;border-top:1px solid var(--gray-100);margin-top:4px">
+    <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:8px">
+      💬 Contribuições${cmts.length?' ('+cmts.length+')':''}
+    </div>
+    ${cmts.length===0?'<div style="font-size:11.5px;color:var(--gray-400);font-style:italic;margin-bottom:8px">Sem contribuições nesta etapa.</div>':''}
+    ${rows}
+    <div style="display:flex;gap:6px;align-items:flex-start;margin-top:6px">
+      <select id="cmt-type-${stepIdx}" onclick="event.stopPropagation()" style="height:32px;padding:0 6px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;flex-shrink:0">
+        <option value="sugestao">💡</option><option value="validacao">✅</option>
+        <option value="problema">⚠️</option><option value="duvida">❓</option>
+      </select>
+      <textarea id="cmt-ta-${stepIdx}" onclick="event.stopPropagation()"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitCardComment(${stepIdx})}"
+        placeholder="Adicionar contribuição…" rows="1"
+        style="flex:1;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:6px 9px;font-size:12px;resize:none;font-family:var(--font);outline:none;min-height:32px"></textarea>
+      <button onclick="event.stopPropagation();submitCardComment(${stepIdx})"
+        style="height:32px;padding:0 11px;border-radius:var(--radius-sm);border:none;background:var(--green);color:white;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">Enviar</button>
+    </div>
+  </div>`;
+}
+
+function submitCardComment(stepIdx) {
+  const ta  = document.getElementById('cmt-ta-'   + stepIdx);
+  const sel = document.getElementById('cmt-type-' + stepIdx);
+  if (!ta || !ta.value.trim()) return;
+  let name  = sessionStorage.getItem('cmt_name');
+  let actor = sessionStorage.getItem('cmt_actor');
+  if (!name) {
+    name  = (prompt('Seu nome:') || '').trim() || 'Anônimo';
+    actor = (prompt('Sua função (ex: SESANI, SEOFI, Comunidade):') || '').trim() || 'outro';
+    sessionStorage.setItem('cmt_name',  name);
+    sessionStorage.setItem('cmt_actor', actor);
+  }
+  if (!steps[stepIdx].comments) steps[stepIdx].comments = [];
+  steps[stepIdx].comments.push({
+    name, actor, type: sel?.value || 'sugestao',
+    text: ta.value.trim(),
+    time: new Date().toLocaleString('pt-BR'),
+  });
+  addHistory('Contribuição adicionada', stepIdx, name + ': ' + ta.value.trim().substring(0, 60));
+  saveSteps();
+  openCard = stepIdx;
+  renderFlow();
+  setTimeout(() => document.getElementById('card-' + stepIdx)?.scrollIntoView({behavior:'smooth',block:'nearest'}), 60);
+  toast('Contribuição registrada!', 'success');
+}
+
+function deleteCardComment(stepIdx, cmtIdx) {
+  if (!auth) return;
+  if (!steps[stepIdx]?.comments) return;
+  steps[stepIdx].comments.splice(cmtIdx, 1);
+  saveSteps();
+  renderFlow();
+}
+
+/* ================================================
+   4. STAGE FILTER (for Execução Indireta steps)
+================================================ */
+let activeUStage = null;
+let activeULane  = null;
+
+/* ================================================
+   5. STEP DETAIL PANEL (right sidebar)
+================================================ */
+let _detailStepIdx = null;
+
+function showStepDetail(idx) {
+  _detailStepIdx = idx;
+  const s     = steps[idx];
+  if (!s) return;
+  const ac    = ACTORS[s.actor] || {label:s.actor||'',color:'#555',bg:'#eee'};
+  const ph    = PHASES.find(p=>p.id===s.phase) || {label:'',color:'#555'};
+  const isMacro = !!s._stage;
+  const MBTYPE  = typeof MACRO_BPMN_TYPES!=='undefined' ? MACRO_BPMN_TYPES : {};
+  const btype   = isMacro ? (MBTYPE[s._btype]||{icon:'📋',label:'Tarefa',bg:'#f3f4f6',color:'#374151'}) : null;
+  const MSTAGES = typeof MACRO_STAGES!=='undefined' ? MACRO_STAGES : [];
+  const stageMeta = isMacro ? (MSTAGES.find(x=>x.id===s._stage)||{name:s._stage,color:'#555'}) : null;
+  const MGWS    = typeof MACRO_GATEWAYS!=='undefined' ? MACRO_GATEWAYS : {};
+  const gw      = s._gw ? MGWS[s._gw] : null;
+  const cmts    = s.comments || [];
+
+  const itemsHtml = (s.items||[]).length ? (s.items||[]).map(it=>
+    `<div style="display:flex;gap:5px;align-items:flex-start;font-size:12px;color:var(--gray-600);line-height:1.5;margin-bottom:3px">
+      <div style="width:4px;height:4px;border-radius:50%;background:var(--green-l);flex-shrink:0;margin-top:5px"></div>${sanitize(it)}</div>`).join('') : '';
+  const docsHtml = (s.docs||[]).length ? (s.docs||[]).map(d=>
+    `<span style="font-size:10.5px;padding:2px 7px;border-radius:5px;background:#eff6ff;color:#1d4ed8;display:inline-flex;align-items:center;gap:3px;margin:2px">📄 ${sanitize(d)}</span>`).join('') : '<span style="font-size:12px;color:var(--gray-400)">Nenhum</span>';
+  const sysHtml = (s._systems||[]).length ? (s._systems||[]).map(x=>
+    `<span style="font-size:10.5px;padding:2px 7px;border-radius:5px;background:#f0fdf4;color:#166534;display:inline-flex;align-items:center;gap:3px;margin:2px">⚙️ ${sanitize(x)}</span>`).join('') : '';
+  const inHtml = (s._inputs||[]).length ? (s._inputs||[]).map(x=>
+    `<div style="font-size:12px;color:var(--gray-600);line-height:1.5;margin-bottom:2px">→ ${sanitize(x)}</div>`).join('') : '';
+  const gwHtml = gw ? `
+    <div style="display:flex;align-items:center;gap:7px;padding:7px 10px;background:#fffbeb;border:1px dashed #f59e0b;border-radius:var(--radius-sm);margin-top:2px;cursor:pointer">
+      <div style="width:12px;height:12px;background:#f59e0b;transform:rotate(45deg);flex-shrink:0;border-radius:1px"></div>
+      <span style="font-size:11.5px;color:#92400e">${sanitize(gw.question)}</span>
+    </div>` : '';
+
+  const detail = document.getElementById('detailPanelContent');
+  if (!detail) return;
+  document.getElementById('detailPanelEmpty').style.display = 'none';
+  detail.style.display = 'block';
+  detail.innerHTML = `
+    <div style="padding:14px 14px 10px;border-bottom:1px solid var(--gray-200);background:var(--white)">
+      <div style="font-size:9.5px;font-family:var(--mono);color:var(--gray-400);margin-bottom:3px">${sanitize(s.id||s.num||String(idx+1))}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--gray-900);line-height:1.4;margin-bottom:7px">${sanitize(s.title)}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:8px;background:${ac.bg};color:${ac.color}">● ${sanitize(ac.label)}</span>
+        ${btype?`<span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:8px;background:${btype.bg};color:${btype.color}">${btype.icon} ${btype.label}</span>`:''}
+        ${stageMeta?`<span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:8px;background:${stageMeta.color}18;color:${stageMeta.color}">${sanitize(stageMeta.name.replace(/^\d+\.\s*/,''))}</span>`:`<span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:8px;background:${ph.color}18;color:${ph.color}">${sanitize(ph.label)}</span>`}
+      </div>
+    </div>
+    <div style="padding:12px 14px;overflow-y:auto">
+      ${s.desc?`<div style="font-size:12.5px;color:var(--gray-600);line-height:1.7;margin-bottom:12px">${sanitize(s.desc)}</div>`:''}
+      ${itemsHtml?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:6px">Atividades</div>${itemsHtml}</div>`:''}
+      ${inHtml?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:5px">Entradas</div>${inHtml}</div>`:''}
+      <div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:5px">Documentos</div>${docsHtml}</div>
+      ${sysHtml?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:5px">Sistemas</div>${sysHtml}</div>`:''}
+      ${gwHtml?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:5px">Gateway seguinte</div>${gwHtml}</div>`:''}
+      <div><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:6px">Contribuições (${cmts.length})</div>
+        ${cmts.length===0?'<div style="font-size:11.5px;color:var(--gray-400);font-style:italic">Nenhuma ainda.</div>':
+        cmts.map(c=>{const ty={validacao:{icon:'✅',color:'#166534'},sugestao:{icon:'💡',color:'#92400e'},problema:{icon:'⚠️',color:'#991b1b'},duvida:{icon:'❓',color:'#1e40af'}}[c.type]||{icon:'💬',color:'#555'};
+          return `<div style="margin-bottom:7px;padding:7px 9px;background:var(--gray-100);border-radius:var(--radius-sm);font-size:12px"><strong>${sanitize(c.name)}</strong> <span style="color:${ty.color}">${ty.icon}</span><br>${sanitize(c.text)}<br><span style="font-size:10px;color:var(--gray-400)">${sanitize(c.time)}</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
 /* --- INIT ---------------------------------------------- */
 // Clear legacy keys
 localStorage.removeItem('sesai_steps_v4');
 localStorage.removeItem('sesai_fb_v4');
 document.getElementById('actorFilterBar').style.display='flex';
+// Set flow title from active process
+document.getElementById('flowTitle').textContent = _activeProc()?.name || 'Fluxo';
+document.getElementById('flowDesc').textContent  = _activeProc()?.desc || 'Percorra cada etapa e registre contribuições sobre o processo';
 renderProcBar();
 renderFlow();
 updateFBBadge();
 document.getElementById('tc-flow').textContent = steps.length;
+// Offline detection
+window.addEventListener('online',  () => document.getElementById('offlineBar')?.classList.remove('show'));
+window.addEventListener('offline', () => document.getElementById('offlineBar')?.classList.add('show'));
+if (!navigator.onLine) document.getElementById('offlineBar')?.classList.add('show');
 </script>
 </body>
 </html>
